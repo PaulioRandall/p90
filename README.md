@@ -1,107 +1,154 @@
-# Sveltekit Minimalist Template
+# TBD
 
-A minimalist [Sveltekit](https://kit.svelte.dev/) template with only [Prettier](https://prettier.io/) and a few sparse components and pages.
+A minimalist CSS pre-processor for Svelte.
 
-## Full list of commands
+It took me less than an hour to write my first CSS pre-processor within my website (Sveltekit). All it did was replace named values `$green` with whatever I configured `rgb(10, 240, 10)`. Super simple.
 
-| Command | Description |
-| --- | :--- |
-| **`npm run fmt`** | Format everything |
-| **`npm run clean`** | Delete build directory |
-| **`npm run build`** | Build the project |
-| **`npm run dev`** | Runs in developer mode |
-| **`npm run preview`** | Builds project and starts as if it was in production |
-| **`npm run commit`** | Do all checks needed to confirm changes are ready for integration |
+Have a ago at forking or plundering even if you still intend to use a main stream tool. Once you understand how they work you'll be in a better position to evaluate and choose a suitable main stream option.
 
-## Getting started
+## Using this package
 
-### 1. Install Node v18.16.0 
+With this project you have three options:
 
-By either:
+### 1. Fork and customise
 
-1. Installing [nvm](https://github.com/nvm-sh/nvm) then:
+Fork the repository and use as a starting point for your own CSS pre-processor. (Github)[https://github.com/PaulioRandall/svelte-css-preprocessor].
 
-```bash
-nvm install 18.16.0
-nvm use 18.16.0
+### 2. Plunder
+
+Plunder the (`./src/lib`)[https://github.com/PaulioRandall/svelte-css-preprocessor/tree/trunk/src/lib] folder for code to embed in your own projects and packages.
+
+### 3. Use like any other package
+
+By adding it as a dev dependency...
+
+```json
+{
+	"devDependencies": {
+		"TBD": "v0.0.0"
+	}
+}
 ```
 
-2. Installing [Node v18.16.0 directly](https://nodejs.org/en/download/).
-
-### 2. Fork and clone
-
-Or clone it first to try out:
-
-```bash
-git clone https://github.com/PaulioRandall/sveltekit-minimalist-template.git
-cd sveltekit-minimalist-template
-```
-
-### (Optional) 3. Delete the lock file
-
-For good measure:
-
-```bash
-rm -f package-lock.json
-```
-
-### 4. Update package metadata 
-
-Update `package.json` with your project name, repository url, and other metadata.
-
-### (Optional) 5. Update dependencies
-
-Including the node version if possible. For most teams it's wise to stay on an LTS version and not upgrade until the next LTS version
-is both stable and your dependencies are compatible.
-
-### 6. Install dependencies
+...installing...
 
 ```bash
 npm i
 ```
 
-### 7. Run in dev mode
+...importing and applying...
 
-```bash
-npm run dev
+```js
+import { TBD } from 'TBD'
+import styles from './src/styles.js'
+
+export default {
+  ...,
+  preprocess: [TBD(styles)],
+  ...,
 ```
 
-### 8. Visit the site
+...configuring styles...
 
-Start modifying at [localhost:3000](http://localhost:3000).
+```js
+import { rgbsToColors, generateThemeVars, renderColorSchemes } from 'TBD'
 
-### 9. Commit changes
+// Write any functions for helping to populate the configuration first.
+// It's plain JavaScript, no need to learn fancy syntax like other advanced
+// CSS tooling.
 
-When you are ready to commit and push changes use the following command to do a full format, build, and test.
+// Generates 'rgb(r, g, b)' from '[r, g, b]'.
+// Generates 'rgba(r, g, b, a)' from '[r, g, b, a]'.
+//
+// Example output:
+//
+// burly_wood: "rgb(222, 184, 135)"
+// burly_wood_shadow: "rgba(222, 184, 135, 0.4)",
+const color = rgbsToColors({
+	burly_wood: [222, 184, 135],
+	burly_wood_shadow: [222, 184, 135, 0.4],
+	ice_cream: [250, 250, 250],
+	very_light_sky_blue: [231, 245, 255],
+	jet_blue: [30, 85, 175],
+	very_dark_navy: [5, 10, 35],
+	dark_navy_grey: [5, 10, 60],
+})
 
-```bash
-npm run commit
+// Generates 'var(--theme-name)' from light and dark theme maps.
+//
+// Use '$colorSchemes' within CSS to create the media queries.
+//
+// Example output:
+//
+// primary: 'var(--theme-primary)',
+// text: 'var(--theme-text)',
+// strong: 'var(--theme-strong)',
+const theme = generateThemeVars({
+	light: {
+		primary: color.ice_cream,
+		text: color.dark_navy_grey,
+		strong: color.jet_blue,
+		// ...
+	},
+	dark: {
+		primary: color.very_dark_navy,
+		text: color.very_light_sky_blue,
+		strong: color.burly_wood,
+		// ...
+	},
+})
+
+export default {
+	// It's entirely up to you what you put here.
+	// Beaware that it all gets stringified except that objects are namespaces
+	// (object paths) and thus itereated:
+	//   colors: {
+	//     burly_wood: "rgb(222, 184, 135)"
+	//   }
+	// And accessed in CSS as:
+	//   "$colors.burly_wood"
+	//
+	// Arrays are converted to CSV strings, e.g:
+	//   ['Nunito', 'sans-serif', 'Helvetica']
+	// Becomes:
+	//   "'Nunito', 'sans-serif', 'Helvetica'"
+
+	color, // E.g. $color.jet_blue
+	theme, // E.g. $theme.text
+
+	// Here's some other common styling config you could add...
+
+	font_family: {
+		nunito: ['Nunito', 'sans-serif', 'Helvetica', 'Arial', 'Verdana'],
+	},
+	font_size: {
+		// Constructed using utopia.fyi
+		sm: 'clamp(0.89rem, calc(0.85rem + 0.18vw), 1.03rem)',
+		md: 'clamp(1.06rem, calc(0.98rem + 0.39vw), 1.38rem)',
+		lg: 'clamp(1.25rem, calc(1.19rem + 0.31vw), 1.5rem)',
+		xl: 'clamp(1.5rem, calc(1.41rem + 0.47vw), 1.88rem)',
+	},
+	space: {
+		sm: '0.5rem',
+		md: '1rem',
+		lg: '2rem',
+		xl: '4rem',
+	},
+	break: {
+		screen_min_width: '320px',
+		phone_max_width: '599px',
+		tablet_min_width: '600px',
+	},
+}
 ```
 
-You'll know if everything is good because you'll get a curated ASCII scene. This can be changed by modifying `./scripts/youre-ready-to-integrate.txt`:
+## Full list of commands
 
-```bash
-                                       ...oo000o.
-                                                 00oo.
-  __________  _________  ______  _____________        oo.
-  |        |  |       |  |    |  |           |  _____    o
-  | You're |  | Ready |  | To |  | Integrate |  |__D|____][_
-  |________|%%|_______|%%|____|%%|___________|%%|_~~~~++++~_}
-   @~@~~@~@    @~~@~~@    @~~@    @~~@~~~@~~@    @~~@~~~@~~@
-```
-
-## Customise formatting
-
-Modify `.prettierrc.json` to customise styling. Or replace Prettier with your preferred tool.
-
-## Production build warning
-
-```bash
-Could not detect a supported production environment...
-```
-
-Don't worry if you get a build warning like the one above.
-
-When the time comes to deploy to development and production environments you'll want to research [SvelteKit adapters](https://kit.svelte.dev/docs/adapters).
-
-Since I use Vercel to host my personal website I use [@sveltejs/adapter-vercel](https://www.npmjs.com/package/@sveltejs/adapter-vercel). There are many others and you can write your own. I've written a custom Express adapter before and it's not too difficult; just a little tedious because they are not easy to test.
+| Command               | Description                                                       |
+| --------------------- | :---------------------------------------------------------------- |
+| **`npm run fmt`**     | Format everything                                                 |
+| **`npm run clean`**   | Delete build directory                                            |
+| **`npm run build`**   | Build the project                                                 |
+| **`npm run dev`**     | Runs in developer mode                                            |
+| **`npm run preview`** | Builds project and starts as if it was in production              |
+| **`npm run commit`**  | Do all checks needed to confirm changes are ready for integration |

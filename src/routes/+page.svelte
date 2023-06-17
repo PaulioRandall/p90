@@ -1,12 +1,13 @@
 <script>
-	import Title from '$lib/Title.svelte'
-	import Meta from '$lib/Meta.svelte'
-	import Paragraph from '$lib/Paragraph.svelte'
+	import Title from './Title.svelte'
+	import Paragraph from './Paragraph.svelte'
 
-	const title = 'Minimalist Sveltekit Template'
+	const title = 'Minimalist CSS pre-processor for Svelte'
 </script>
 
-<Meta {title} />
+<svelte:head>
+	<title>{title}</title>
+</svelte:head>
 
 <main>
 	<Title>{title}</Title>

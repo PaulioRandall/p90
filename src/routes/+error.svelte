@@ -1,16 +1,17 @@
 <script>
 	import { page } from '$app/stores'
 
-	import Title from '$lib/Title.svelte'
-	import Paragraph from '$lib/Paragraph.svelte'
-	import Meta from '$lib/Meta.svelte'
+	import Title from './Title.svelte'
+	import Paragraph from './Paragraph.svelte'
 </script>
 
-<Meta title="Error: {$page.status}" />
+<svelte:head>
+	<title>Error: {$page.error.message}</title>
+</svelte:head>
 
 <main>
 	<Title>{$page.status}</Title>
-	<Paragraph>
+	<Paragraph center>
 		{$page.error.message}
 	</Paragraph>
 </main>
