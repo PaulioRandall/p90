@@ -11,7 +11,7 @@
 		margin: 0;
 		padding: 0;
 
-		margin-bottom: 1rem;
+		margin-bottom: $space.md;
 	}
 
 	.center {

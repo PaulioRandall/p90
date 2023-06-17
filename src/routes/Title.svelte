@@ -4,13 +4,14 @@
 
 <style>
 	.title {
-		margin: 2rem 0;
+		margin: $space.xl 0;
 		padding: 0;
 
+		color: $theme.strong;
+		font-family: $font_family.sans_serif;
 		text-align: center;
 		font-weight: normal;
 		font-style: italic;
-
-		font-size: var(--font-size-xl);
+		font-size: $font_size.lg;
 	}
 </style>

@@ -1,4 +1,4 @@
-# TBD
+# P90
 
 A minimalist CSS pre-processor for Svelte.
 
@@ -25,7 +25,7 @@ By adding it as a dev dependency...
 ```json
 {
 	"devDependencies": {
-		"TBD": "v0.0.0"
+		"p90": "v0.0.0"
 	}
 }
 ```
@@ -39,19 +39,19 @@ npm i
 ...importing and applying...
 
 ```js
-import { TBD } from 'TBD'
+import { p90 } from 'p90'
 import styles from './src/styles.js'
 
 export default {
   ...,
-  preprocess: [TBD(styles)],
+  preprocess: [p90(styles)],
   ...,
 ```
 
 ...configuring styles...
 
 ```js
-import { rgbsToColors, generateThemeVars, renderColorSchemes } from 'TBD'
+import { rgbsToColors, generateThemeVars, renderColorSchemes } from 'p90'
 
 // Write any functions for helping to populate the configuration first.
 // It's plain JavaScript, no need to learn fancy syntax like other advanced
