@@ -128,11 +128,11 @@ Some of them are really convenient while others are so trivial I wouldn't blame 
 
 | Name                                                | Does what?                                                                                                   |
 | --------------------------------------------------- | :----------------------------------------------------------------------------------------------------------- |
-| [rgbToColor](#-rgbToColor)                         | Converts a three or four value RGB array to a CSS rgb value                                                  |
-| [rgbsToColors](#-rgbsToColors)                     | Converts a map of three or four value RGB arrays to a map of CSS rgb values                                  |
-| [rgbNoAlpha](#-rgbNoAlpha)                         | Removes alpha component of an RGB array                                                                      |
-| [renderColorSchemes](#-renderColorSchemes)         | Creates CSS color scheme media queries from a set of themes; goes hand-in-hand with `generateThemeVariables` |
-| [generateThemeVariables](###%20generateThemeVariables) | Creates a **set** of CSS variables from a set of themes; goes hand-in-hand with `renderColorSchemes`         |
+| [rgbToColor](#rgbtocolor)                         | Converts a three or four value RGB array to a CSS rgb value                                                  |
+| [rgbsToColors](#rgbstocolors)                     | Converts a map of three or four value RGB arrays to a map of CSS rgb values                                  |
+| [rgbNoAlpha](#rgbnoalpha)                         | Removes alpha component of an RGB array                                                                      |
+| [renderColorSchemes](#rendercolorschemes)         | Creates CSS color scheme media queries from a set of themes; goes hand-in-hand with `generateThemeVariables` |
+| [generateThemeVariables](#generatethemevariables) | Creates a **set** of CSS variables from a set of themes; goes hand-in-hand with `renderColorSchemes`         |
 
 ### rgbToColor
 
