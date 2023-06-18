@@ -28,7 +28,7 @@ Loot the [`./src/lib`](https://github.com/PaulioRandall/svelte-css-preprocessor/
 
 ## Usage
 
-### `svelte.config.js`
+### svelte.config.js
 
 Import and add **p90** to the `preprocess` array in your `svelte.config.js`.
 
@@ -46,7 +46,7 @@ export default {
 }
 ```
 
-### `p90-styles.js`
+### p90-styles.js
 
 ```js
 // ./src/p90-styles.js
@@ -75,12 +75,12 @@ const colors = rgbsToColors(rgbs)
 const themes = {
 	// P90 doesn't care what the theme names are but CSS does!
 	light: {
-		base: color.ice_cream,
-		text: color.dark_navy_grey,
+		base: colors.ice_cream,
+		text: colors.dark_navy_grey,
 	},
 	dark: {
-		base: color.very_dark_navy,
-		text: color.very_light_sky_blue,
+		base: colors.very_dark_navy,
+		text: colors.very_light_sky_blue,
 	},
 }
 
@@ -114,7 +114,7 @@ export default {
 	},
 	screen: {
 		phone_only: `(max-width: ${phone_max_width})`,
-		tablet_only: `(min-width: ${tablet_min_width}) and (max-width: ${tablet_max_width})`,
+		tablet_only: `(min-width: ${tablet_portrait_min_width}) and (max-width: ${tablet_landscape_max_width})`,
 		desktop_only: `(min-width: ${desktop_min_width})`,
 	},
 }
@@ -126,13 +126,13 @@ There exists some utility functions for common activities. The cool part is you 
 
 Some of them are really convenient while others are so trivial I wouldn't blame you for spending 30 seconds crafting your own.
 
-| Name                                                 | Does what?                                                                                                   |
-| ---------------------------------------------------- | :----------------------------------------------------------------------------------------------------------- |
-| [rgbToColor](### rgbToColor)                         | Converts a three or four value RGB array to a CSS rgb value                                                  |
-| [rgbsToColors](### rgbsToColors)                     | Converts a map of three or four value RGB arrays to a map of CSS rgb values                                  |
-| [rgbNoAlpha](### rgbNoAlpha)                         | Removes alpha component of an RGB array                                                                      |
-| [renderColorSchemes](### renderColorSchemes)         | Creates CSS color scheme media queries from a set of themes; goes hand-in-hand with `generateThemeVariables` |
-| [generateThemeVariables](### generateThemeVariables) | Creates a **set** of CSS variables from a set of themes; goes hand-in-hand with `renderColorSchemes`         |
+| Name                                                | Does what?                                                                                                   |
+| --------------------------------------------------- | :----------------------------------------------------------------------------------------------------------- |
+| [rgbToColor](###rgbToColor)                         | Converts a three or four value RGB array to a CSS rgb value                                                  |
+| [rgbsToColors](###rgbsToColors)                     | Converts a map of three or four value RGB arrays to a map of CSS rgb values                                  |
+| [rgbNoAlpha](###rgbNoAlpha)                         | Removes alpha component of an RGB array                                                                      |
+| [renderColorSchemes](###renderColorSchemes)         | Creates CSS color scheme media queries from a set of themes; goes hand-in-hand with `generateThemeVariables` |
+| [generateThemeVariables](###generateThemeVariables) | Creates a **set** of CSS variables from a set of themes; goes hand-in-hand with `renderColorSchemes`         |
 
 ### rgbToColor
 
