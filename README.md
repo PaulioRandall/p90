@@ -1,8 +1,8 @@
 # P90
 
-A minimalist CSS pre-processor for Svelte. No need to learn fancy syntax like other advanced CSS tooling.
+A minimalist CSS pre-processor for Svelte. No need to learn fancy syntax like other other CSS tooling.
 
-The rest of the introduction is hidden within this README's examples because you really don't give a damn.
+The rest of the introduction is hidden within the examples because you really don't give a damn.
 
 ## Choose your questline
 
@@ -21,7 +21,7 @@ Loot the [`./src/lib`](https://github.com/PaulioRandall/svelte-css-preprocessor/
 ```json
 {
 	"devDependencies": {
-		"p90": "v0.2.0"
+		"p90": "v0.4.0"
 	}
 }
 ```
@@ -36,7 +36,7 @@ Import and add **p90** to the `preprocess` array in your `svelte.config.js`.
 
 ```js
 // svelte.config.js
-import { p90 } from 'p90'
+import p90 from 'p90'
 import styles from './src/p90-styles.js'
 
 export default {
@@ -127,7 +127,10 @@ export default {
 <slot />
 
 <style>
-	$color_schemes :global(body) {
+	/* prettier-ignore */
+	$color_schemes
+
+	:global(body) {
 		background: $theme.base;
 		color: $theme.text;
 		font-family: $font_family.sans_serif;

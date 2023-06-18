@@ -1,1 +1,1 @@
-export { applyStyles as default } from './_apply-styles.js'
+export { applyStyles as default } from './apply-styles.js'

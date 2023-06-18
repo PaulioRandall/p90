@@ -1,2 +1,2 @@
-export * from './_color-scheme-renderer.js'
-export * from './_colors.js'
+export * from './color-scheme-renderer.js'
+export * from './colors.js'

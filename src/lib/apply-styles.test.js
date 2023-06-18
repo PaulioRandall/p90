@@ -1,4 +1,4 @@
-import { applyStyles } from './_apply-styles.js'
+import { applyStyles } from './apply-styles.js'
 
 const newFile = (content, markup, attributes, filename) => {
 	return {
