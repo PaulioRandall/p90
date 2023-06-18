@@ -2,7 +2,7 @@
 
 A minimalist CSS pre-processor for Svelte. No need to learn fancy syntax like other advanced CSS tooling.
 
-The rest of the introduction is at the bottom of this README because you really don't give a damn.
+The rest of the introduction is hidden within this README's examples because you really don't give a damn.
 
 ## Choose your questline
 
@@ -73,14 +73,16 @@ const rgbs = {
 const colors = rgbsToColors(rgbs)
 
 const themes = {
-	// P90 doesn't care what the theme names are but CSS does!
+	// P90 doesn't care what the theme names are but CSS/browsers do!
 	light: {
 		base: colors.ice_cream,
 		text: colors.dark_navy_grey,
+		strong: colors.jet_blue,
 	},
 	dark: {
 		base: colors.very_dark_navy,
 		text: colors.very_light_sky_blue,
+		strong: colors.burly_wood,
 	},
 }
 
@@ -91,11 +93,9 @@ export default {
 	//
 	// But above all... do what works, is easy to read, and easy to change!
 	// Be consistent only to the point where consitency provides value.
-	break: breakpoints,
+	color: colors,
 	color_schemes: renderColorSchemes(themes),
 	theme: generateThemeVars(themes),
-	rgb: rgbs, // Probably don't need but meh.
-	color: colors,
 	font_family: {
 		sans_serif: ['sans-serif', 'Helvetica', 'Arial', 'Verdana'],
 	},
@@ -116,8 +116,67 @@ export default {
 		phone_only: `(max-width: ${phone_max_width})`,
 		tablet_only: `(min-width: ${tablet_portrait_min_width}) and (max-width: ${tablet_landscape_max_width})`,
 		desktop_only: `(min-width: ${desktop_min_width})`,
+		larger_devices: `(min-width: ${tablet_landscape_min_width})`,
 	},
 }
+```
+
+### +layout.svelte
+
+```html
+<slot />
+
+<style>
+	$color_schemes :global(body) {
+		background: $theme.base;
+		color: $theme.text;
+		font-family: $font_family.sans_serif;
+		font-size: $font_size.md;
+	}
+</style>
+```
+
+### +page.svelte
+
+```html
+<page>
+	<h1>A Bohemian quest for simplicity</h1>
+
+	<p>
+		It took me about an hour to learn and write my first CSS pre-processor after
+		deciding existing tooling was overweight for my needs. Refactoring reduced
+		my solution to about 20 lines of code. It simply substituted named values
+		like `$green` with whatever I configured `rgb(10, 240, 10)`. I've added a
+		handful of utility functions for common use cases and here we are.
+	</p>
+
+	<p>
+		It was so simple that I started wondering why we've invented a plethora of
+		CSS like languages with needless diabolical syntax. Why do complex
+		transpiling when simply value substitution can do the job. Let JavaScript
+		handle logic because that's what it's designed to do. You know, making use
+		of languages we already know and hate.
+	</p>
+
+	<p>
+		Please, have a ago at forking or plundering even if you intend to use a main
+		stream tool. You'll start to realise just how bloated most software
+		libraries are.
+	</p>
+</page>
+
+<style>
+	h1 {
+		color: $theme.strong;
+		font-size: $font_size.lg;
+	}
+
+	@media $screen.larger_devices {
+		h1 {
+			font-size: $font_size.xl;
+		}
+	}
+</style>
 ```
 
 ## Util functions
@@ -126,17 +185,22 @@ There exists some utility functions for common activities. The cool part is you 
 
 Some of them are really convenient while others are so trivial I wouldn't blame you for spending 30 seconds crafting your own.
 
-| Name                                                | Does what?                                                                                                   |
-| --------------------------------------------------- | :----------------------------------------------------------------------------------------------------------- |
-| [rgbToColor](#rgbtocolor)                         | Converts a three or four value RGB array to a CSS rgb value                                                  |
-| [rgbsToColors](#rgbstocolors)                     | Converts a map of three or four value RGB arrays to a map of CSS rgb values                                  |
-| [rgbNoAlpha](#rgbnoalpha)                         | Removes alpha component of an RGB array                                                                      |
-| [renderColorSchemes](#rendercolorschemes)         | Creates CSS color scheme media queries from a set of themes; goes hand-in-hand with `generateThemeVariables` |
-| [generateThemeVariables](#generatethemevariables) | Creates a **set** of CSS variables from a set of themes; goes hand-in-hand with `renderColorSchemes`         |
+```js
+import p90Util from 'p90/util'
+```
+
+| Name                                              | Does what?                                                                                                                               |
+| ------------------------------------------------- | :--------------------------------------------------------------------------------------------------------------------------------------- |
+| [rgbToColor](#rgbtocolor)                         | Converts an RGB or RGBA array to a CSS RGB or RGBA value.                                                                                |
+| [rgbsToColors](#rgbstocolors)                     | Converts a map of RGB and RGBA arrays to CSS RGB and RGBA values.                                                                        |
+| [rgbWithAlpha](#rgbwithalpha)                     | Adds an alpha component to an RGB array. array                                                                                           |
+| [rgbaWithoutAlpha](#rgbawithoutalpha)             | Removes the alpha component from an RGBA array. array                                                                                    |
+| [renderColorSchemes](#rendercolorschemes)         | Generates CSS color scheme media queries from a set of themes; goes hand-in-hand with [generateThemeVariables](#generatethemevariables). |
+| [generateThemeVariables](#generatethemevariables) | Generates a **set** of CSS variables from a set of themes; goes hand-in-hand with [renderColorSchemes](#rendercolorschemes).             |
 
 ### rgbToColor
 
-Converts a three or four value RGB array to a CSS rgb value.
+Converts an RGB or RGBA array to a CSS RGB or RGBA value. See [rgbsToColors](#rgbstocolors) to map whole objects containing RGB arrays.
 
 ```js
 import { rgbToColor } from 'p90/util'
@@ -152,7 +216,7 @@ console.log(burlyWoodTransparent)
 
 ### rgbsToColors
 
-Converts a map of three or four value RGB arrays to a map of CSS rgb values.
+Converts a map of RGB and RGBA arrays to CSS RGB and RGBA values. See [rgbToColor](#rgbtocolor) to map a single array.
 
 ```js
 import { rgbsToColors } from 'p90/util'
@@ -167,25 +231,41 @@ const colors = rgbsToColors({
 })
 
 console.log(colors) // Use console.table for easy reading
-/* `{
+/*
+{
 	burly_wood: "rgb(222, 184, 135)",
 	burly_wood_lucid: "rgba(222, 184, 135, 0.5)",
 	ice_cream: "rgb(250, 250, 250)",
 	jet_blue: "rgb(30, 85, 175)",
 	dark_navy_grey: "rgb(5, 10, 60)",
 	dark_navy_grey_lucid: "rgba(5, 10, 60, 0.5)",
-}` */
+}
+*/
 ```
 
-### rgbNoAlpha
+### rgbWithAlpha
 
-Removes alpha component of an RGB array.
+Adds an alpha component to an RGB array. See [rgbaWithoutAlpha](#rgbawithoutalpha) to remove.
 
 ```js
-import { rgbNoAlpha } from 'p90/util'
+import { rgbWithAlpha } from 'p90/util'
+
+const rgb = [222, 184, 135]
+const rgba = rgbWithAlpha(rgb, 0.5)
+
+console.log(rgba)
+// [222, 184, 135, 0.5]
+```
+
+### rgbaWithoutAlpha
+
+Removes the alpha component from an RGBA array. See [rgbWithAlpha](#rgbwithalpha) to add.
+
+```js
+import { rgbaWithoutAlpha } from 'p90/util'
 
 const rgba = [222, 184, 135, 0.5]
-const rgb = rgbNoAlpha(rgba)
+const rgb = rgbaWithoutAlpha(rgba)
 
 console.log(rgb)
 // [222, 184, 135]
@@ -193,13 +273,13 @@ console.log(rgb)
 
 ### renderColorSchemes
 
-Creates CSS color scheme media queries from a set of themes; goes hand-in-hand with `generateThemeVariables`.
+Generates CSS color scheme media queries from a set of themes; goes hand-in-hand with [generateThemeVariables](#generatethemevariables)
 
 ```js
 import { renderColorSchemes } from 'p90/util'
 
 const themes = {
-	// P90 doesn't care what the theme names are but CSS does!
+	// P90 doesn't care what the theme names are but CSS/browsers do!
 	light: {
 		base: [250, 250, 250],
 		text: [5, 10, 60],
@@ -231,13 +311,13 @@ console.log(colorSchemes)
 
 ### generateThemeVariables
 
-Creates a **set** of CSS variables from a set of themes; goes hand-in-hand with `renderColorSchemes`.
+Generates a **set** of CSS variables from a set of themes; goes hand-in-hand with [renderColorSchemes](#rendercolorschemes).
 
 ```js
 import { generateThemeVariables } from 'p90/util'
 
 const themes = {
-	// P90 doesn't care what the theme names are but CSS does!
+	// P90 doesn't care what the theme names are but CSS/browsers do!
 	light: {
 		base: [250, 250, 250],
 		text: [5, 10, 60],
@@ -257,11 +337,3 @@ console.log(themeVariables)
 }
 */
 ```
-
-## A Bohemian's quest for simplicity
-
-It took me about an hour to learn and write my first CSS pre-processor after deciding existing tooling was grossly overweight for my needs. Refactoring reduced my solution to about 20 lines of code. It simply substituted named values like `$green` with whatever I configured `rgb(10, 240, 10)`. I've added a handful of common use case features and here we are.
-
-It was so simple that I started wondering why we've invented a plethora of CSS like languages with needlessly diabolic syntax. Why do complex transpiling when simply value substitution can do the job. Let JavaScript or TypeScript handle logic because that's what they're good at (relative to CSS that is). You know, making use of languages we already know and hate.
-
-Please, have a ago at forking or plundering even if you still intend to use a main stream tool. You'll start to realise just how bloated most developer tools are.

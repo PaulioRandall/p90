@@ -12,6 +12,10 @@ export const rgbsToColors = (rgb) => {
 	return result
 }
 
-export const rgbNoAlpha = (rgb) => {
-	return rgb.slice(0, 3)
+export const rgbaWithoutAlpha = (rgba) => {
+	return rgba.slice(0, 3)
+}
+
+export const rgbWithAlpha = (rgb, alpha) => {
+	return [...rgb, alpha]
 }
