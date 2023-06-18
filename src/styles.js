@@ -1,12 +1,8 @@
 import {
+	rgbsToColors,
 	renderColorSchemes,
 	generateThemeVariables,
-} from '../src/lib/color-scheme-renderer.js'
-
-import { rgbsToColors, rgbToColor, rgbNoAlpha } from '../src/lib/colors.js'
-
-// Write any lists, maps, or helper functions in plain JavaScript, no need to
-// learn fancy syntax like other advanced CSS tooling.
+} from 'p90/util'
 
 const rgb = {
 	rosy_red: [255, 145, 145],

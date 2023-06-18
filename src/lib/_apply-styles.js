@@ -63,5 +63,5 @@ const stringifyValue = (name, v) => {
 }
 
 const escapeForRegex = (s) => {
-	return s.replace(/[/\-\\^$*+?.()|[\]{}]/g, '\\$&')
+	return s.replace(/[/\-\.\(\)]/g, '\\$&')
 }
