@@ -1,19 +1,24 @@
-// TODO: Rewrite so placeholders are found first and then mapped to the value.
-//       This allows for greater flexibility in logging and future features.
-
 export const applyStyles = (styles) => {
 	return {
 		style: ({ content, markup, attributes, filename }) => {
 			let css = content
-			css = replaceNamesWithValues(css, '', styles)
+
+			if (!Array.isArray(styles)) {
+				styles = [styles]
+			}
+
+			css = applyStyleSets(css, styles)
 			return { code: css }
 		},
 	}
 }
 
-// TODO: Allow 'styles' to be an array of objects where each is processed
-//       following array order. This allows the foremost objects to inject
-//       new variables that get processed by the later.
+const applyStyleSets = (css, styles) => {
+	for (const set of styles) {
+		css = replaceNamesWithValues(css, '', set)
+	}
+	return css
+}
 
 const replaceNamesWithValues = (css, mapPath, map) => {
 	for (const fieldName in map) {
@@ -25,7 +30,7 @@ const replaceNamesWithValues = (css, mapPath, map) => {
 
 const replaceNameWithValue = (css, name, value) => {
 	if (value === null || value === undefined) {
-		throw new Error(`Null or undefined value '${name}'`)
+		throw new TypeError(`Null or undefined value '${name}'`)
 	}
 
 	if (isObject(value)) {
