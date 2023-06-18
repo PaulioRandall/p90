@@ -2,9 +2,9 @@
 
 A minimalist CSS pre-processor for Svelte.
 
-It took me less than an hour to write my first CSS pre-processor within my website (Sveltekit). All it did was replace named values `$green` with whatever I configured `rgb(10, 240, 10)`. Super simple.
+It took me less than an hour to write my first CSS pre-processor within my website (Sveltekit). After refactoring it was about 20 lines of code. All it did was substitute named values like `$green` with whatever I configured `rgb(10, 240, 10)`. Super simple.
 
-Have a ago at forking or plundering even if you still intend to use a main stream tool. Once you understand how they work you'll be in a better position to evaluate and choose a suitable main stream option.
+Please, have a ago at forking or plundering even if you still intend to use a main stream tool. Once you understand how these sorts of tools work you'll be in a better position to evaluate and choose a suitable main stream option. You'll also start to realise just how bloated most developer tools are.
 
 ## Using this package
 
@@ -12,11 +12,11 @@ With this project you have three options:
 
 ### 1. Fork and customise
 
-Fork the repository and use as a starting point for your own CSS pre-processor. (Github)[https://github.com/PaulioRandall/svelte-css-preprocessor].
+Fork the repository and use as a starting point for your own CSS pre-processor. [Github](https://github.com/PaulioRandall/svelte-css-preprocessor).
 
 ### 2. Plunder
 
-Plunder the (`./src/lib`)[https://github.com/PaulioRandall/svelte-css-preprocessor/tree/trunk/src/lib] folder for code to embed in your own projects and packages.
+Plunder the [`./src/lib`](https://github.com/PaulioRandall/svelte-css-preprocessor/tree/trunk/src/lib) folder for code to embed in your own projects and packages.
 
 ### 3. Use like any other package
 
@@ -39,8 +39,9 @@ npm i
 ...importing and applying...
 
 ```js
+// svelte.config.js
 import { p90 } from 'p90'
-import styles from './src/styles.js'
+import styles from './src/p90-styles.js'
 
 export default {
   ...,
@@ -50,7 +51,10 @@ export default {
 
 ...configuring styles...
 
+> TODO: Example out of date, will update at the next milestone
+
 ```js
+// ./src/p90-styles.js
 import { rgbsToColors, generateThemeVars, renderColorSchemes } from 'p90'
 
 // Write any functions for helping to populate the configuration first.
@@ -141,14 +145,3 @@ export default {
 	},
 }
 ```
-
-## Full list of commands
-
-| Command               | Description                                                       |
-| --------------------- | :---------------------------------------------------------------- |
-| **`npm run fmt`**     | Format everything                                                 |
-| **`npm run clean`**   | Delete build directory                                            |
-| **`npm run build`**   | Build the project                                                 |
-| **`npm run dev`**     | Runs in developer mode                                            |
-| **`npm run preview`** | Builds project and starts as if it was in production              |
-| **`npm run commit`**  | Do all checks needed to confirm changes are ready for integration |

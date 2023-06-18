@@ -1,7 +1,7 @@
 import adapter from '@sveltejs/adapter-auto'
 import path from 'path'
 
-import { applyStyles } from './src/lib/apply-styles.js'
+import { applyStyles } from 'p90'
 import styles from './src/styles.js'
 
 export default {

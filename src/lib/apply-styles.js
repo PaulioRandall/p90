@@ -1,17 +1,19 @@
+// TODO: Rewrite so placeholders are found first and then mapped to the value.
+//       This allows for greater flexibility in logging and future features.
+
 export const applyStyles = (styles) => {
 	return {
 		style: ({ content, markup, attributes, filename }) => {
-			const isPureCSS = attributes.lang && attributes.lang
-			if (isPureCSS) {
-				return { code: content }
-			}
-
 			let css = content
 			css = replaceNamesWithValues(css, '', styles)
 			return { code: css }
 		},
 	}
 }
+
+// TODO: Allow 'styles' to be an array of objects where each is processed
+//       following array order. This allows the foremost objects to inject
+//       new variables that get processed by the later.
 
 const replaceNamesWithValues = (css, mapPath, map) => {
 	for (const fieldName in map) {
@@ -35,7 +37,7 @@ const replaceNameWithValue = (css, name, value) => {
 }
 
 const injectValue = (css, fullName, value) => {
-	const lookAheadForEndOfName = '(?=[^a-z0-9-_])'
+	const lookAheadForEndOfName = '(?=([^a-z0-9-_]|$))'
 	const s = escapeForRegex(fullName)
 	const p = new RegExp(`\\\$${s}${lookAheadForEndOfName}`, 'g')
 	return css.replace(p, value)
