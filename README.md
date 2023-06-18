@@ -86,6 +86,14 @@ const themes = {
 	},
 }
 
+// Export either an object (style set) containing the substitution mappings or
+// an array style sets each containing there own substitution mappings.
+//
+// If p90 receives and array then it will apply each style set in turn so that
+// the outputs of the first can be processed by the second. You generally want
+// to avoid this as it can make code hard to read and change; but I have found
+// one or two fair use cases.
+
 export default {
 	// Here's the neat part...
 	// You can call these whatever you like.
@@ -184,9 +192,9 @@ export default {
 
 ## Util functions
 
-There exists some utility functions for common activities. The cool part is you don't have to use them. If you don't like the way I've approached CSS code generation then right your own functions in your styles file.
+There exists some utility functions for common activities. The cool part is you don't have to use them. If you don't like the way I've approached CSS code generation then right your own functions. It's just polain JavaScript after all.
 
-Some of them are really convenient while others are so trivial I wouldn't blame you for spending 30 seconds crafting your own.
+Some of them are really convenient while others are so trivial it'll be quicker to write your own than look up the name in the docs.
 
 ```js
 import p90Util from 'p90/util'

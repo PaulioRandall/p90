@@ -108,6 +108,16 @@ describe('applyStyles substitutes when', () => {
 		)
 		expect(act).toEqual(`color: rgb(115, 16, 16);`)
 	})
+
+	test('styles contain the falsy values: empty string, number zero', () => {
+		const styles = {
+			green: "",
+			red: 0,
+		}
+
+		const act = applyStylesToCss(styles, `color: $green; color: $red;`)
+		expect(act).toEqual(`color: ; color: 0;`)
+	})
 })
 
 describe('applyStyles is given multiple style sets', () => {
@@ -124,7 +134,7 @@ describe('applyStyles is given multiple style sets', () => {
 })
 
 describe('applyStyles fails when', () => {
-	test('a style value is null or undefined', () => {
+	test('a style value is null', () => {
 		const styles = {
 			green: null,
 		}
