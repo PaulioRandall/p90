@@ -111,7 +111,7 @@ describe('applyStyles substitutes when', () => {
 
 	test('styles contain the falsy values: empty string, number zero', () => {
 		const styles = {
-			green: "",
+			green: '',
 			red: 0,
 		}
 

@@ -70,3 +70,104 @@ const stringifyValue = (name, v) => {
 const escapeForRegex = (s) => {
 	return s.replace(/[/\-\.\(\)]/g, '\\$&')
 }
+
+// 1. Scan next token
+//   1. Look for $ (store start index)
+//   2. Scan until hit whitespace or ; (store end index)
+
+// NEXT:
+//   3. Move scanner to own file and write tests
+// 2. Parse token
+//   1. Split into path segments
+// 3. Lookup value in config
+//   1. If not there throw error
+// 4. Replace value in CSS using start & end index
+
+export const applyStyles2 = (styleSets) => {
+	return {
+		style: ({ content, markup, attributes, filename }) => {
+			let css = content
+
+			if (!Array.isArray(styleSets)) {
+				styleSets = [styleSets]
+			}
+
+			for (const styles of styleSets) {
+				let f = newScanner(css)
+				let lookupPath = null
+
+				while (f != null) {
+					;[lookupPath, f] = f()
+					if (lookupPath != null) {
+						console.log(lookupPath)
+					}
+				}
+			}
+
+			return { code: css }
+		},
+	}
+}
+
+const newScanner = (css) => {
+	// PLESAE NOTE: CBA to handle code points in the first implementation.
+	// TODO: Scan code points instead of bytes.
+
+	const len = css.length
+	let idx = 0
+
+	const scanNextToken = () => {
+		const startIdx = findNextDollar()
+
+		if (startIdx === -1) {
+			idx = len
+			return [null, null]
+		}
+
+		const lookupPath = scanLookupPath(startIdx)
+		idx += lookupPath.length
+
+		if (idx >= len) {
+			return [lookupPath, null]
+		}
+
+		return [lookupPath, scanNextToken]
+	}
+
+	const findNextDollar = () => {
+		const isEscaped = (i) => i + 1 < len && css[i + 1] === '$'
+
+		// idx is updated in the calling function
+		while (idx < len) {
+			const i = css.indexOf('$', idx)
+
+			if (i === -1) {
+				return -1
+			}
+
+			if (!isEscaped(i)) {
+				return i
+			}
+
+			// Escaped $
+			idx = i + 2
+		}
+
+		return -1
+	}
+
+	const scanLookupPath = (start) => {
+		const isEndOfP90Variable = (i) => css[i].match(/[\s;]/)
+		let i = start
+
+		for (; i < len; i++) {
+			if (isEndOfP90Variable(i)) {
+				break
+			}
+		}
+
+		return css.slice(start, i)
+	}
+
+	return scanNextToken
+}
