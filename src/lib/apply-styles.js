@@ -74,9 +74,8 @@ const escapeForRegex = (s) => {
 // 1. Scan next token
 //   1. Look for $ (store start index)
 //   2. Scan until hit whitespace or ; (store end index)
-
-// NEXT:
 //   3. Move scanner to own file and write tests
+// NEXT:
 // 2. Parse token
 //   1. Split into path segments
 // 3. Lookup value in config
@@ -108,4 +107,3 @@ export const applyStyles2 = (styleSets) => {
 		},
 	}
 }
-
