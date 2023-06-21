@@ -1,6 +1,6 @@
 import { newScanFunc } from './scanner.js'
 
-export const applyStyles = (styleSets) => {
+export const sveltePreProcess = (styleSets) => {
 	return {
 		style: ({ content, markup, attributes, filename }) => {
 			let css = content

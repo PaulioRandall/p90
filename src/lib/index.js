@@ -1,1 +1,1 @@
-export { applyStyles as default } from './apply-styles.js'
+export { sveltePreProcess as default } from './replacer.js'

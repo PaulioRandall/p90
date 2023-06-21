@@ -1,4 +1,4 @@
-import { applyStyles } from './apply-styles.js'
+import { sveltePreProcess } from './replacer.js'
 
 const newFile = (content, markup, attributes, filename) => {
 	return {
@@ -10,15 +10,15 @@ const newFile = (content, markup, attributes, filename) => {
 }
 
 const applyStylesToFile = (styles, file) => {
-	return applyStyles(styles).style(file).code
+	return sveltePreProcess(styles).style(file).code
 }
 
 const applyStylesToCss = (styles, css) => {
 	const file = newFile(css)
-	return applyStyles(styles).style(file).code
+	return sveltePreProcess(styles).style(file).code
 }
 
-describe('WHEN applyStyles called', () => {
+describe('WHEN sveltePreProcess called', () => {
 	test('GIVEN placeholder is the only CSS', () => {
 		const styles = {
 			green: 'forestgreen',
@@ -120,7 +120,7 @@ describe('WHEN applyStyles called', () => {
 	})
 })
 
-describe('WHEN applyStyles called', () => {
+describe('WHEN sveltePreProcess called', () => {
 	describe('GIVEN multiple style sets', () => {
 		test('THEN they are all executed in order', () => {
 			const styles = [
