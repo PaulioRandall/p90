@@ -1,88 +1,6 @@
-export const applyStyles = (styles) => {
-	return {
-		style: ({ content, markup, attributes, filename }) => {
-			let css = content
+import { newScanFunc } from './scanner.js'
 
-			if (!Array.isArray(styles)) {
-				styles = [styles]
-			}
-
-			css = applyStyleSets(css, styles)
-			return { code: css }
-		},
-	}
-}
-
-const applyStyleSets = (css, styles) => {
-	for (const set of styles) {
-		css = replaceNamesWithValues(css, '', set)
-	}
-	return css
-}
-
-const replaceNamesWithValues = (css, mapPath, map) => {
-	for (const fieldName in map) {
-		const fullName = joinNames(mapPath, fieldName)
-		css = replaceNameWithValue(css, fullName, map[fieldName])
-	}
-	return css
-}
-
-const replaceNameWithValue = (css, name, value) => {
-	if (value === null || value === undefined) {
-		throw new TypeError(`Null or undefined value '${name}'`)
-	}
-
-	if (isObject(value)) {
-		return replaceNamesWithValues(css, name, value)
-	}
-
-	value = stringifyValue(name, value)
-	return injectValue(css, name, value)
-}
-
-const injectValue = (css, fullName, value) => {
-	const lookAheadForEndOfName = '(?=([^a-z0-9-_]|$))'
-	const s = escapeForRegex(fullName)
-	const p = new RegExp(`\\\$${s}${lookAheadForEndOfName}`, 'g')
-	return css.replace(p, value)
-}
-
-const joinNames = (...names) => {
-	return names
-		.map((n) => n.trim())
-		.filter((n) => n.length > 0)
-		.join('.')
-}
-
-const isObject = (v) => {
-	return typeof v === 'object' && !Array.isArray(v)
-}
-
-const stringifyValue = (name, v) => {
-	if (Array.isArray(v)) {
-		return v.join(', ')
-	}
-
-	return v
-}
-
-const escapeForRegex = (s) => {
-	return s.replace(/[/\-\.\(\)]/g, '\\$&')
-}
-
-// 1. Scan next token
-//   1. Look for $ (store start index)
-//   2. Scan until hit whitespace or ; (store end index)
-//   3. Move scanner to own file and write tests
-// NEXT:
-// 2. Parse token
-//   1. Split into path segments
-// 3. Lookup value in config
-//   1. If not there throw error
-// 4. Replace value in CSS using start & end index
-
-export const applyStyles2 = (styleSets) => {
+export const applyStyles = (styleSets) => {
 	return {
 		style: ({ content, markup, attributes, filename }) => {
 			let css = content
@@ -92,15 +10,56 @@ export const applyStyles2 = (styleSets) => {
 			}
 
 			for (const styles of styleSets) {
-				const f = newScanner(css)
-				let token = null
-
-				while ((token = f()) !== null) {
-					console.log(token)
-				}
+				css = replaceAllTokens(css, styles)
 			}
 
 			return { code: css }
 		},
 	}
+}
+
+const replaceAllTokens = (css, styles) => {
+	const tokens = findAllTokens(css, styles)
+
+	// Work from back to front of the CSS string otherwise replacements at
+	// the start will cause later tokens to hold the wrong start & end.
+	tokens.reverse()
+
+	for (const tk of tokens) {
+		const value = lookupStylesValue(styles, tk)
+		css = replaceTokenWithValue(css, tk, value)
+	}
+
+	return css
+}
+
+const findAllTokens = (css) => {
+	const f = newScanFunc(css)
+	const result = []
+	let token = null
+
+	while ((token = f()) !== null) {
+		result.push(token)
+	}
+
+	return result
+}
+
+const lookupStylesValue = (styles, token) => {
+	let value = styles
+
+	for (const part of token.path) {
+		value = value[part]
+		if (value === undefined || value === null) {
+			throw new Error(`Could not find '${part}' in styles['${token.raw}']`)
+		}
+	}
+
+	return value
+}
+
+const replaceTokenWithValue = (css, token, value) => {
+	const prefix = css.slice(0, token.start)
+	const postfix = css.slice(token.end, css.length)
+	return `${prefix}${value}${postfix}`
 }

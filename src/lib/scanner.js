@@ -11,6 +11,7 @@ export const newScanFunc = (cssStr) => {
 
 	const scanNextToken = () => {
 		if (!hasNextDollar()) {
+			idx += css.length
 			css = []
 			return null
 		}
@@ -31,12 +32,12 @@ export const newScanFunc = (cssStr) => {
 			}
 
 			if (!isEscapeChar(i)) {
-				sliceOff(i)
+				sliceToken(i)
 				return true
 			}
 
 			// Escaped $
-			sliceOff(i + 2)
+			sliceToken(i + 2)
 		}
 
 		return false
@@ -54,10 +55,10 @@ export const newScanFunc = (cssStr) => {
 			}
 		}
 
-		return sliceOff(i)
+		return sliceToken(i)
 	}
 
-	const sliceOff = (len) => {
+	const sliceToken = (len) => {
 		const v = css.slice(0, len).join('')
 
 		const token = {

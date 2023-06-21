@@ -18,8 +18,8 @@ const applyStylesToCss = (styles, css) => {
 	return applyStyles(styles).style(file).code
 }
 
-describe('applyStyles substitutes when', () => {
-	test('the placeholder is the only CSS', () => {
+describe('WHEN applyStyles called', () => {
+	test('GIVEN placeholder is the only CSS', () => {
 		const styles = {
 			green: 'forestgreen',
 		}
@@ -28,7 +28,7 @@ describe('applyStyles substitutes when', () => {
 		expect(act).toEqual('forestgreen')
 	})
 
-	test('normal CSS appears before and after the placeholder value', () => {
+	test('GIVEN  normal CSS appears before and after the placeholder', () => {
 		const styles = {
 			green: 'forestgreen',
 		}
@@ -37,7 +37,7 @@ describe('applyStyles substitutes when', () => {
 		expect(act).toEqual(`color: forestgreen; font-size: 200%;`)
 	})
 
-	test('the same placeholder is used multiple times', () => {
+	test('GIVEN same placeholder is used multiple times', () => {
 		const styles = {
 			green: 'forestgreen',
 		}
@@ -51,7 +51,7 @@ describe('applyStyles substitutes when', () => {
 		)
 	})
 
-	test('substitutes when the different placeholders are used', () => {
+	test('GIVEN different placeholders are used', () => {
 		const styles = {
 			green: 'forestgreen',
 			red: 'indianred',
@@ -61,7 +61,7 @@ describe('applyStyles substitutes when', () => {
 		expect(act).toEqual(`color: forestgreen; color: indianred;`)
 	})
 
-	test('new lines appear in the CSS', () => {
+	test('GIVEN new lines appear in the CSS', () => {
 		const styles = {
 			green: 'forestgreen',
 			red: 'indianred',
@@ -71,16 +71,16 @@ describe('applyStyles substitutes when', () => {
 		expect(act).toEqual(`color: forestgreen;\ncolor: indianred;`)
 	})
 
-	test('the replacement value is an array', () => {
+	test('GIVEN replacement value is an array', () => {
 		const styles = {
 			blood_red: [115, 16, 16],
 		}
 
 		const act = applyStylesToCss(styles, `color: rgb($blood_red);`)
-		expect(act).toEqual(`color: rgb(115, 16, 16);`)
+		expect(act).toEqual(`color: rgb(115,16,16);`)
 	})
 
-	test('the styles are nested', () => {
+	test('GIVEN styles are nested', () => {
 		const styles = {
 			color: {
 				blood_red: 'rgb(115, 16, 16)',
@@ -91,7 +91,7 @@ describe('applyStyles substitutes when', () => {
 		expect(act).toEqual(`color: rgb(115, 16, 16);`)
 	})
 
-	test('styles contain multiple levels of nesting', () => {
+	test('GIVEN styles contain multiple levels of nesting', () => {
 		const styles = {
 			useless: {
 				nesting: {
@@ -109,7 +109,7 @@ describe('applyStyles substitutes when', () => {
 		expect(act).toEqual(`color: rgb(115, 16, 16);`)
 	})
 
-	test('styles contain the falsy values: empty string, number zero', () => {
+	test('GIVEN styles contain the falsy values: empty string, number zero', () => {
 		const styles = {
 			green: '',
 			red: 0,
@@ -120,26 +120,28 @@ describe('applyStyles substitutes when', () => {
 	})
 })
 
-describe('applyStyles is given multiple style sets', () => {
-	test('they are all executed in order', () => {
-		const styles = [
-			{ first: '$second' },
-			{ second: '$third' },
-			{ third: '\\o/' },
-		]
+describe('WHEN applyStyles called', () => {
+	describe('GIVEN multiple style sets', () => {
+		test('THEN they are all executed in order', () => {
+			const styles = [
+				{ first: '$second' },
+				{ second: '$third' },
+				{ third: '\\o/' },
+			]
 
-		const act = applyStylesToCss(styles, `$first`)
-		expect(act).toEqual('\\o/')
+			const act = applyStylesToCss(styles, `$first`)
+			expect(act).toEqual('\\o/')
+		})
 	})
-})
 
-describe('applyStyles fails when', () => {
-	test('a style value is null', () => {
-		const styles = {
-			green: null,
-		}
+	describe('GIVEN null value in styles', () => {
+		test('THEN erro should be thrown', () => {
+			const styles = {
+				green: null,
+			}
 
-		const f = () => applyStylesToCss(styles, `$green`)
-		expect(f).toThrow(TypeError)
+			const f = () => applyStylesToCss(styles, `$green`)
+			expect(f).toThrow(Error)
+		})
 	})
 })
