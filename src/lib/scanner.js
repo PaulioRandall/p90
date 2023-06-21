@@ -58,10 +58,13 @@ export const newScanFunc = (cssStr) => {
 	}
 
 	const sliceOff = (len) => {
+		const v = css.slice(0, len).join('')
+
 		const token = {
 			start: idx,
 			end: idx + len,
-			value: css.slice(0, len).join(''),
+			raw: v,
+			path: v.slice(1).split('.'),
 		}
 
 		idx += len
