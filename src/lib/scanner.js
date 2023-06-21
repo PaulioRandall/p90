@@ -7,6 +7,7 @@ export const newScanFunc = (cssStr) => {
 	}
 
 	let css = Array.from(cssStr)
+	let idx = 0
 
 	const scanNextToken = () => {
 		if (!hasNextDollar()) {
@@ -14,8 +15,7 @@ export const newScanFunc = (cssStr) => {
 			return null
 		}
 
-		const lookupPath = scanLookupPath()
-		return lookupPath.join('')
+		return scanLookupPath()
 	}
 
 	const hasNextDollar = () => {
@@ -31,12 +31,12 @@ export const newScanFunc = (cssStr) => {
 			}
 
 			if (!isEscapeChar(i)) {
-				css.splice(0, i)
+				sliceOff(i)
 				return true
 			}
 
 			// Escaped $
-			css.splice(0, i + 2)
+			sliceOff(i + 2)
 		}
 
 		return false
@@ -54,9 +54,19 @@ export const newScanFunc = (cssStr) => {
 			}
 		}
 
-		const result = css.slice(0, i)
-		css.splice(0, result.length)
-		return result
+		return sliceOff(i)
+	}
+
+	const sliceOff = (len) => {
+		const token = {
+			start: idx,
+			end: idx + len,
+			value: css.slice(0, len).join(''),
+		}
+
+		idx += len
+		css.splice(0, len)
+		return token
 	}
 
 	return scanNextToken

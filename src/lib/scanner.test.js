@@ -1,5 +1,9 @@
 import { newScanFunc } from './scanner.js'
 
+const newToken = (start, end, value) => {
+	return { start, end, value }
+}
+
 describe('newScanFunc given emtpy string', () => {
 	test('returns null', () => {
 		const f = newScanFunc('')
@@ -28,7 +32,8 @@ describe('newScanFunc given non-empty string', () => {
 		})
 
 		test('returns first variable when called', () => {
-			expect(f()).toEqual('$abc')
+			const exp = newToken(0, 4, '$abc')
+			expect(f()).toEqual(exp)
 		})
 
 		test('returns null when called twice', () => {
@@ -40,15 +45,18 @@ describe('newScanFunc given non-empty string', () => {
 		const f = newScanFunc('$abc$efg$hij')
 
 		test('returns first variable when called', () => {
-			expect(f()).toEqual('$abc')
+			const exp = newToken(0, 4, '$abc')
+			expect(f()).toEqual(exp)
 		})
 
 		test('returns second variable when called twice', () => {
-			expect(f()).toEqual('$efg')
+			const exp = newToken(4, 8, '$efg')
+			expect(f()).toEqual(exp)
 		})
 
 		test('returns thrid variable when called three times', () => {
-			expect(f()).toEqual('$hij')
+			const exp = newToken(8, 12, '$hij')
+			expect(f()).toEqual(exp)
 		})
 
 		test('returns null when called four times', () => {
@@ -61,15 +69,18 @@ describe('newScanFunc given non-empty string', () => {
 		const f = newScanFunc(given)
 
 		test('returns first variable when called', () => {
-			expect(f()).toEqual('$green')
+			const exp = newToken(7, 13, '$green')
+			expect(f()).toEqual(exp)
 		})
 
 		test('returns second variable when called twice', () => {
-			expect(f()).toEqual('$lg')
+			const exp = newToken(26, 29, '$lg')
+			expect(f()).toEqual(exp)
 		})
 
 		test('returns thrid variable when called three times', () => {
-			expect(f()).toEqual('$nunito')
+			const exp = newToken(44, 51, '$nunito')
+			expect(f()).toEqual(exp)
 		})
 
 		test('returns null when called four times', () => {
@@ -81,13 +92,15 @@ describe('newScanFunc given non-empty string', () => {
 		test('one namespace returns full path', () => {
 			const given = 'color: $color.green;'
 			const f = newScanFunc(given)
-			expect(f()).toEqual('$color.green')
+			const exp = newToken(7, 19, '$color.green')
+			expect(f()).toEqual(exp)
 		})
 
 		test('multiple namespaces returns full path', () => {
 			const given = 'color: $theme.light.color.base;'
 			const f = newScanFunc(given)
-			expect(f()).toEqual('$theme.light.color.base')
+			const exp = newToken(7, 30, '$theme.light.color.base')
+			expect(f()).toEqual(exp)
 		})
 	})
 })

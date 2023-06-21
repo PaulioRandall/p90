@@ -92,14 +92,11 @@ export const applyStyles2 = (styleSets) => {
 			}
 
 			for (const styles of styleSets) {
-				let f = newScanner(css)
-				let lookupPath = null
+				const f = newScanner(css)
+				let token = null
 
-				while (f != null) {
-					;[lookupPath, f] = f()
-					if (lookupPath != null) {
-						console.log(lookupPath)
-					}
+				while ((token = f()) !== null) {
+					console.log(token)
 				}
 			}
 
