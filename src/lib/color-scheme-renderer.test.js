@@ -47,7 +47,7 @@ describe('renderColorSchemes', () => {
 	}
 }
 
-` // Two lines are always appended to ensure space
+` // Two lines are always appended for a little space
 
 		const act = renderColorSchemes(themes)
 		expect(act).toEqual(exp)

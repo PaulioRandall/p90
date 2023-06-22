@@ -1,4 +1,4 @@
-import { sveltePreProcess } from './replacer.js'
+import { replacer } from './replacer.js'
 
 const newFile = (content, markup, attributes, filename) => {
 	return {
@@ -10,15 +10,15 @@ const newFile = (content, markup, attributes, filename) => {
 }
 
 const applyStylesToFile = (styles, file) => {
-	return sveltePreProcess(styles).style(file).code
+	return replacer(styles).style(file).code
 }
 
 const applyStylesToCss = (styles, css) => {
 	const file = newFile(css)
-	return sveltePreProcess(styles).style(file).code
+	return replacer(styles).style(file).code
 }
 
-describe('WHEN sveltePreProcess called', () => {
+describe('WHEN replacer called', () => {
 	test('GIVEN placeholder is the only CSS', () => {
 		const styles = {
 			green: 'forestgreen',
@@ -120,7 +120,7 @@ describe('WHEN sveltePreProcess called', () => {
 	})
 })
 
-describe('WHEN sveltePreProcess called', () => {
+describe('WHEN replacer called', () => {
 	describe('GIVEN multiple style sets', () => {
 		test('THEN they are all executed in order', () => {
 			const styles = [
@@ -135,13 +135,39 @@ describe('WHEN sveltePreProcess called', () => {
 	})
 
 	describe('GIVEN null value in styles', () => {
-		test('THEN erro should be thrown', () => {
+		test('THEN error should be thrown', () => {
 			const styles = {
 				green: null,
 			}
 
 			const f = () => applyStylesToCss(styles, `$green`)
 			expect(f).toThrow(Error)
+		})
+	})
+
+	describe('GIVEN function as replacement value', () => {
+		describe('THEN function is called', () => {
+			test('AND result used for substitution', () => {
+				const styles = {
+					color: () => {
+						return 'scarlet'
+					},
+				}
+
+				const act = applyStylesToCss(styles, `$color`)
+				expect(act).toEqual('scarlet')
+			})
+
+			test('AND null or undefined result throws error', () => {
+				const styles = {
+					color: () => {
+						return null
+					},
+				}
+
+				const f = () => applyStylesToCss(styles, `$color`)
+				expect(f).toThrow(Error)
+			})
 		})
 	})
 })

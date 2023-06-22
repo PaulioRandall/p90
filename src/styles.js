@@ -41,12 +41,6 @@ export default {
 
 	rgb,
 	color,
-	/*
-	colorWithOpacity: (name, opacity) => {
-		const rgb = rgbNoAlpha(rgb[name])
-		return `rgba(${rgb}, ${opacity})`
-	},
-	*/
 
 	font_family: {
 		sans_serif: ['sans-serif', 'Arial', 'Verdana'],

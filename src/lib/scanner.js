@@ -10,7 +10,7 @@ export const newScanFunc = (cssStr) => {
 	let idx = 0
 
 	const scanNextToken = () => {
-		if (!hasNextDollar()) {
+		if (!jumpToNextDollar()) {
 			idx += css.length
 			css = []
 			return null
@@ -19,7 +19,7 @@ export const newScanFunc = (cssStr) => {
 		return scanLookupPath()
 	}
 
-	const hasNextDollar = () => {
+	const jumpToNextDollar = () => {
 		const isEscapeChar = (i) => {
 			return i + 1 < css.length && css[i + 1] === '$'
 		}

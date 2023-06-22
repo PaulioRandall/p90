@@ -21,7 +21,7 @@ Loot the [`./src/lib`](https://github.com/PaulioRandall/svelte-css-preprocessor/
 ```json
 {
 	"devDependencies": {
-		"p90": "v0.5.0"
+		"p90": "v0.6.0"
 	}
 }
 ```
@@ -32,7 +32,7 @@ Loot the [`./src/lib`](https://github.com/PaulioRandall/svelte-css-preprocessor/
 
 Import and add **p90** to the `preprocess` array in your `svelte.config.js`.
 
-`./src/p90-styles.js` is our configuration file that we'll create in a minute. Move and rename as you see fit.
+`./src/p90-styles.js` exports the config object we'll create in a moment. Move and rename as you see fit.
 
 ```js
 // svelte.config.js
@@ -86,26 +86,30 @@ const themes = {
 	},
 }
 
-// Export either an object (style set) containing the substitution mappings or
-// an array style sets each containing there own substitution mappings.
+// Export either an object (style set) containing the key-value
+// mappings or an array style sets each containing there own
+// mappings.
 //
-// If p90 receives and array then it will apply each style set in turn so that
-// the outputs of the first can be processed by the second. You generally want
-// to avoid this as it can make code hard to read and change; but I have found
-// one or two fair use cases.
+// If p90 receives and array then they are applied sequentially
+// so that the output of the first can be processed by the second.
+// You'll generally want to avoid this since makes code hard to
+// read and change; but I one or two fair use cases.
 
 export default {
-	// Here's the neat part...
-	// You can call these whatever you like.
-	// Use kebab-case if you don't like snake_case.
+	// Here's the neat part... these key-value pairs are up to you.
+	// - Everything will end up as a string.
+	// - Functions are called without any parameters.
+	// - Promises are not resolved (it was a concious design decision).
+	// - Undefined and null values throw an error.
+	// - Use kebab-case or camelCase if you don't like snake_case.
 	//
 	// But above all... do what works, is easy to read, and easy to change!
-	// Be consistent only to the point where consitency provides value.
 	color: colors,
 	color_schemes: renderColorSchemes(themes),
 	theme: generateThemeVars(themes),
 	font_family: {
-		sans_serif: ['sans-serif', 'Helvetica', 'Arial', 'Verdana'],
+		// Silly. I know. But I needed an example with functions.
+		sans_serif: () => ['sans-serif', 'Helvetica', 'Arial', 'Verdana'],
 	},
 	font_size: {
 		// Constructed using utopia.fyi
@@ -154,24 +158,25 @@ export default {
 	<h1>A Bohemian quest for simplicity</h1>
 
 	<p>
-		It took me about an hour to learn and write my first CSS pre-processor after
-		deciding existing tooling was overweight for my needs. Refactoring reduced
-		my solution to about 20 lines of code. It simply substituted named values
-		like `$green` with whatever I configured `rgb(10, 240, 10)`. I've added a
-		handful of utility functions for common use cases and here we are.
+		It took me about an hour to learn and write my first Svelte CSS
+		pre-processor after deciding existing tooling was overweight for my needs.
+		Refactoring reduced my solution to about 20 lines of code. It simply
+		substituted named values like `$green` with whatever I configured `rgb(10,
+		240, 10)`. I've added a handful of utility functions for common use cases
+		and here we are.
 	</p>
 
 	<p>
-		It was so simple that I started wondering why we've invented a plethora of
-		CSS like languages with needless diabolical syntax. Why do complex
-		transpiling when simply value substitution can do the job. Let JavaScript
-		handle logic because that's what it's designed to do. You know, making use
-		of languages we already know and hate.
+		It was so simple that I wondered why we've invented a plethora of CSS like
+		languages with needless diabolical syntax. Because no one had yet created
+		Svelte! Why do complex transpiling when simply value substitution can do the
+		job. Let JavaScript handle logic because that's what it's designed to do.
+		You know, making use of languages we already know and hate.
 	</p>
 
 	<p>
-		Please, have a ago at forking or plundering even if you intend to use a main
-		stream tool. You'll start to realise just how bloated most software
+		Please, have a ago at using, forking or plundering even if you intend to use
+		a main stream tool. You'll start to realise just how bloated most software
 		libraries are.
 	</p>
 </page>
@@ -192,26 +197,31 @@ export default {
 
 ## Util functions
 
-There exists some utility functions for common activities. The cool part is you don't have to use them. If you don't like the way I've approached CSS code generation then right your own functions. It's just polain JavaScript after all.
+There exists some utility functions for common activities. You don't have to use them to use **P90**. If you don't like the way I've approached CSS code generation then right your own functions. It's just plain JavaScript after all.
 
-Some of them are really convenient while others are so trivial it'll be quicker to write your own than look up the name in the docs.
+Some are really convenient while others are so trivial it'll be quicker to write your own than look them up in the docs.
 
 ```js
 import p90Util from 'p90/util'
 ```
 
-| Name                                              | Does what?                                                                                                                               |
-| ------------------------------------------------- | :--------------------------------------------------------------------------------------------------------------------------------------- |
-| [rgbToColor](#rgbtocolor)                         | Converts an RGB or RGBA array to a CSS RGB or RGBA value.                                                                                |
-| [rgbsToColors](#rgbstocolors)                     | Converts a map of RGB and RGBA arrays to CSS RGB and RGBA values.                                                                        |
-| [rgbWithAlpha](#rgbwithalpha)                     | Adds an alpha component to an RGB array. array                                                                                           |
-| [rgbaWithoutAlpha](#rgbawithoutalpha)             | Removes the alpha component from an RGBA array. array                                                                                    |
-| [renderColorSchemes](#rendercolorschemes)         | Generates CSS color scheme media queries from a set of themes; goes hand-in-hand with [generateThemeVariables](#generatethemevariables). |
-| [generateThemeVariables](#generatethemevariables) | Generates a **set** of CSS variables from a set of themes; goes hand-in-hand with [renderColorSchemes](#rendercolorschemes).             |
+| Name                                                          | Does what?                                                                                                                                                            |
+| ------------------------------------------------------------- | :-------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [rgbToColor](#rgbtocolor)                                     | Converts an RGB or RGBA array to a CSS RGB or RGBA value.                                                                                                             |
+| [rgbsToColors](#rgbstocolors)                                 | Converts a map of RGB and RGBA arrays to CSS RGB and RGBA values.                                                                                                     |
+| [rgbWithAlpha](#rgbwithalpha)                                 | Adds an alpha component to an RGB array. array                                                                                                                        |
+| [rgbaWithoutAlpha](#rgbawithoutalpha)                         | Removes the alpha component from an RGBA array. array                                                                                                                 |
+| [renderColorSchemes](#rendercolorschemes)                     | Generates CSS color scheme media queries from a set of themes with CSS variables as values; goes hand-in-hand with [generateThemeVariables](#generatethemevariables). |
+| [generateThemeVariables](#generatethemevariables)             | Generates a **set** of CSS variables from a set of themes; goes hand-in-hand with [renderColorSchemes](#rendercolorschemes).                                          |
+| [buildColorSchemeMediaQueries](#buildcolorschememediaqueries) | Generates CSS color scheme media queries.                                                                                                                             |
 
 ### rgbToColor
 
 Converts an RGB or RGBA array to a CSS RGB or RGBA value. See [rgbsToColors](#rgbstocolors) to map whole objects containing RGB arrays.
+
+**Parameters**:
+
+- **rgb**: RGB or RGBA array `[r, g, b]` or `[r, g, b, a]`.
 
 ```js
 import { rgbToColor } from 'p90/util'
@@ -228,6 +238,10 @@ console.log(burlyWoodTransparent)
 ### rgbsToColors
 
 Converts a map of RGB and RGBA arrays to CSS RGB and RGBA values. See [rgbToColor](#rgbtocolor) to map a single array.
+
+**Parameters**:
+
+- **rgbs**: map of RGB and RGBA arrays.
 
 ```js
 import { rgbsToColors } from 'p90/util'
@@ -258,6 +272,11 @@ console.log(colors) // Use console.table for easy reading
 
 Adds an alpha component to an RGB array. See [rgbaWithoutAlpha](#rgbawithoutalpha) to remove.
 
+**Parameters**:
+
+- **rgb**: RGB array `[r, g, b]`.
+- **alpha**: alpha component to append to RGB array.
+
 ```js
 import { rgbWithAlpha } from 'p90/util'
 
@@ -272,6 +291,10 @@ console.log(rgba)
 
 Removes the alpha component from an RGBA array. See [rgbWithAlpha](#rgbwithalpha) to add.
 
+**Parameters**:
+
+- **rgba**: RGBA array `[r, g, b, a]`.
+
 ```js
 import { rgbaWithoutAlpha } from 'p90/util'
 
@@ -285,6 +308,10 @@ console.log(rgb)
 ### renderColorSchemes
 
 Generates CSS color scheme media queries from a set of themes; goes hand-in-hand with [generateThemeVariables](#generatethemevariables)
+
+**Parameters**:
+
+- **themes**: map of CSS colour schemes (themes).
 
 ```js
 import { renderColorSchemes } from 'p90/util'
@@ -324,6 +351,10 @@ console.log(colorSchemes)
 
 Generates a **set** of CSS variables from a set of themes; goes hand-in-hand with [renderColorSchemes](#rendercolorschemes).
 
+**Parameters**:
+
+- **themes**: map of CSS colour schemes (themes).
+
 ```js
 import { generateThemeVariables } from 'p90/util'
 
@@ -346,5 +377,50 @@ console.log(themeVariables)
 	base: "var(--theme-base)",
 	text: "var(--theme-text)",
 }
+*/
+```
+
+### buildColorSchemeMediaQueries
+
+Generates CSS colour scheme media queries.
+
+**Parameters**:
+
+- **schemes**: map of CSS colour schemes
+- **global**: generate global CSS `:global(...)` (default: `true`)
+- **toValue**: (prop, value) => "" (default: `` js (p, v) => `${p}: ${v}`  ``)
+
+```js
+import { buildColorSchemeMediaQueries } from 'p90/util'
+
+const schemes = {
+	// P90 doesn't care what the scheme names are but CSS/browsers do!
+	light: {
+		color: [250, 250, 250],
+		'background-color': [5, 10, 60],
+	},
+	dark: {
+		color: [5, 10, 35],
+		'background-color': [231, 245, 255],
+	},
+}
+
+const toValue = (prop, rgb) => `${prop}: rgb(${rgb[0]}, ${rgb[1]}, ${rgb[2]})`
+const mediaQueries = buildColorSchemeMediaQueries(schemes, false, toValue)
+console.log(mediaQueries)
+/*
+`@media (prefers-color-scheme: light) {
+	:root {
+		color: rgb(250, 250, 250);
+		background-color: rgb(5, 10, 60);
+	}
+}
+
+@media (prefers-color-scheme: dark) {
+	:root {
+		color: rgb(5, 10, 35);
+		background-color: rgb(231, 245, 255);
+	}
+}`
 */
 ```

@@ -1,1 +1,1 @@
-export { sveltePreProcess as default } from './replacer.js'
+export { replacer as default } from './replacer.js'

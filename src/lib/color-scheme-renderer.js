@@ -11,26 +11,32 @@ export const generateThemeVariables = (themes) => {
 }
 
 export const renderColorSchemes = (themes) => {
-	return generateMediaQueries(themes)
+	const toVar = (name, value) => `--theme-${name}: ${value}`
+	return buildColorSchemeMediaQueries(themes, toVar)
 }
 
-const generateMediaQueries = (themes) => {
+const defaultToValue = (name, value) => `${name}: ${value}`
+export const buildColorSchemeMediaQueries = (
+	themes,
+	toValue = defaultToValue
+) => {
 	let result = ''
 
 	for (const name in themes) {
-		result += generateMediaQuery(name, themes[name])
+		result += buildColorSchemeMediaQuery(name, themes[name], toValue)
 		result += '\n\n'
 	}
 
 	return result
 }
 
-const generateMediaQuery = (name, theme) => {
+const buildColorSchemeMediaQuery = (name, theme, toValue) => {
 	let result = `@media (prefers-color-scheme: ${name}) {`
 	result += '\n\t:global(:root) {'
 
 	for (const key in theme) {
-		result += `\n\t\t--theme-${key}: ${theme[key]};`
+		const value = toValue(key, theme[key])
+		result += `\n\t\t${value};`
 	}
 
 	result += '\n\t}'
