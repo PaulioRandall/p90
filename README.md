@@ -207,6 +207,7 @@ import p90Util from 'p90/util'
 
 | Name                                                          | Does what?                                                                                                                                                            |
 | ------------------------------------------------------------- | :-------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [newScanFunc](#newscanfunc)                                   | Given a CSS string creates a function which can be called repeatedly to find all substitution tokens within.                                                          |
 | [rgbToColor](#rgbtocolor)                                     | Converts an RGB or RGBA array to a CSS RGB or RGBA value.                                                                                                             |
 | [rgbsToColors](#rgbstocolors)                                 | Converts a map of RGB and RGBA arrays to CSS RGB and RGBA values.                                                                                                     |
 | [rgbWithAlpha](#rgbwithalpha)                                 | Adds an alpha component to an RGB array. array                                                                                                                        |
@@ -214,6 +215,43 @@ import p90Util from 'p90/util'
 | [renderColorSchemes](#rendercolorschemes)                     | Generates CSS color scheme media queries from a set of themes with CSS variables as values; goes hand-in-hand with [generateThemeVariables](#generatethemevariables). |
 | [generateThemeVariables](#generatethemevariables)             | Generates a **set** of CSS variables from a set of themes; goes hand-in-hand with [renderColorSchemes](#rendercolorschemes).                                          |
 | [buildColorSchemeMediaQueries](#buildcolorschememediaqueries) | Generates CSS color scheme media queries.                                                                                                                             |
+
+### newScanFunc
+
+You can pretty much ignore this function unless you want to scan CSS files into tokens.
+
+Given a CSS string creates a function which is called repeatedly to find all substitution tokens in the order they appear. It is wise to perform and string substitution in reverse order otherwise the `start` and `end` fields of later tokens become useless due to the CSS string length changing.
+
+Use it like this:
+
+```js
+import { newScanFunc } from 'p90/util'
+
+const f = newScanFunc(css)
+const tokens = []
+
+let tk = null
+while ((tk = f()) !== null) {
+	tokens.push(tk)
+}
+
+tokens.reverse() // Because we have to substitute from back to front
+
+for (const tk of tokens) {
+	css = doSubstitution(css, tk, ...)
+}
+```
+
+Tokens look like this:
+
+```js
+token = {
+	start: 20, // only supports 2 byte unicode as of writing
+	end: 32, // add length of raw to start
+	raw: '$color.green',
+	path: ['color', 'green'],
+}
+```
 
 ### rgbToColor
 
@@ -386,9 +424,9 @@ Generates CSS colour scheme media queries.
 
 **Parameters**:
 
-- **schemes**: map of CSS colour schemes
-- **global**: generate global CSS `:global(...)` (default: `true`)
-- **toValue**: (prop, value) => "" (default: `` js (p, v) => `${p}: ${v}`  ``)
+- **schemes**: map of CSS colour schemes.
+- **global**: generate global CSS `:global(...)` (default: `true`).
+- **toValue**: (prop, value) => "" (default: `` (p, v) => `${p}: ${v}`  ``).
 
 ```js
 import { buildColorSchemeMediaQueries } from 'p90/util'
