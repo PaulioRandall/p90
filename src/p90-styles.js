@@ -29,18 +29,18 @@ const themes = {
 	dark: {
 		primary: color.very_dark_navy,
 		text: color.very_light_sky_blue,
-		strong: color.burly_wood,
 		link: color.blood_red,
+		strong: color.burly_wood,
 		// ...
 	},
 }
 
 export default {
-	colorSchemes: renderColorSchemes(themes),
-	theme: generateThemeVariables(themes),
-
 	rgb,
 	color,
+
+	colorSchemes: renderColorSchemes(themes),
+	theme: generateThemeVariables(themes),
 
 	font_family: {
 		sans_serif: ['sans-serif', 'Arial', 'Verdana'],

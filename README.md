@@ -94,7 +94,6 @@ const themes = {
 // so that the output of the first can be processed by the second.
 // You'll generally want to avoid this since makes code hard to
 // read and change; but I one or two fair use cases.
-
 export default {
 	// Here's the neat part... these key-value pairs are up to you.
 	// - Everything will end up as a string.
@@ -104,13 +103,20 @@ export default {
 	// - Use kebab-case or camelCase if you don't like snake_case.
 	//
 	// But above all... do what works, is easy to read, and easy to change!
+
+	rgb: rgbs,
 	color: colors,
+
 	color_schemes: renderColorSchemes(themes),
-	theme: generateThemeVars(themes),
+	theme: generateThemeVariables(themes),
+
 	font_family: {
-		// Silly. I know. But I needed an example with functions.
-		sans_serif: () => ['sans-serif', 'Helvetica', 'Arial', 'Verdana'],
+		// Silly. I know. But just an example of function call.
+		sans_serif: () => {
+			return ['sans-serif', 'Helvetica', 'Arial', 'Verdana']
+		},
 	},
+
 	font_size: {
 		// Constructed using utopia.fyi
 		sm: 'clamp(0.89rem, calc(0.85rem + 0.18vw), 1.03rem)',
@@ -118,12 +124,13 @@ export default {
 		lg: 'clamp(1.25rem, calc(1.19rem + 0.31vw), 1.5rem)',
 		xl: 'clamp(1.5rem, calc(1.41rem + 0.47vw), 1.88rem)',
 	},
+
 	space: {
-		sm: '0.5rem',
 		md: '1rem',
 		lg: '2rem',
 		xl: '4rem',
 	},
+
 	screen: {
 		phone_only: `(max-width: ${phone_max_width})`,
 		tablet_only: `(min-width: ${tablet_portrait_min_width}) and (max-width: ${tablet_landscape_max_width})`,
