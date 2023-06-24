@@ -2,7 +2,7 @@ import adapter from '@sveltejs/adapter-auto'
 import path from 'path'
 
 import p90 from 'p90'
-import styles from './src/styles.js'
+import styles from './src/p90-styles.js'
 
 export default {
 	kit: {
