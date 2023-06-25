@@ -22,7 +22,7 @@
 		margin: 0;
 
 		color: $theme.text;
-		font-size: $font_size.md;
+		font-size: $font.size.md;
 		text-size-adjust: 100%;
 		tab-size: 2;
 	}

@@ -8,10 +8,10 @@
 		padding: 0;
 
 		color: $theme.strong;
-		font-family: $font_family.sans_serif;
+		font-family: $font.family.sans_serif;
 		text-align: center;
 		font-weight: normal;
 		font-style: italic;
-		font-size: $font_size.lg;
+		font-size: $font.size.lg;
 	}
 </style>

@@ -35,26 +35,32 @@ const themes = {
 	},
 }
 
-export default {
-	rgb,
-	color,
-
-	colorSchemes: renderColorSchemes(themes),
-	theme: generateThemeVariables(themes),
-
-	font_family: {
-		sans_serif: ['sans-serif', 'Arial', 'Verdana'],
+export default [
+	{
+		// This style map is processed first
+		rgb,
+		color,
 	},
+	{
+		// Then this one
+		colorSchemes: renderColorSchemes(themes),
+		theme: generateThemeVariables(themes),
 
-	font_size: {
-		// Constructed using utopia.fyi
-		md: 'clamp(1.06rem, calc(0.98rem + 0.39vw), 1.38rem)',
-		lg: 'clamp(1.5rem, calc(1.41rem + 0.47vw), 1.88rem)',
-	},
+		font: {
+			family: {
+				sans_serif: ['sans-serif', 'Arial', 'Verdana'],
+			},
+			size: {
+				// Constructed using utopia.fyi
+				md: 'clamp(1.06rem, calc(0.98rem + 0.39vw), 1.38rem)',
+				lg: 'clamp(1.5rem, calc(1.41rem + 0.47vw), 1.88rem)',
+			},
+		},
 
-	space: {
-		md: '1rem',
-		lg: '2rem',
-		xl: '4rem',
+		space: {
+			md: '1rem',
+			lg: '2rem',
+			xl: '4rem',
+		},
 	},
-}
+]

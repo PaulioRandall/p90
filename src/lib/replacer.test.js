@@ -135,13 +135,13 @@ describe('WHEN replacer called', () => {
 	})
 
 	describe('GIVEN null value in styles', () => {
-		test('THEN error should be thrown', () => {
+		test('THEN no replacement should take place', () => {
 			const styles = {
 				green: null,
 			}
 
 			const f = () => applyStylesToCss(styles, `$green`)
-			expect(f).toThrow(Error)
+			expect(f()).toEqual('$green')
 		})
 	})
 

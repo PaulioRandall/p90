@@ -46,6 +46,10 @@ const findAllTokens = (css) => {
 
 const replaceToken = (css, styles, tk) => {
 	let value = lookupStylesValue(styles, tk)
+	if (value == null) {
+		return css
+	}
+
 	value = resolveValue(value)
 	checkValue(tk, value)
 	return replaceTokenWithValue(css, tk, value)
@@ -57,7 +61,7 @@ const lookupStylesValue = (styles, tk) => {
 	for (const part of tk.path) {
 		value = value[part]
 		if (value === undefined || value === null) {
-			throw new Error(`Could not find '${part}' in styles{'${tk.raw}'}`)
+			return null
 		}
 	}
 
