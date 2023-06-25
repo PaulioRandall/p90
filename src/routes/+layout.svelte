@@ -8,7 +8,10 @@
 		min-height: 100vh;
 	}
 
-	$colorSchemes :global(*),
+	/* prettier-ignore */
+	$renderColorSchemes
+
+	:global(*),
 	:global(::before),
 	:global(::after) {
 		box-sizing: border-box;

@@ -37,13 +37,14 @@ const themes = {
 
 export default [
 	{
-		// This style map is processed first
+		// This style map is processed first.
+		// Tokens injected by this map will be processed by the second.
 		rgb,
 		color,
 	},
 	{
-		// Then this one
-		colorSchemes: renderColorSchemes(themes),
+		// This one is processed second.
+		renderColorSchemes: renderColorSchemes(themes),
 		theme: generateThemeVariables(themes),
 
 		font: {
