@@ -21,7 +21,7 @@ Loot the [`./src/lib`](https://github.com/PaulioRandall/svelte-css-preprocessor/
 ```json
 {
 	"devDependencies": {
-		"p90": "v0.6.0"
+		"p90": "v0.7.0"
 	}
 }
 ```
