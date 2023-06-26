@@ -44,7 +44,7 @@ export default [
 	},
 	{
 		// This one is processed second.
-		renderColorSchemes: renderColorSchemes(themes),
+		renderColorSchemes: async () => renderColorSchemes(themes),
 		theme: generateThemeVariables(themes),
 
 		font: {

@@ -15,10 +15,9 @@ export const renderColorSchemes = (themes) => {
 	return buildColorSchemeMediaQueries(themes, toVar)
 }
 
-const defaultToValue = (name, value) => `${name}: ${value}`
 export const buildColorSchemeMediaQueries = (
 	themes,
-	toValue = defaultToValue
+	toValue = (name, value) => `${name}: ${value}`
 ) => {
 	let result = ''
 

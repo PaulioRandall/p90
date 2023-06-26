@@ -1,7 +1,4 @@
-import {
-	generateThemeVariables,
-	renderColorSchemes,
-} from './color-scheme-renderer.js'
+import { generateThemeVariables, renderColorSchemes } from './color-schemes.js'
 
 const themes = {
 	light: {

@@ -21,7 +21,7 @@ Loot the [`./src/lib`](https://github.com/PaulioRandall/svelte-css-preprocessor/
 ```json
 {
 	"devDependencies": {
-		"p90": "v0.7.0"
+		"p90": "v0.8.0"
 	}
 }
 ```
@@ -98,7 +98,7 @@ export default {
 	// Here's the neat part... these key-value pairs are up to you.
 	// - Everything will end up as a string.
 	// - Functions are called without any parameters.
-	// - Promises are not resolved (it was a concious design decision).
+	// - Promises are resolved to values.
 	// - Undefined and null values throw an error.
 	// - Use kebab-case or camelCase if you don't like snake_case.
 	//
@@ -112,7 +112,7 @@ export default {
 
 	font_family: {
 		// Silly. I know. But just an example of function call.
-		sans_serif: () => {
+		sans_serif: async () => {
 			return ['sans-serif', 'Helvetica', 'Arial', 'Verdana']
 		},
 	},

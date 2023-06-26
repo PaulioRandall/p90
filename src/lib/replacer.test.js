@@ -9,13 +9,10 @@ const newFile = (content, markup, attributes, filename) => {
 	}
 }
 
-const applyStylesToFile = (styles, file) => {
-	return replacer(styles).style(file).code
-}
-
-const applyStylesToCss = (styles, css) => {
+const applyStylesToCss = async (styles, css) => {
 	const file = newFile(css)
-	return replacer(styles).style(file).code
+	const result = await replacer(styles).style(file)
+	return result.code
 }
 
 describe('WHEN replacer called', () => {
@@ -25,7 +22,7 @@ describe('WHEN replacer called', () => {
 		}
 
 		const act = applyStylesToCss(styles, `$green`)
-		expect(act).toEqual('forestgreen')
+		expect(act).resolves.toEqual('forestgreen')
 	})
 
 	test('GIVEN  normal CSS appears before and after the placeholder', () => {
@@ -34,7 +31,7 @@ describe('WHEN replacer called', () => {
 		}
 
 		const act = applyStylesToCss(styles, `color: $green; font-size: 200%;`)
-		expect(act).toEqual(`color: forestgreen; font-size: 200%;`)
+		expect(act).resolves.toEqual(`color: forestgreen; font-size: 200%;`)
 	})
 
 	test('GIVEN same placeholder is used multiple times', () => {
@@ -46,7 +43,7 @@ describe('WHEN replacer called', () => {
 			styles,
 			`color: $green; color: $green; color: $green; color: forestgreen;`
 		)
-		expect(act).toEqual(
+		expect(act).resolves.toEqual(
 			`color: forestgreen; color: forestgreen; color: forestgreen; color: forestgreen;`
 		)
 	})
@@ -58,7 +55,7 @@ describe('WHEN replacer called', () => {
 		}
 
 		const act = applyStylesToCss(styles, `color: $green; color: $red;`)
-		expect(act).toEqual(`color: forestgreen; color: indianred;`)
+		expect(act).resolves.toEqual(`color: forestgreen; color: indianred;`)
 	})
 
 	test('GIVEN new lines appear in the CSS', () => {
@@ -68,7 +65,7 @@ describe('WHEN replacer called', () => {
 		}
 
 		const act = applyStylesToCss(styles, `color: $green;\ncolor: $red;`)
-		expect(act).toEqual(`color: forestgreen;\ncolor: indianred;`)
+		expect(act).resolves.toEqual(`color: forestgreen;\ncolor: indianred;`)
 	})
 
 	test('GIVEN replacement value is an array', () => {
@@ -77,7 +74,7 @@ describe('WHEN replacer called', () => {
 		}
 
 		const act = applyStylesToCss(styles, `color: rgb($blood_red);`)
-		expect(act).toEqual(`color: rgb(115,16,16);`)
+		expect(act).resolves.toEqual(`color: rgb(115,16,16);`)
 	})
 
 	test('GIVEN styles are nested', () => {
@@ -88,7 +85,7 @@ describe('WHEN replacer called', () => {
 		}
 
 		const act = applyStylesToCss(styles, `color: $color.blood_red;`)
-		expect(act).toEqual(`color: rgb(115, 16, 16);`)
+		expect(act).resolves.toEqual(`color: rgb(115, 16, 16);`)
 	})
 
 	test('GIVEN styles contain multiple levels of nesting', () => {
@@ -106,7 +103,7 @@ describe('WHEN replacer called', () => {
 			styles,
 			`color: $useless.nesting.color.blood_red;`
 		)
-		expect(act).toEqual(`color: rgb(115, 16, 16);`)
+		expect(act).resolves.toEqual(`color: rgb(115, 16, 16);`)
 	})
 
 	test('GIVEN styles contain the falsy values: empty string, number zero', () => {
@@ -116,7 +113,7 @@ describe('WHEN replacer called', () => {
 		}
 
 		const act = applyStylesToCss(styles, `color: $green; color: $red;`)
-		expect(act).toEqual(`color: ; color: 0;`)
+		expect(act).resolves.toEqual(`color: ; color: 0;`)
 	})
 })
 
@@ -130,7 +127,7 @@ describe('WHEN replacer called', () => {
 			]
 
 			const act = applyStylesToCss(styles, `$first`)
-			expect(act).toEqual('\\o/')
+			expect(act).resolves.toEqual('\\o/')
 		})
 	})
 
@@ -140,8 +137,8 @@ describe('WHEN replacer called', () => {
 				green: null,
 			}
 
-			const f = () => applyStylesToCss(styles, `$green`)
-			expect(f()).toEqual('$green')
+			const act = applyStylesToCss(styles, `$green`)
+			expect(act).resolves.toEqual('$green')
 		})
 	})
 
@@ -155,7 +152,7 @@ describe('WHEN replacer called', () => {
 				}
 
 				const act = applyStylesToCss(styles, `$color`)
-				expect(act).toEqual('scarlet')
+				expect(act).resolves.toEqual('scarlet')
 			})
 
 			test('AND null or undefined result throws error', () => {
@@ -165,8 +162,23 @@ describe('WHEN replacer called', () => {
 					},
 				}
 
-				const f = () => applyStylesToCss(styles, `$color`)
-				expect(f).toThrow(Error)
+				const act = applyStylesToCss(styles, `$color`)
+				expect(act).rejects.toBeInstanceOf(Error)
+			})
+		})
+	})
+
+	describe('GIVEN async function as replacement value', () => {
+		describe('THEN function is called', () => {
+			test('AND result used for substitution', () => {
+				const styles = {
+					color: async () => {
+						return 'scarlet'
+					},
+				}
+
+				const act = applyStylesToCss(styles, `$color`)
+				expect(act).resolves.toEqual('scarlet')
 			})
 		})
 	})

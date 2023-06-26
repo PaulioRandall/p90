@@ -2,7 +2,7 @@ import { newScanFunc } from './scanner.js'
 
 export const replacer = (styleSets) => {
 	return {
-		style: ({ content, markup, attributes, filename }) => {
+		style: async ({ content, markup, attributes, filename }) => {
 			let css = content
 
 			if (!Array.isArray(styleSets)) {
@@ -10,15 +10,15 @@ export const replacer = (styleSets) => {
 			}
 
 			for (const styles of styleSets) {
-				css = replaceAllTokens(css, styles)
+				css = await replaceAllTokens(css, styles)
 			}
 
-			return { code: css }
+			return Promise.resolve({ code: css })
 		},
 	}
 }
 
-const replaceAllTokens = (css, styles) => {
+const replaceAllTokens = async (css, styles) => {
 	const tokens = findAllTokens(css)
 
 	// Work from back to front of the CSS string otherwise replacements at
@@ -26,7 +26,7 @@ const replaceAllTokens = (css, styles) => {
 	tokens.reverse()
 
 	for (const tk of tokens) {
-		css = replaceToken(css, styles, tk)
+		css = await replaceToken(css, styles, tk)
 	}
 
 	return css
@@ -44,14 +44,16 @@ const findAllTokens = (css) => {
 	return result
 }
 
-const replaceToken = (css, styles, tk) => {
+const replaceToken = async (css, styles, tk) => {
 	let value = lookupStylesValue(styles, tk)
-	if (value == null) {
+	if (value === null) {
 		return css
 	}
 
 	value = resolveValue(value)
+	value = await Promise.resolve(value)
 	checkValue(tk, value)
+
 	return replaceTokenWithValue(css, tk, value)
 }
 
