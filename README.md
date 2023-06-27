@@ -21,7 +21,7 @@ Loot the [`./src/lib`](https://github.com/PaulioRandall/svelte-css-preprocessor/
 ```json
 {
 	"devDependencies": {
-		"p90": "v0.8.0"
+		"p90": "v0.9.0"
 	}
 }
 ```
@@ -47,6 +47,8 @@ export default {
 ```
 
 ### p90-styles.js
+
+Rename, move, and reorganise as you see fit.
 
 ```js
 // ./src/p90-styles.js
@@ -94,50 +96,71 @@ const themes = {
 // so that the output of the first can be processed by the second.
 // You'll generally want to avoid this since makes code hard to
 // read and change; but I one or two fair use cases.
-export default {
+export default [
 	// Here's the neat part... these key-value pairs are up to you.
-	// - Everything will end up as a string.
 	// - Functions are called without any parameters.
 	// - Promises are resolved to values.
 	// - Undefined and null values throw an error.
 	// - Use kebab-case or camelCase if you don't like snake_case.
 	//
 	// But above all... do what works, is easy to read, and easy to change!
+	{
+		rgb: rgbs,
+		color: colors,
 
-	rgb: rgbs,
-	color: colors,
-
-	color_schemes: renderColorSchemes(themes),
-	theme: generateThemeVariables(themes),
-
-	font_family: {
-		// Silly. I know. But just an example of function call.
-		sans_serif: async () => {
-			return ['sans-serif', 'Helvetica', 'Arial', 'Verdana']
+		// Objects are converted into CSS properties if called directly.
+		// But must only contain properties that are straight forward to
+		// stringify, i.e. string, number, bigint, and boolean
+		// E.g:
+		//   '$highlight.hover;' => 'border: 2px solid $theme.strong;
+		highlight: {
+			default: {
+				'border-radius': '0.4rem',
+				border: '10px solid transparent',
+				transition: 'border 300ms ease-out',
+			},
+			hover: {
+				border: '10px solid $theme.strong',
+			},
 		},
 	},
+	{
+		color_schemes: renderColorSchemes(themes),
+		theme: generateThemeVariables(themes),
 
-	font_size: {
-		// Constructed using utopia.fyi
-		sm: 'clamp(0.89rem, calc(0.85rem + 0.18vw), 1.03rem)',
-		md: 'clamp(1.06rem, calc(0.98rem + 0.39vw), 1.38rem)',
-		lg: 'clamp(1.25rem, calc(1.19rem + 0.31vw), 1.5rem)',
-		xl: 'clamp(1.5rem, calc(1.41rem + 0.47vw), 1.88rem)',
-	},
+		// Organise as you please.
+		// Both nesting and dead flat structures have their virtues.
+		// I advise keeping nesting to a minimum, it's easier to read and navigate.
+		font: {
+			family: {
+				// Silly. I know. But just an example of a function call.
+				sans_serif: async () => {
+					return ['sans-serif', 'Helvetica', 'Arial', 'Verdana']
+				},
+			},
+			size: {
+				// Constructed using utopia.fyi... Could these be constructed in code?
+				sm: 'clamp(0.89rem, calc(0.85rem + 0.18vw), 1.03rem)',
+				md: 'clamp(1.06rem, calc(0.98rem + 0.39vw), 1.38rem)',
+				lg: 'clamp(1.25rem, calc(1.19rem + 0.31vw), 1.5rem)',
+				xl: 'clamp(1.5rem, calc(1.41rem + 0.47vw), 1.88rem)',
+			}
+		}
 
-	space: {
-		md: '1rem',
-		lg: '2rem',
-		xl: '4rem',
-	},
+		space: {
+			md: '1rem',
+			lg: '2rem',
+			xl: '4rem',
+		},
 
-	screen: {
-		phone_only: `(max-width: ${phone_max_width})`,
-		tablet_only: `(min-width: ${tablet_portrait_min_width}) and (max-width: ${tablet_landscape_max_width})`,
-		desktop_only: `(min-width: ${desktop_min_width})`,
-		larger_devices: `(min-width: ${tablet_landscape_min_width})`,
-	},
-}
+		screen: {
+			phone_only: `(max-width: ${phone_max_width})`,
+			tablet_only: `(min-width: ${tablet_portrait_min_width}) and (max-width: ${tablet_landscape_max_width})`,
+			desktop_only: `(min-width: ${desktop_min_width})`,
+			larger_devices: `(min-width: ${tablet_landscape_min_width})`,
+		}
+	}
+]
 ```
 
 ### +layout.svelte
@@ -152,8 +175,8 @@ export default {
 	:global(body) {
 		background: $theme.base;
 		color: $theme.text;
-		font-family: $font_family.sans_serif;
-		font-size: $font_size.md;
+		font-family: $font.family.sans_serif;
+		font-size: $font.size.md;
 	}
 </style>
 ```
@@ -191,13 +214,21 @@ export default {
 <style>
 	h1 {
 		color: $theme.strong;
-		font-size: $font_size.lg;
+		font-size: $font.size.lg;
 	}
 
 	@media $screen.larger_devices {
 		h1 {
-			font-size: $font_size.xl;
+			font-size: $font.size.xl;
 		}
+	}
+
+	/* Just for fun */
+	p {
+		$highlight.default;
+	}
+	p:hover {
+		$highlight.hover;
 	}
 </style>
 ```

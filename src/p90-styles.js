@@ -41,6 +41,19 @@ export default [
 		// Tokens injected by this map will be processed by the second.
 		rgb,
 		color,
+
+		// Objects are converted into CSS properties if called directly.
+		// E.g. '$highlight.hover' => 'border: 2px solid $theme.strong;'
+		highlight: {
+			default: {
+				'border-radius': '0.4rem',
+				border: '10px inset transparent',
+				transition: 'border 300ms ease-out',
+			},
+			hover: {
+				border: '10px inset $theme.strong',
+			},
+		},
 	},
 	{
 		// This one is processed second.

@@ -50,9 +50,9 @@ const replaceToken = async (css, styles, tk) => {
 		return css
 	}
 
-	value = resolveValue(value)
+	value = resolveValue(tk, value)
 	value = await Promise.resolve(value)
-	checkValue(tk, value)
+	checkReplacementValue(tk, value)
 
 	return replaceTokenWithValue(css, tk, value)
 }
@@ -62,6 +62,7 @@ const lookupStylesValue = (styles, tk) => {
 
 	for (const part of tk.path) {
 		value = value[part]
+
 		if (value === undefined || value === null) {
 			return null
 		}
@@ -70,7 +71,7 @@ const lookupStylesValue = (styles, tk) => {
 	return value
 }
 
-const checkValue = (tk, value) => {
+const checkReplacementValue = (tk, value) => {
 	if (value === undefined || value === null) {
 		throw new Error(
 			`Value returned by function '${tk.raw}' returned null or undefined`
@@ -78,11 +79,42 @@ const checkValue = (tk, value) => {
 	}
 }
 
-const resolveValue = (value) => {
-	if (typeof value === 'function') {
+const resolveValue = (tk, value) => {
+	if (isFunction(value)) {
 		return value()
 	}
-	return value
+
+	if (isObject(value)) {
+		return objectToCss(tk, value)
+	}
+
+	return value.toString()
+}
+
+const objectToCss = (tk, obj) => {
+	const result = []
+
+	for (const prop in obj) {
+		const value = obj[prop]
+		checkCssPropValue(tk, prop, value)
+		result.push(`${prop}: ${value}`)
+	}
+
+	return result.join(';\n')
+}
+
+const checkCssPropValue = (tk, prop, value) => {
+	if (!isValidCssPropValue(value)) {
+		throw new Error(
+			`For '${tk.raw}', the CSS value for property '${prop}' does not have a valid type`
+		)
+	}
+}
+
+const isValidCssPropValue = (v) => {
+	const validTypes = ['string', 'number', 'bigint', 'boolean']
+
+	return validTypes.includes(typeof v)
 }
 
 const replaceTokenWithValue = (css, tk, value) => {
@@ -90,3 +122,6 @@ const replaceTokenWithValue = (css, tk, value) => {
 	const postfix = css.slice(tk.end, css.length)
 	return `${prefix}${value}${postfix}`
 }
+
+const isFunction = (v) => typeof v === 'function'
+const isObject = (v) => typeof v === 'object' && !Array.isArray(v)

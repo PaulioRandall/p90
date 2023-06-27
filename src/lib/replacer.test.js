@@ -182,4 +182,75 @@ describe('WHEN replacer called', () => {
 			})
 		})
 	})
+
+	describe('GIVEN object as replacement value', () => {
+		describe('THEN object is converted into CSS properties (string)', () => {
+			test('AND result used for substitution', () => {
+				const styles = {
+					highlightable: {
+						'border-radius': '0.4rem',
+						border: '2px solid transparent',
+						transition: 'border 300ms ease-out',
+					},
+					highlighted: {
+						border: '2px solid goldenrod',
+					},
+				}
+
+				const css = [
+					'.menu-item {',
+					'  $highlightable;',
+					'}',
+					'',
+					'.menu-item:hover {',
+					'  $highlighted;',
+					'}',
+				].join('\n')
+
+				const exp = [
+					'.menu-item {',
+					'  border-radius: 0.4rem;',
+					'border: 2px solid transparent;',
+					'transition: border 300ms ease-out;',
+					'}',
+					'',
+					'.menu-item:hover {',
+					'  border: 2px solid goldenrod;',
+					'}',
+				].join('\n')
+
+				const act = applyStylesToCss(styles, css)
+				expect(act).resolves.toEqual(exp)
+			})
+		})
+
+		describe('AND object contains nested objects', () => {
+			test('THEN error is thrown', () => {
+				const styles = {
+					highlight: {
+						default: {
+							border: '2px solid transparent',
+							transition: 'border 300ms ease-out',
+						},
+						hover: {
+							border: '2px solid goldenrod',
+						},
+					},
+				}
+
+				const css = [
+					'.menu-item {',
+					'  $highlight;', // <-- Simulated user error
+					'}',
+					'',
+					'.menu-item:hover {',
+					'  $highlight.hover;',
+					'}',
+				].join('\n')
+
+				const act = applyStylesToCss(styles, css)
+				expect(act).rejects.toBeInstanceOf(Error)
+			})
+		})
+	})
 })

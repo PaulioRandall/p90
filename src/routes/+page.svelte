@@ -12,4 +12,41 @@
 <main>
 	<Title>{title}</Title>
 	<Paragraph>A paragraph...</Paragraph>
+
+	<div class="container">
+		<div class="box" />
+		<div class="box" />
+		<div class="box" />
+	</div>
 </main>
+
+<style>
+	.container {
+		display: flex;
+		justify-content: center;
+		column-gap: 2rem;
+	}
+
+	@media (prefers-color-scheme: light) {
+		.box {
+			background-color: indianred;
+		}
+	}
+
+	@media (prefers-color-scheme: dark) {
+		.box {
+			background-color: purple;
+		}
+	}
+
+	.box {
+		width: 100px;
+		height: 100px;
+	
+		$highlight.default;
+	}
+
+	.box:hover {
+		$highlight.hover;
+	}
+</style>
