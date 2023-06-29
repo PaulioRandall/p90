@@ -1,4 +1,4 @@
-import { newScanFunc } from './scanner.js'
+import { newScanFunc } from './scan-tokens.js'
 
 const newToken = (start, end, raw, path, args = []) => {
 	return { start, end, raw, path, args }

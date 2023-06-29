@@ -43,7 +43,7 @@
 		width: 100px;
 		height: 100px;
 	
-		$highlight.default;
+		$highlight.normal;
 	}
 
 	.box:hover {

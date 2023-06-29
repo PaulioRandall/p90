@@ -1,4 +1,4 @@
-import { newScanFunc } from './scanner.js'
+import { newScanFunc } from './scan-tokens.js'
 
 export const replacer = (styleSets) => {
 	return {
