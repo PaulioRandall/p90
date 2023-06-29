@@ -81,7 +81,7 @@ const checkReplacementValue = (tk, value) => {
 
 const resolveValue = (tk, value) => {
 	if (isFunction(value)) {
-		return value()
+		return value(...tk.args)
 	}
 
 	if (isObject(value)) {

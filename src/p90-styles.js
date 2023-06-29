@@ -54,10 +54,21 @@ export default [
 				border: '10px inset $theme.strong',
 			},
 		},
+
+		// Example func call
+		add: (...numbers) => {
+			let result = 0
+
+			for (const n of numbers) {
+				result += parseFloat(n)
+			}
+
+			return result
+		},
 	},
 	{
 		// This one is processed second.
-		renderColorSchemes: async () => renderColorSchemes(themes),
+		renderColorSchemes: renderColorSchemes(themes),
 		theme: generateThemeVariables(themes),
 
 		font: {

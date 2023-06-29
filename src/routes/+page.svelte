@@ -24,7 +24,7 @@
 	.container {
 		display: flex;
 		justify-content: center;
-		column-gap: 2rem;
+		column-gap: $add(0.5, 0.8, 0.7)rem;
 	}
 
 	@media (prefers-color-scheme: light) {

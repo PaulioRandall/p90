@@ -165,6 +165,21 @@ describe('WHEN replacer called', () => {
 				const act = applyStylesToCss(styles, `$color`)
 				expect(act).rejects.toBeInstanceOf(Error)
 			})
+
+			test('AND function has arguments', () => {
+				let unspecifiedArg = 'something'
+
+				const styles = {
+					func: (a, b, c, d) => {
+						unspecifiedArg = d
+						return `${a}-${b}-${c}`
+					},
+				}
+
+				const act = applyStylesToCss(styles, `$func(alpha, beta, charlie)`)
+				expect(act).resolves.toEqual('alpha-beta-charlie')
+				expect(unspecifiedArg).toBeUndefined()
+			})
 		})
 	})
 
