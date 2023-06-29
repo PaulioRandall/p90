@@ -1,4 +1,4 @@
-import { newScanFunc } from './scan-tokens.js'
+import tokenScanner from './token-scanner.js'
 
 export const replacer = (styleSets) => {
 	return {
@@ -19,7 +19,7 @@ export const replacer = (styleSets) => {
 }
 
 const replaceAllTokens = async (css, styles) => {
-	const tokens = findAllTokens(css)
+	const tokens = tokenScanner.scanAll(css)
 
 	// Work from back to front of the CSS string otherwise replacements at
 	// the start will cause later tokens to hold the wrong start & end.
@@ -30,18 +30,6 @@ const replaceAllTokens = async (css, styles) => {
 	}
 
 	return css
-}
-
-const findAllTokens = (css) => {
-	const f = newScanFunc(css)
-	const result = []
-	let tk = null
-
-	while ((tk = f()) !== null) {
-		result.push(tk)
-	}
-
-	return result
 }
 
 const replaceToken = async (css, styles, tk) => {

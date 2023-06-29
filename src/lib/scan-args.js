@@ -1,3 +1,24 @@
+export const countArgsLen = (css, tokenName) => {
+	if (css.length === 0 || css[0] !== '(') {
+		return 0
+	}
+
+	let len = 0
+
+	for (; len < css.length; len++) {
+		if (css[len] === ')') {
+			break
+		}
+	}
+
+	if (len >= css.length) {
+		throw new Error(`Could not find closing paren for '${tokenName}'`)
+	}
+
+	len++
+	return len
+}
+
 export const scanArgs = (argsStr) => {
 	argsStr = argsStr.slice(1) // Remove opening paren
 	if (argsStr.length === 1) {
@@ -14,23 +35,6 @@ export const scanArgs = (argsStr) => {
 	}
 
 	return args
-}
-
-export const nextTokenArgsLen = (css, nameToken) => {
-	let len = 0
-
-	for (; len < css.length; len++) {
-		if (css[len] === ')') {
-			break
-		}
-	}
-
-	if (len >= css.length) {
-		throw new Error(`Could not find closing paren for '${nameToken.raw}'`)
-	}
-
-	len++
-	return len
 }
 
 const scanNextArg = (argsStr) => {

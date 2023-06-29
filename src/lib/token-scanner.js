@@ -1,6 +1,18 @@
-import { scanArgs, nextTokenArgsLen } from './scan-args.js'
+import { scanArgs, countArgsLen } from './scan-args.js'
 
-export const newScanFunc = (cssStr) => {
+const scanAll = (cssStr) => {
+	const f = scanFunc(cssStr)
+	const result = []
+	let tk = null
+
+	while ((tk = f()) !== null) {
+		result.push(tk)
+	}
+
+	return result
+}
+
+const scanFunc = (cssStr) => {
 	// PLESAE NOTE: CBA to handle two code points for the first implementation.
 	// TODO
 
@@ -53,11 +65,11 @@ export const newScanFunc = (cssStr) => {
 
 		const tk = sliceToken(len)
 
-		if (css.length === 0 || css[0] !== '(') {
+		const argsLen = countArgsLen(css, tk.raw)
+		if (argsLen === 0) {
 			return tk
 		}
 
-		const argsLen = nextTokenArgsLen(css, tk)
 		const argsTk = sliceToken(argsLen)
 		tk.end = argsTk.end
 		tk.raw += argsTk.raw
@@ -99,4 +111,9 @@ export const newScanFunc = (cssStr) => {
 	}
 
 	return scanNextToken
+}
+
+export default {
+	scanAll: scanAll,
+	scanFunc: scanFunc,
 }
