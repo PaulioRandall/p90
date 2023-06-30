@@ -8,12 +8,12 @@ const newStringReader = (s) => {
 	const haveEnough = (n) => idx + n <= len
 
 	const seek = (regex) => {
-		// TODO
-		// 1. Finds first regex match
-		// 2. readRunes up until the match
-		// Returns:
-		// - true if found
-		// - false if EOF
+		for (; idx < len; idx++) {
+			if (runes[idx].match(regex)) {
+				return true
+			}
+		}
+		return false
 	}
 
 	const matchRune = (regex) => !isEmpty() && runes[idx].match(regex)

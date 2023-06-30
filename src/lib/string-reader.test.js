@@ -69,3 +69,19 @@ describe('WHEN expectRune is called', () => {
 		})
 	})
 })
+
+describe('stringReader.seek', () => {
+	test('#1', () => {
+		const sr = stringReader.new('abc')
+		const found = sr.seek(/b/)
+		expect(found).toEqual(true)
+		expect(sr.index()).toEqual(1)
+	})
+
+	test('#2', () => {
+		const sr = stringReader.new('abc')
+		const found = sr.seek(/d/)
+		expect(found).toEqual(false)
+		expect(sr.index()).toEqual(3)
+	})
+})
