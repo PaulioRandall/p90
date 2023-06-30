@@ -20,10 +20,10 @@ const testFunc = ({ func, given, regex, exp, expError, expEmtpy = true }) => {
 	}
 }
 
-describe('WHEN acceptRune is called', () => {
+describe('WHEN accept is called', () => {
 	describe('WITH matching regex', () => {
 		testFunc({
-			func: 'acceptRune',
+			func: 'accept',
 			given: 'a',
 			regex: /a/,
 			exp: 'a',
@@ -32,7 +32,7 @@ describe('WHEN acceptRune is called', () => {
 
 	describe('WITH non-matching regex', () => {
 		testFunc({
-			func: 'acceptRune',
+			func: 'accept',
 			given: 'a',
 			regex: /b/,
 			exp: null,
@@ -42,7 +42,7 @@ describe('WHEN acceptRune is called', () => {
 
 	describe('WITH empty reader', () => {
 		testFunc({
-			func: 'acceptRune',
+			func: 'accept',
 			given: '',
 			regex: /a/,
 			exp: null,
@@ -50,10 +50,10 @@ describe('WHEN acceptRune is called', () => {
 	})
 })
 
-describe('WHEN expectRune is called', () => {
+describe('WHEN expect is called', () => {
 	describe('WITH matching regex', () => {
 		testFunc({
-			func: 'expectRune',
+			func: 'expect',
 			given: 'a',
 			regex: /a/,
 			exp: 'a',
@@ -62,7 +62,7 @@ describe('WHEN expectRune is called', () => {
 
 	describe('WITH non-matching regex', () => {
 		testFunc({
-			func: 'expectRune',
+			func: 'expect',
 			given: 'a',
 			regex: /b/,
 			expError: Error,
@@ -74,6 +74,7 @@ describe('stringReader.seek', () => {
 	test('#1', () => {
 		const sr = stringReader.new('abc')
 		const found = sr.seek(/b/)
+
 		expect(found).toEqual(true)
 		expect(sr.index()).toEqual(1)
 	})
@@ -81,6 +82,7 @@ describe('stringReader.seek', () => {
 	test('#2', () => {
 		const sr = stringReader.new('abc')
 		const found = sr.seek(/d/)
+
 		expect(found).toEqual(false)
 		expect(sr.index()).toEqual(3)
 	})

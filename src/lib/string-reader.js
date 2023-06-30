@@ -7,6 +7,10 @@ const newStringReader = (s) => {
 	const isEmpty = () => idx >= len
 	const haveEnough = (n) => idx + n <= len
 
+	const slice = (start, end) => {
+		return runes.slice(start, end).join('')
+	}
+
 	const seek = (regex) => {
 		for (; idx < len; idx++) {
 			if (runes[idx].match(regex)) {
@@ -18,8 +22,7 @@ const newStringReader = (s) => {
 
 	const matchRune = (regex) => !isEmpty() && runes[idx].match(regex)
 
-	const skip = () => readRune()
-	const readRune = () => readRunes(1)[0]
+	const read = () => readRunes(1)[0]
 
 	const readRunes = (n) => {
 		if (!haveEnough(n)) {
@@ -33,6 +36,18 @@ const newStringReader = (s) => {
 		return result
 	}
 
+	const accept = (regex) => {
+		return matchRune(regex) ? read() : null
+	}
+
+	const expect = (regex) => {
+		const ru = accept(regex)
+		if (ru === null) {
+			throw new Error(`Expected ${regex} but got ${runes[idx]}`)
+		}
+		return ru
+	}
+
 	const readWhile = (regex) => {
 		const result = []
 
@@ -44,26 +59,18 @@ const newStringReader = (s) => {
 		return result.join('')
 	}
 
-	const acceptRune = (regex) => {
-		return matchRune(regex) ? readRune() : null
-	}
-
-	const expectRune = (regex) => {
-		const ru = acceptRune(regex)
-		if (ru === null) {
-			throw new Error(`Expected ${regex} but got ${runes[idx]}`)
-		}
-		return ru
-	}
+	const skipWhitespace = () => readWhile(/\s/)
 
 	return {
 		index,
 		isEmpty,
-		skip,
+		slice,
 		seek,
+		read,
+		accept,
+		expect,
 		readWhile,
-		acceptRune,
-		expectRune,
+		skipWhitespace,
 	}
 }
 

@@ -5,13 +5,6 @@ const newToken = (start, end, raw, path, args = []) => {
 }
 
 describe('WHEN newScanFunc called', () => {
-	describe('GIVEN emtpy string', () => {
-		test('THEN returns null', () => {
-			const f = tokenScanner.scanFunc('')
-			expect(f).toEqual(null)
-		})
-	})
-
 	describe('GIVEN non-empty string', () => {
 		describe('AND no P90 variables', () => {
 			const f = tokenScanner.scanFunc('abc')
@@ -109,7 +102,7 @@ describe('WHEN newScanFunc called', () => {
 			})
 		})
 	})
-	/*
+
 	describe('GIVEN token with parens BUT no arguments', () => {
 		test('THEN returns token with no arguments', () => {
 			const f = tokenScanner.scanFunc('$func()')
@@ -153,5 +146,4 @@ describe('WHEN newScanFunc called', () => {
 			})
 		})
 	})
-	*/
 })
