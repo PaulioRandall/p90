@@ -18,6 +18,7 @@ const newStringReader = (s) => {
 
 	const matchRune = (regex) => !isEmpty() && runes[idx].match(regex)
 
+	const skip = () => readRune()
 	const readRune = () => readRunes(1)[0]
 
 	const readRunes = (n) => {
@@ -30,6 +31,17 @@ const newStringReader = (s) => {
 		const result = runes.slice(idx, idx + n)
 		idx += n
 		return result
+	}
+
+	const readWhile = (regex) => {
+		const result = []
+
+		while (matchRune(regex)) {
+			result.push(runes[idx])
+			idx++
+		}
+
+		return result.join('')
 	}
 
 	const acceptRune = (regex) => {
@@ -47,7 +59,9 @@ const newStringReader = (s) => {
 	return {
 		index,
 		isEmpty,
+		skip,
 		seek,
+		readWhile,
 		acceptRune,
 		expectRune,
 	}

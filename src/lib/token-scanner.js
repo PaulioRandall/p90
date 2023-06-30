@@ -1,4 +1,5 @@
 import { scanArgs, countArgsLen } from './scan-args.js'
+import stringReader from './string-reader.js'
 
 const scanAll = (cssStr) => {
 	const f = scanFunc(cssStr)
@@ -16,6 +17,8 @@ const scanFunc = (cssStr) => {
 	// PLESAE NOTE: CBA to handle two code points for the first implementation.
 	// TODO
 
+	const sr = stringReader.new(cssStr)
+
 	if (!cssStr || cssStr === '') {
 		return null
 	}
@@ -24,13 +27,21 @@ const scanFunc = (cssStr) => {
 	let idx = 0
 
 	const scanNextToken = () => {
-		if (!jumpToNextDollar()) {
-			idx += css.length
-			css = []
+		if (!sr.seek(/\$/)) {
 			return null
 		}
 
-		return scanToken()
+		const start = sr.index()
+		sr.skip()
+		const name = sr.readWhile(/[a-zA-Z0-9_\-\.]/)
+
+		return {
+			start: start,
+			end: sr.index(),
+			raw: `$${name}`,
+			path: name.split('.'),
+			args: [],
+		}
 	}
 
 	const jumpToNextDollar = () => {

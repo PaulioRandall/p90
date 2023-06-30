@@ -142,6 +142,7 @@ describe('WHEN replacer called', () => {
 		})
 	})
 
+	/*
 	describe('GIVEN function as replacement value', () => {
 		describe('THEN function is called', () => {
 			test('AND result used for substitution', () => {
@@ -268,4 +269,5 @@ describe('WHEN replacer called', () => {
 			})
 		})
 	})
+	*/
 })

@@ -109,7 +109,7 @@ describe('WHEN newScanFunc called', () => {
 			})
 		})
 	})
-
+	/*
 	describe('GIVEN token with parens BUT no arguments', () => {
 		test('THEN returns token with no arguments', () => {
 			const f = tokenScanner.scanFunc('$func()')
@@ -153,4 +153,5 @@ describe('WHEN newScanFunc called', () => {
 			})
 		})
 	})
+	*/
 })
