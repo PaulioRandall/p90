@@ -1,76 +1,48 @@
 import { newScanner } from './scanner.js'
 
-const testFunc = ({ func, given, regex, exp, expError, expEmtpy = true }) => {
-	const sr = newScanner(given)
-	const f = () => sr[func](regex)
+describe('newScanner(...).accept', () => {
+	test('#1', () => {
+		const sr = newScanner('abc')
+		const act = sr.accept(/a/)
 
-	if (expError) {
-		expect(f).toThrow(expError)
-		return
-	}
-
-	const act = f()
-	it('THEN returns the result', () => expect(act).toEqual(exp))
-
-	if (expEmtpy) {
-		it('AND reader will be empty', () => expect(sr.isEmpty()).toEqual(true))
-	} else {
-		it('AND reader will NOT be empty', () =>
-			expect(sr.isEmpty()).toEqual(false))
-	}
-}
-
-describe('WHEN accept is called', () => {
-	describe('WITH matching regex', () => {
-		testFunc({
-			func: 'accept',
-			given: 'a',
-			regex: /a/,
-			exp: 'a',
-		})
+		expect(act).toEqual('a')
+		expect(sr.index()).toEqual(1)
 	})
 
-	describe('WITH non-matching regex', () => {
-		testFunc({
-			func: 'accept',
-			given: 'a',
-			regex: /b/,
-			exp: null,
-			expEmtpy: false,
-		})
+	test('#2', () => {
+		const sr = newScanner('abc')
+		const act = sr.accept(/b/)
+
+		expect(act).toEqual(null)
+		expect(sr.index()).toEqual(0)
 	})
 
-	describe('WITH empty reader', () => {
-		testFunc({
-			func: 'accept',
-			given: '',
-			regex: /a/,
-			exp: null,
-		})
+	test('#3', () => {
+		const sr = newScanner('')
+		const act = sr.accept(/a/)
+
+		expect(act).toEqual(null)
+		expect(sr.index()).toEqual(0)
 	})
 })
 
-describe('WHEN expect is called', () => {
-	describe('WITH matching regex', () => {
-		testFunc({
-			func: 'expect',
-			given: 'a',
-			regex: /a/,
-			exp: 'a',
-		})
+describe('newScanner(...).expect', () => {
+	test('#1', () => {
+		const sr = newScanner('abc')
+		const act = sr.expect(/a/)
+
+		expect(act).toEqual('a')
+		expect(sr.index()).toEqual(1)
 	})
 
-	describe('WITH non-matching regex', () => {
-		testFunc({
-			func: 'expect',
-			given: 'a',
-			regex: /b/,
-			expError: Error,
-		})
+	test('#2', () => {
+		const sr = newScanner('abc')
+		const f = () => sr.expect(/b/)
+		expect(f).toThrow(Error)
 	})
 })
 
-describe('scanner.seek', () => {
+describe('newScanner(...).seek', () => {
 	test('#1', () => {
 		const sr = newScanner('abc')
 		const found = sr.seek(/b/)
@@ -85,5 +57,74 @@ describe('scanner.seek', () => {
 
 		expect(found).toEqual(false)
 		expect(sr.index()).toEqual(3)
+	})
+})
+
+describe('newScanner(...).readWhile', () => {
+	test('#1', () => {
+		const sr = newScanner('abc')
+		const s = sr.readWhile(/[a-z]/)
+
+		expect(s).toEqual('abc')
+		expect(sr.index()).toEqual(3)
+	})
+
+	test('#2', () => {
+		const sr = newScanner('abc')
+		const s = sr.readWhile(/[ab]/)
+
+		expect(s).toEqual('ab')
+		expect(sr.index()).toEqual(2)
+	})
+
+	test('#3', () => {
+		const sr = newScanner('abc1abc')
+		const s = sr.readWhile(/[a-z]/)
+
+		expect(s).toEqual('abc')
+		expect(sr.index()).toEqual(3)
+	})
+
+	test('#4', () => {
+		const sr = newScanner('abc')
+		const s = sr.readWhile(/[0-9]/)
+
+		expect(s).toEqual('')
+		expect(sr.index()).toEqual(0)
+	})
+
+	test('#5', () => {
+		const sr = newScanner('abc123')
+		sr.readWhile(/[a-z]/)
+		const s = sr.readWhile(/[0-9]/)
+
+		expect(s).toEqual('123')
+		expect(sr.index()).toEqual(6)
+	})
+})
+
+describe('newScanner(...).skipSpace', () => {
+	test('#1', () => {
+		const sr = newScanner('')
+		const s = sr.skipSpace()
+		expect(sr.index()).toEqual(0)
+	})
+
+	test('#2', () => {
+		const sr = newScanner('   ')
+		const s = sr.skipSpace()
+		expect(sr.index()).toEqual(3)
+	})
+
+	test('#3', () => {
+		const sr = newScanner(' a ')
+		const s = sr.skipSpace()
+		expect(sr.index()).toEqual(1)
+	})
+
+	test('#4', () => {
+		const sr = newScanner('\t\f\v\r')
+		const s = sr.skipSpace()
+		expect(sr.index()).toEqual(4)
 	})
 })

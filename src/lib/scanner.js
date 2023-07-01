@@ -13,10 +13,10 @@ export const newScanner = (s) => {
 	const len = runes.length
 	let idx = 0
 
-	// index returns the current iterator index.
+	// index returns the iterators' index.
 	const index = () => idx
 
-	// isEmpty is obvious.
+	// isEmpty doesn't need explanation.
 	const isEmpty = () => idx >= len
 
 	// haveEnough returns true if there is at least n unread runes.
