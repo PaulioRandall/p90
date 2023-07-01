@@ -34,26 +34,31 @@ Fork the repository and use as a starting point for your own CSS pre-processor. 
 
 Add **p90** to the `preprocess` array in your `svelte.config.js`.
 
-`./src/p90-styles.js` exports the config object we'll create next. Move and rename as you see fit.
+`./src/p90-styles.js` exports the config object we'll create next.
 
 ```js
 // svelte.config.js
 import p90 from 'p90'
 import styles from './src/p90-styles.js'
 
-const options {/*
-	mimeTypes: [
+export default {
+  ...,
+  preprocess: [p90(styles)],
+  ...,
+}
+```
+
+```js
+// Options with defaults.
+P90(styles, {
+	failOnError = false, // Svelte will usually tell you where the error is.
+	printErrors = true,  // Prints file name and token info.
+	mimeTypes: [ // import { defaultMimeTypes } from 'p90'
 		'', // None or empty lang attribute
 		'text/css',
 		'text/p90',
 	],
-*/}
-
-export default {
-  ...,
-  preprocess: [p90(styles, options)],
-  ...,
-}
+})
 ```
 
 ### p90-styles.js
@@ -66,11 +71,7 @@ import { rgbsToColors, generateThemeVars, renderColorSchemes } from 'p90/util'
 
 const breakpoints = {
 	phone_max_width: '599px',
-	tablet_portrait_min_width: '600px',
-	tablet_portrait_max_width: '899px',
 	tablet_landscape_min_width: '900px',
-	tablet_landscape_max_width: '1199px',
-	desktop_min_width: '1200px',
 }
 
 const rgbs = {
@@ -167,9 +168,6 @@ export default [
 		},
 
 		screen: {
-			phone_only: `(max-width: ${phone_max_width})`,
-			tablet_only: `(min-width: ${tablet_portrait_min_width}) and (max-width: ${tablet_landscape_max_width})`,
-			desktop_only: `(min-width: ${desktop_min_width})`,
 			larger_devices: `(min-width: ${tablet_landscape_min_width})`,
 		}
 	}

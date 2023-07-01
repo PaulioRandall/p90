@@ -1,26 +1,26 @@
 import tokenScanner from './token-scanner.js'
 
+const ttyRed = '\x1b[31m'
+const ttyYellow = '\x1b[33m'
+const ttyReset = '\x1b[0m'
+
 export const defaultMimeTypes = ['', 'text/css', 'text/p90']
 
-export const preprocessor = (styleSets, options = {}) => {
-	const { verbose = false, mimeTypes = defaultMimeTypes } = options
+export const p90 = (styleSets, options = {}) => {
+	options = {
+		failOnError: false,
+		printErrors: true,
+		mimeTypes: defaultMimeTypes,
+		...options,
+	}
 
 	return {
 		style: async ({ content, markup, attributes, filename }) => {
-			if (!isP90Style(mimeTypes, attributes.lang)) {
+			if (!isP90Style(options.mimeTypes, attributes.lang)) {
 				return content
 			}
 
-			if (verbose) {
-				process.stdout.write(`\nP90 processing: ${filename}`)
-			}
-
-			try {
-				content = await processCss(styleSets, content)
-			} catch (e) {
-				process.stdout.write(`\nP90 error: ${filename}`)
-				throw e
-			}
+			content = await processCss(content, styleSets, filename, options)
 
 			return Promise.resolve({ code: content })
 		},
@@ -32,19 +32,19 @@ const isP90Style = (mimeTypes, lang) => {
 	return mimeTypes.includes(lang)
 }
 
-const processCss = async (styleSets, css) => {
+const processCss = async (css, styleSets, filename, options) => {
 	if (!Array.isArray(styleSets)) {
 		styleSets = [styleSets]
 	}
 
 	for (const styles of styleSets) {
-		css = await replaceAllTokens(css, styles)
+		css = await replaceAllTokens(css, styles, filename, options)
 	}
 
 	return css
 }
 
-const replaceAllTokens = async (css, styles) => {
+const replaceAllTokens = async (css, styles, filename, options) => {
 	const tokens = tokenScanner.scanAll(css, '$')
 
 	// Work from back to front of the CSS string otherwise replacements at
@@ -52,7 +52,20 @@ const replaceAllTokens = async (css, styles) => {
 	tokens.reverse()
 
 	for (const tk of tokens) {
-		css = await replaceToken(css, styles, tk)
+		try {
+			css = await replaceToken(css, styles, tk)
+		} catch (e) {
+			if (options.printErrors) {
+				process.stderr.write(`${ttyRed}\nP90 error: ${filename}${ttyReset}`)
+				process.stderr.write(
+					`${ttyYellow}\nP90 token: ${JSON.stringify(tk, null, 2)}${ttyReset}\n`
+				)
+			}
+
+			if (options.failOnError) {
+				throw e
+			}
+		}
 	}
 
 	return css

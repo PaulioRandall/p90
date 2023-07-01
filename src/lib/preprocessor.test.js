@@ -1,4 +1,4 @@
-import { preprocessor } from './preprocessor.js'
+import { p90 } from './preprocessor.js'
 
 const newFile = (content, markup, attributes, filename) => {
 	return {
@@ -11,13 +11,13 @@ const newFile = (content, markup, attributes, filename) => {
 
 const applyStylesToCss = async (styles, css, options, attributes) => {
 	const file = newFile(css, undefined, attributes)
-	const result = await preprocessor(styles, options).style(file)
+	const result = await p90(styles, options).style(file)
 	return result.code
 }
 
 const joinLines = (...lines) => lines.join('\n')
 
-describe('preprocessor({...})', () => {
+describe('p90({...})', () => {
 	test('#1', () => {
 		const styles = {
 			green: 'forestgreen',
@@ -157,7 +157,12 @@ describe('preprocessor({...})', () => {
 			},
 		}
 
-		const promise = applyStylesToCss(styles, `$color`)
+		const options = {
+			failOnError: true,
+			printErrors: false,
+		}
+
+		const promise = applyStylesToCss(styles, `$color`, options)
 		expect(promise).rejects.toBeInstanceOf(Error)
 	})
 
@@ -248,7 +253,12 @@ describe('preprocessor({...})', () => {
 			'}'
 		)
 
-		const promise = applyStylesToCss(styles, css)
+		const options = {
+			failOnError: true,
+			printErrors: false,
+		}
+
+		const promise = applyStylesToCss(styles, css, options)
 		expect(promise).rejects.toBeInstanceOf(Error)
 	})
 
@@ -298,7 +308,7 @@ describe('preprocessor({...})', () => {
 	})
 })
 
-describe('preprocessor([...])', () => {
+describe('skipSpaces([...])', () => {
 	test('#1', () => {
 		const styles = [
 			{ first: '$second' },
@@ -311,7 +321,7 @@ describe('preprocessor([...])', () => {
 	})
 })
 
-describe('preprocessor({...}, )', () => {
+describe('skipSpaces({...}, )', () => {
 	test('#1', () => {
 		const styles = {
 			color: 'green',
