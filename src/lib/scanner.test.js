@@ -103,28 +103,28 @@ describe('newScanner(...).readWhile', () => {
 	})
 })
 
-describe('newScanner(...).skipSpace', () => {
+describe('newScanner(...).skipSpaces', () => {
 	test('#1', () => {
 		const sr = newScanner('')
-		const s = sr.skipSpace()
+		const s = sr.skipSpaces()
 		expect(sr.index()).toEqual(0)
 	})
 
 	test('#2', () => {
 		const sr = newScanner('   ')
-		const s = sr.skipSpace()
+		const s = sr.skipSpaces()
 		expect(sr.index()).toEqual(3)
 	})
 
 	test('#3', () => {
 		const sr = newScanner(' a ')
-		const s = sr.skipSpace()
+		const s = sr.skipSpaces()
 		expect(sr.index()).toEqual(1)
 	})
 
 	test('#4', () => {
 		const sr = newScanner('\t\f\v\r')
-		const s = sr.skipSpace()
+		const s = sr.skipSpaces()
 		expect(sr.index()).toEqual(4)
 	})
 })

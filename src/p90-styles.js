@@ -58,17 +58,15 @@ export default [
 		// Example func call
 		add: (...numbers) => {
 			let result = 0
-
 			for (const n of numbers) {
 				result += parseFloat(n)
 			}
-
 			return result
 		},
 	},
 	{
 		// This one is processed second.
-		renderColorSchemes: renderColorSchemes(themes),
+		render_color_schemes: renderColorSchemes(themes),
 		theme: generateThemeVariables(themes),
 
 		font: {

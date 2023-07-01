@@ -25,25 +25,27 @@ const scanFunc = (css, prefixRune = '$') => {
 	const prefixRegex = new RegExp(prefix)
 
 	const scanName = () => {
-		const name = sr.readWhile(/[a-zA-Z0-9_\-\.]/)
-		sr.skipSpace()
-		return name
+		return sr.readWhile(/[a-zA-Z0-9_\-\.]/)
+	}
+
+	const scanSuffix = () => {
+		sr.skipSpaces()
+		const suffix = sr.accept(/;/)
+		return suffix ? suffix : ''
 	}
 
 	const scanParams = (name) => {
+		sr.skipSpaces()
 		if (!sr.accept(/\(/)) {
 			return []
 		}
 
-		sr.skipSpace()
-
+		sr.skipSpaces()
 		if (sr.accept(/\)/)) {
 			return []
 		}
 
 		const args = scanArgs(name)
-
-		sr.skipSpace()
 		sr.expect(/\)/)
 
 		return args
@@ -56,24 +58,23 @@ const scanFunc = (css, prefixRune = '$') => {
 			const arg = scanArg(name)
 			args.push(arg)
 
+			sr.skipSpaces()
 			if (!sr.accept(/,/)) {
 				break
 			}
-
-			sr.skipSpace()
 		}
 
 		return args
 	}
 
 	const scanArg = (name) => {
-		const arg = sr.readWhile(/[^,)]/)
+		sr.skipSpaces()
 
+		const arg = sr.readWhile(/[^,)]/)
 		if (arg === '') {
 			throw new Error(`Missing argument for '${name}'`)
 		}
 
-		sr.skipSpace()
 		return arg
 	}
 
@@ -86,12 +87,15 @@ const scanFunc = (css, prefixRune = '$') => {
 		const startRune = sr.read()
 		const name = scanName()
 		const args = scanParams(name)
+		const suffix = scanSuffix()
 		const end = sr.index()
 
 		return {
 			start: start,
 			end: end,
+			prefix: prefixRune,
 			raw: sr.slice(start, end),
+			suffix: suffix,
 			path: name.split('.'),
 			args: args,
 		}

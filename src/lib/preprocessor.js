@@ -43,6 +43,7 @@ const replaceToken = async (css, styles, tk) => {
 	value = resolveValue(tk, value)
 	value = await Promise.resolve(value)
 	checkReplacementValue(tk, value)
+	value += tk.suffix
 
 	return replaceTokenWithValue(css, tk, value)
 }

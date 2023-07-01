@@ -86,8 +86,8 @@ export const newScanner = (s) => {
 		return result.join('')
 	}
 
-	// skipSpace reads until a non-whitespace rune is encountered.
-	const skipSpace = () => readWhile(/\s/)
+	// skipSpaces reads until a non-whitespace rune or EOF is encountered.
+	const skipSpaces = () => readWhile(/\s/)
 
 	return {
 		index,
@@ -100,6 +100,6 @@ export const newScanner = (s) => {
 		accept,
 		expect,
 		readWhile,
-		skipSpace,
+		skipSpaces,
 	}
 }
