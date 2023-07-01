@@ -103,7 +103,6 @@ const checkCssPropValue = (tk, prop, value) => {
 
 const isValidCssPropValue = (v) => {
 	const validTypes = ['string', 'number', 'bigint', 'boolean']
-
 	return validTypes.includes(typeof v)
 }
 
