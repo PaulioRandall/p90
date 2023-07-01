@@ -1,1 +1,1 @@
-export { replacer as default } from './replacer.js'
+export { preprocessor as default } from './preprocessor.js'

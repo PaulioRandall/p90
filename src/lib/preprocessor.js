@@ -1,6 +1,6 @@
 import tokenScanner from './token-scanner.js'
 
-export const replacer = (styleSets, options = {}) => {
+export const preprocessor = (styleSets, options = {}) => {
 	const { prefixRune } = options
 
 	return {
