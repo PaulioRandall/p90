@@ -1,7 +1,7 @@
-import scanner from './scanner.js'
+import { newScanner } from './scanner.js'
 
 const testFunc = ({ func, given, regex, exp, expError, expEmtpy = true }) => {
-	const sr = scanner.new(given)
+	const sr = newScanner(given)
 	const f = () => sr[func](regex)
 
 	if (expError) {
@@ -72,7 +72,7 @@ describe('WHEN expect is called', () => {
 
 describe('scanner.seek', () => {
 	test('#1', () => {
-		const sr = scanner.new('abc')
+		const sr = newScanner('abc')
 		const found = sr.seek(/b/)
 
 		expect(found).toEqual(true)
@@ -80,7 +80,7 @@ describe('scanner.seek', () => {
 	})
 
 	test('#2', () => {
-		const sr = scanner.new('abc')
+		const sr = newScanner('abc')
 		const found = sr.seek(/d/)
 
 		expect(found).toEqual(false)

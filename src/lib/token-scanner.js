@@ -1,4 +1,4 @@
-import scanner from './scanner.js'
+import { newScanner } from './scanner.js'
 
 const scanAll = (css) => {
 	const f = scanFunc(css)
@@ -16,11 +16,11 @@ const scanFunc = (css) => {
 	// PLESAE NOTE: CBA to handle two code points for the first implementation.
 	// TODO
 
-	const sr = scanner.new(css)
+	const sr = newScanner(css)
 
 	const scanName = () => {
 		const name = sr.readWhile(/[a-zA-Z0-9_\-\.]/)
-		sr.skipWhitespace()
+		sr.skipSpace()
 		return name
 	}
 
@@ -29,7 +29,7 @@ const scanFunc = (css) => {
 			return []
 		}
 
-		sr.skipWhitespace()
+		sr.skipSpace()
 
 		if (sr.accept(/\)/)) {
 			return []
@@ -37,7 +37,7 @@ const scanFunc = (css) => {
 
 		const args = scanArgs(name)
 
-		sr.skipWhitespace()
+		sr.skipSpace()
 		sr.expect(/\)/)
 
 		return args
@@ -54,7 +54,7 @@ const scanFunc = (css) => {
 				break
 			}
 
-			sr.skipWhitespace()
+			sr.skipSpace()
 		}
 
 		return args
@@ -67,7 +67,7 @@ const scanFunc = (css) => {
 			throw new Error(`Missing argument for '${name}'`)
 		}
 
-		sr.skipWhitespace()
+		sr.skipSpace()
 		return arg
 	}
 
