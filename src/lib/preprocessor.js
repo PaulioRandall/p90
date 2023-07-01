@@ -3,7 +3,7 @@ import tokenScanner from './token-scanner.js'
 export const defaultMimeTypes = ['', 'text/css', 'text/p90']
 
 export const preprocessor = (styleSets, options = {}) => {
-	const { mimeTypes = defaultMimeTypes } = options
+	const { verbose = false, mimeTypes = defaultMimeTypes } = options
 
 	return {
 		style: async ({ content, markup, attributes, filename }) => {
@@ -11,17 +11,18 @@ export const preprocessor = (styleSets, options = {}) => {
 				return content
 			}
 
-			let css = content
-
-			if (!Array.isArray(styleSets)) {
-				styleSets = [styleSets]
+			if (verbose) {
+				process.stdout.write(`\nP90 processing: ${filename}`)
 			}
 
-			for (const styles of styleSets) {
-				css = await replaceAllTokens(css, styles)
+			try {
+				content = await processCss(styleSets, content)
+			} catch (e) {
+				process.stdout.write(`\nP90 error: ${filename}`)
+				throw e
 			}
 
-			return Promise.resolve({ code: css })
+			return Promise.resolve({ code: content })
 		},
 	}
 }
@@ -29,6 +30,18 @@ export const preprocessor = (styleSets, options = {}) => {
 const isP90Style = (mimeTypes, lang) => {
 	lang = lang ? lang : ''
 	return mimeTypes.includes(lang)
+}
+
+const processCss = async (styleSets, css) => {
+	if (!Array.isArray(styleSets)) {
+		styleSets = [styleSets]
+	}
+
+	for (const styles of styleSets) {
+		css = await replaceAllTokens(css, styles)
+	}
+
+	return css
 }
 
 const replaceAllTokens = async (css, styles) => {

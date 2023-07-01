@@ -5,7 +5,7 @@ const newFile = (content, markup, attributes, filename) => {
 		content: content,
 		markup: markup ? markup : '',
 		attributes: attributes ? attributes : [],
-		filename: filename ? filename : '',
+		filename: filename ? filename : 'CssTest.svelte',
 	}
 }
 
