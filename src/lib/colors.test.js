@@ -1,7 +1,7 @@
 import { rgbsToColors } from './colors.js'
 
 describe('rgbsToColors', () => {
-	test('correctly converts all RGB values', () => {
+	test('#1', () => {
 		const rgbs = {
 			red: [255, 0, 0],
 			green: [0, 255, 0],

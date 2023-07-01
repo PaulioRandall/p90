@@ -14,7 +14,7 @@ const themes = {
 }
 
 describe('generateThemeVariables', () => {
-	test('correctly generates theme variables', () => {
+	test('#1', () => {
 		const exp = {
 			base: 'var(--theme-base)',
 			text: 'var(--theme-text)',
@@ -27,7 +27,7 @@ describe('generateThemeVariables', () => {
 })
 
 describe('renderColorSchemes', () => {
-	test('correctly renders color scheme media queries', () => {
+	test('#1', () => {
 		const exp = `@media (prefers-color-scheme: light) {
 	:global(:root) {
 		--theme-base: rgb(250, 250, 250);
