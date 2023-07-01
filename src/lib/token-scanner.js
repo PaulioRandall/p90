@@ -25,7 +25,7 @@ const scanFunc = (css, prefixRune = '$') => {
 	const prefixRegex = new RegExp(prefix)
 
 	const scanName = () => {
-		return sr.readWhile(/[a-zA-Z0-9_\-\.]/)
+		return sr.readWhile(/[a-zA-Z0-9_\-\.\$]/)
 	}
 
 	const scanSuffix = () => {

@@ -275,6 +275,42 @@ describe('preprocessor({...})', () => {
 		const promise = applyStylesToCss(styles, `$empty`)
 		expect(promise).resolves.toEqual('')
 	})
+
+	test('#17', () => {
+		const styles = {
+			$: '$',
+		}
+
+		const promise = applyStylesToCss(styles, `$$`)
+		expect(promise).resolves.toEqual('$')
+	})
+
+	test('#18', () => {
+		const styles = {
+			$$$: '$',
+		}
+
+		const promise = applyStylesToCss(styles, `$$$$`)
+		expect(promise).resolves.toEqual('$')
+	})
+
+	test('#19', () => {
+		const styles = {
+			$: (n = 1) => '$'.repeat(n),
+		}
+
+		const promise = applyStylesToCss(styles, `$$(4)`)
+		expect(promise).resolves.toEqual('$$$$')
+	})
+
+	test('#20', () => {
+		const styles = {
+			$: (n = 1) => '$'.repeat(n),
+		}
+
+		const promise = applyStylesToCss(styles, `$$`)
+		expect(promise).resolves.toEqual('$')
+	})
 })
 
 describe('preprocessor([...])', () => {
