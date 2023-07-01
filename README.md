@@ -258,10 +258,7 @@ import p90Util from 'p90/util'
 | :------------------------------------------------------------ | :-------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | [scanAll](#scanAll)                                           | Given a CSS string returns all P90 tokens within.                                                                                                                     |
 | [newScanFunc](#newscanfunc)                                   | Given a CSS string creates a function which can be called repeatedly to find all P90 tokens within.                                                                   |
-| [rgbToColor](#rgbtocolor)                                     | Converts an RGB or RGBA array to a CSS RGB or RGBA value.                                                                                                             |
 | [rgbsToColors](#rgbstocolors)                                 | Converts a map of RGB and RGBA arrays to CSS RGB and RGBA values.                                                                                                     |
-| [rgbWithAlpha](#rgbwithalpha)                                 | Adds an alpha component to an RGB array. array                                                                                                                        |
-| [rgbaWithoutAlpha](#rgbawithoutalpha)                         | Removes the alpha component from an RGBA array. array                                                                                                                 |
 | [renderColorSchemes](#rendercolorschemes)                     | Generates CSS color scheme media queries from a set of themes with CSS variables as values; goes hand-in-hand with [generateThemeVariables](#generatethemevariables). |
 | [generateThemeVariables](#generatethemevariables)             | Generates a **set** of CSS variables from a set of themes; goes hand-in-hand with [renderColorSchemes](#rendercolorschemes).                                          |
 | [buildColorSchemeMediaQueries](#buildcolorschememediaqueries) | Generates CSS color scheme media queries.                                                                                                                             |
@@ -323,29 +320,9 @@ example_token = {
 }
 ```
 
-### rgbToColor
-
-Converts an RGB or RGBA array to a CSS RGB or RGBA value. See [rgbsToColors](#rgbstocolors) to map whole objects containing RGB arrays.
-
-**Parameters**:
-
-- **rgb**: RGB or RGBA array `[r, g, b]` or `[r, g, b, a]`.
-
-```js
-import { rgbToColor } from 'p90/util'
-
-const burlyWood = rgbToColor([222, 184, 135])
-console.log(burlyWood)
-// "rgb(222, 184, 135)"
-
-const burlyWoodTransparent = rgbToColor([222, 184, 135, 0.5])
-console.log(burlyWoodTransparent)
-// "rgba(222, 184, 135, 0.5)"
-```
-
 ### rgbsToColors
 
-Converts a map of RGB and RGBA arrays to CSS RGB and RGBA values. See [rgbToColor](#rgbtocolor) to map a single array.
+Converts a map of RGB and RGBA arrays to CSS RGB and RGBA values.
 
 **Parameters**:
 
@@ -374,43 +351,6 @@ console.log(colors) // Use console.table for easy reading
 	dark_navy_grey_lucid: "rgba(5, 10, 60, 0.5)",
 }
 */
-```
-
-### rgbWithAlpha
-
-Adds an alpha component to an RGB array. See [rgbaWithoutAlpha](#rgbawithoutalpha) to remove.
-
-**Parameters**:
-
-- **rgb**: RGB array `[r, g, b]`.
-- **alpha**: alpha component to append to RGB array.
-
-```js
-import { rgbWithAlpha } from 'p90/util'
-
-const rgb = [222, 184, 135]
-const rgba = rgbWithAlpha(rgb, 0.5)
-
-console.log(rgba)
-// [222, 184, 135, 0.5]
-```
-
-### rgbaWithoutAlpha
-
-Removes the alpha component from an RGBA array. See [rgbWithAlpha](#rgbwithalpha) to add.
-
-**Parameters**:
-
-- **rgba**: RGBA array `[r, g, b, a]`.
-
-```js
-import { rgbaWithoutAlpha } from 'p90/util'
-
-const rgba = [222, 184, 135, 0.5]
-const rgb = rgbaWithoutAlpha(rgba)
-
-console.log(rgb)
-// [222, 184, 135]
 ```
 
 ### renderColorSchemes
