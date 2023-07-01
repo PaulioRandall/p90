@@ -4,6 +4,8 @@ A minimalist CSS pre-processor for Svelte. No need to learn fancy syntax.
 
 The rest of the introduction is hidden within the examples because you really don't give a damn.
 
+**Note**: Full unicode is not yet supported. 2 byte Unicode only so far.
+
 ## Choose your questline
 
 With this project you have three options:
@@ -75,7 +77,7 @@ const rgbs = {
 const colors = rgbsToColors(rgbs)
 
 const themes = {
-	// P90 doesn't care what the theme names are but CSS/browsers do!
+	// P90 doesn't care what the theme names are but browsers do!
 	light: {
 		base: colors.ice_cream,
 		text: colors.dark_navy_grey,
@@ -246,15 +248,16 @@ export default [
 
 There exists some utility functions for common activities. You don't have to use them to use **P90**. If you don't like the way I've approached CSS code generation then right your own functions. It's just plain JavaScript after all.
 
-Some are really convenient while others are so trivial it'll be quicker to write your own than look them up in the docs.
+Some are really convenient while others are so trivial it'll be quicker to write your own than look them up.
 
 ```js
 import p90Util from 'p90/util'
 ```
 
 | Name                                                          | Does what?                                                                                                                                                            |
-| ------------------------------------------------------------- | :-------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| [newScanFunc](#newscanfunc)                                   | Given a CSS string creates a function which can be called repeatedly to find all substitution tokens within.                                                          |
+| :------------------------------------------------------------ | :-------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [scanAll](#scanAll)                                           | Given a CSS string returns all P90 tokens within.                                                                                                                     |
+| [newScanFunc](#newscanfunc)                                   | Given a CSS string creates a function which can be called repeatedly to find all P90 tokens within.                                                                   |
 | [rgbToColor](#rgbtocolor)                                     | Converts an RGB or RGBA array to a CSS RGB or RGBA value.                                                                                                             |
 | [rgbsToColors](#rgbstocolors)                                 | Converts a map of RGB and RGBA arrays to CSS RGB and RGBA values.                                                                                                     |
 | [rgbWithAlpha](#rgbwithalpha)                                 | Adds an alpha component to an RGB array. array                                                                                                                        |
@@ -263,11 +266,34 @@ import p90Util from 'p90/util'
 | [generateThemeVariables](#generatethemevariables)             | Generates a **set** of CSS variables from a set of themes; goes hand-in-hand with [renderColorSchemes](#rendercolorschemes).                                          |
 | [buildColorSchemeMediaQueries](#buildcolorschememediaqueries) | Generates CSS color scheme media queries.                                                                                                                             |
 
+### scanAll
+
+You can pretty much ignore this function unless you want to scan **P90** tokens within CSS tags.
+
+Given a CSS string returns all P90 tokens in the order they appear. It is wise to perform string substitution in reverse order otherwise the `start` and `end` fields of later tokens become useless due to the CSS string length changing.
+
+**Parameters**:
+
+- **css**: CSS string.
+
+Use it like this:
+
+```js
+import { scanAll } from 'p90/util'
+
+const tokens = scanAll(css)
+tokens.reverse() // Because we have to substitute from back to front
+```
+
 ### newScanFunc
 
 You can pretty much ignore this function unless you want to scan CSS files into tokens.
 
-Given a CSS string creates a function which is called repeatedly to find all substitution tokens in the order they appear. It is wise to perform and string substitution in reverse order otherwise the `start` and `end` fields of later tokens become useless due to the CSS string length changing.
+Given a CSS string creates a function which is called repeatedly to find all **P90** tokens in the order they appear. It is wise to perform string substitution in reverse order otherwise the `start` and `end` fields of later tokens become useless due to the CSS string length changing.
+
+**Parameters**:
+
+- **css**: CSS string.
 
 Use it like this:
 
@@ -276,27 +302,24 @@ import { newScanFunc } from 'p90/util'
 
 const f = newScanFunc(css)
 const tokens = []
-
 let tk = null
+
 while ((tk = f()) !== null) {
 	tokens.push(tk)
 }
 
 tokens.reverse() // Because we have to substitute from back to front
-
-for (const tk of tokens) {
-	css = doSubstitution(css, tk, ...)
-}
 ```
 
-Tokens look like this:
-
 ```js
-token = {
-	start: 20, // only supports 2 byte unicode as of writing
-	end: 32, // add length of raw to start
-	raw: '$color.green',
-	path: ['color', 'green'],
+example_token = {
+	start: 9,
+	end: 34,
+	prefix: '$',
+	raw: '$color.mix(blue, yellow);',
+	suffix: ';', // One of ['', ';', ':']
+	path: ['color', 'mix'],
+	args: ['blue', 'yellow'],
 }
 ```
 
