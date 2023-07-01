@@ -9,28 +9,13 @@ const newFile = (content, markup, attributes, filename) => {
 	}
 }
 
-const applyStylesToCss = async (styles, css, options) => {
-	const file = newFile(css)
+const applyStylesToCss = async (styles, css, options, attributes) => {
+	const file = newFile(css, undefined, attributes)
 	const result = await preprocessor(styles, options).style(file)
 	return result.code
 }
 
 const joinLines = (...lines) => lines.join('\n')
-
-describe('preprocessor(..., { prefixRune="#" })', () => {
-	test('#1', () => {
-		const styles = {
-			green: 'forestgreen',
-		}
-
-		const options = {
-			prefixRune: '#',
-		}
-
-		const act = applyStylesToCss(styles, `#green`, options)
-		expect(act).resolves.toEqual('forestgreen')
-	})
-})
 
 describe('preprocessor({...})', () => {
 	test('#1', () => {
@@ -323,5 +308,37 @@ describe('preprocessor([...])', () => {
 
 		const promise = applyStylesToCss(styles, `$first`)
 		expect(promise).resolves.toEqual('\\o/')
+	})
+})
+
+describe('preprocessor({...}, )', () => {
+	test('#1', () => {
+		const styles = {
+			color: 'green',
+		}
+
+		const attrs = {
+			lang: 'text/p90',
+		}
+
+		const promise = applyStylesToCss(styles, `$color`, {}, attrs)
+		expect(promise).resolves.toEqual('green')
+	})
+
+	test('#2', () => {
+		const styles = {
+			color: 'green',
+		}
+
+		const options = {
+			mimeTypes: ['homer/simpson'],
+		}
+
+		const attrs = {
+			lang: 'homer/simpson',
+		}
+
+		const promise = applyStylesToCss(styles, `$color`, options, attrs)
+		expect(promise).resolves.toEqual('green')
 	})
 })

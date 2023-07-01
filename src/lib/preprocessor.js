@@ -1,10 +1,16 @@
 import tokenScanner from './token-scanner.js'
 
+export const defaultMimeTypes = ['', 'text/css', 'text/p90']
+
 export const preprocessor = (styleSets, options = {}) => {
-	const { prefixRune } = options
+	const { mimeTypes = defaultMimeTypes } = options
 
 	return {
 		style: async ({ content, markup, attributes, filename }) => {
+			if (!isP90Style(mimeTypes, attributes.lang)) {
+				return content
+			}
+
 			let css = content
 
 			if (!Array.isArray(styleSets)) {
@@ -12,7 +18,7 @@ export const preprocessor = (styleSets, options = {}) => {
 			}
 
 			for (const styles of styleSets) {
-				css = await replaceAllTokens(css, styles, prefixRune)
+				css = await replaceAllTokens(css, styles)
 			}
 
 			return Promise.resolve({ code: css })
@@ -20,8 +26,13 @@ export const preprocessor = (styleSets, options = {}) => {
 	}
 }
 
-const replaceAllTokens = async (css, styles, prefixRune) => {
-	const tokens = tokenScanner.scanAll(css, prefixRune)
+const isP90Style = (mimeTypes, lang) => {
+	lang = lang ? lang : ''
+	return mimeTypes.includes(lang)
+}
+
+const replaceAllTokens = async (css, styles) => {
+	const tokens = tokenScanner.scanAll(css, '$')
 
 	// Work from back to front of the CSS string otherwise replacements at
 	// the start will cause later tokens to hold the wrong start & end.

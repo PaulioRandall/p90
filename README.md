@@ -41,9 +41,17 @@ Add **p90** to the `preprocess` array in your `svelte.config.js`.
 import p90 from 'p90'
 import styles from './src/p90-styles.js'
 
+const options {/*
+	mimeTypes: [
+		'', // None or empty lang attribute
+		'text/css',
+		'text/p90',
+	],
+*/}
+
 export default {
   ...,
-  preprocess: [p90(styles)],
+  preprocess: [p90(styles, options)],
   ...,
 }
 ```
