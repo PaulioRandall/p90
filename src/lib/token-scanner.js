@@ -1,4 +1,4 @@
-import stringReader from './string-reader.js'
+import scanner from './scanner.js'
 
 const scanAll = (css) => {
 	const f = scanFunc(css)
@@ -16,7 +16,7 @@ const scanFunc = (css) => {
 	// PLESAE NOTE: CBA to handle two code points for the first implementation.
 	// TODO
 
-	const sr = stringReader.new(css)
+	const sr = scanner.new(css)
 
 	const scanName = () => {
 		const name = sr.readWhile(/[a-zA-Z0-9_\-\.]/)
