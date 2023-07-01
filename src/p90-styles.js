@@ -37,6 +37,8 @@ const themes = {
 
 export default [
 	{
+		props: null,
+
 		// This style map is processed first.
 		// Tokens injected by this map will be processed by the second.
 		rgb,

@@ -36,15 +36,19 @@ const replaceAllTokens = async (css, styles, prefixRune) => {
 
 const replaceToken = async (css, styles, tk) => {
 	let value = lookupStylesValue(styles, tk)
-	if (value === null) {
+	if (value === undefined) {
 		return css
 	}
 
 	value = resolveValue(tk, value)
 	value = await Promise.resolve(value)
 	checkReplacementValue(tk, value)
-	value += tk.suffix
 
+	if (value === null) {
+		return replaceTokenWithValue(css, tk, '')
+	}
+
+	value += tk.suffix
 	return replaceTokenWithValue(css, tk, value)
 }
 
@@ -52,25 +56,27 @@ const lookupStylesValue = (styles, tk) => {
 	let value = styles
 
 	for (const part of tk.path) {
-		value = value[part]
-
 		if (value === undefined || value === null) {
-			return null
+			return undefined
 		}
+
+		value = value[part]
 	}
 
 	return value
 }
 
 const checkReplacementValue = (tk, value) => {
-	if (value === undefined || value === null) {
-		throw new Error(
-			`Value returned by function '${tk.raw}' returned null or undefined`
-		)
+	if (value === undefined) {
+		throw new Error(`Value returned by function '${tk.raw}' returned undefined`)
 	}
 }
 
 const resolveValue = (tk, value) => {
+	if (value === null) {
+		return null
+	}
+
 	if (isFunction(value)) {
 		return value(...tk.args)
 	}
@@ -91,7 +97,7 @@ const objectToCss = (tk, obj) => {
 		result.push(`${prop}: ${value}`)
 	}
 
-	return result.join(';\n')
+	return result.join(';\n') + ';\n'
 }
 
 const checkCssPropValue = (tk, prop, value) => {

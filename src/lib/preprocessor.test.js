@@ -147,7 +147,7 @@ describe('preprocessor({...})', () => {
 
 	test('#9', () => {
 		const styles = {
-			green: null,
+			green: undefined,
 		}
 
 		const promise = applyStylesToCss(styles, `$green`)
@@ -168,7 +168,7 @@ describe('preprocessor({...})', () => {
 	test('#11', () => {
 		const styles = {
 			color: () => {
-				return null
+				return undefined
 			},
 		}
 
@@ -216,11 +216,11 @@ describe('preprocessor({...})', () => {
 
 		const css = joinLines(
 			'.menu-item {',
-			'  $highlightable;',
+			'  $highlightable',
 			'}',
 			'',
 			'.menu-item:hover {',
-			'  $highlighted;',
+			'  $highlighted',
 			'}'
 		)
 
@@ -255,16 +255,25 @@ describe('preprocessor({...})', () => {
 
 		const css = joinLines(
 			'.menu-item {',
-			'  $highlight;', // <-- Simulated user error
+			'  $highlight', // <-- Simulated user error
 			'}',
 			'',
 			'.menu-item:hover {',
-			'  $highlight.hover;',
+			'  $highlight.hover',
 			'}'
 		)
 
 		const promise = applyStylesToCss(styles, css)
 		expect(promise).rejects.toBeInstanceOf(Error)
+	})
+
+	test('#16', () => {
+		const styles = {
+			empty: null,
+		}
+
+		const promise = applyStylesToCss(styles, `$empty`)
+		expect(promise).resolves.toEqual('')
 	})
 })
 

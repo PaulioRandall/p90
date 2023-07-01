@@ -1,6 +1,6 @@
 # P90
 
-A minimalist CSS pre-processor for Svelte. No need to learn fancy syntax like other other CSS tooling.
+A minimalist CSS pre-processor for Svelte. No need to learn fancy syntax.
 
 The rest of the introduction is hidden within the examples because you really don't give a damn.
 
@@ -8,20 +8,20 @@ The rest of the introduction is hidden within the examples because you really do
 
 With this project you have three options:
 
-**1. Fork and customise**
-
-Fork the repository and use as a starting point for your own CSS pre-processor. See code in [Github](https://github.com/PaulioRandall/svelte-css-preprocessor).
-
-**2. Plunder**
+**1. Plunder**
 
 Loot the [`./src/lib`](https://github.com/PaulioRandall/svelte-css-preprocessor/tree/trunk/src/lib) folder for code to embed in your own projects and packages.
+
+**2. Fork and customise**
+
+Fork the repository and use as a starting point for your own CSS pre-processor. See code in [Github](https://github.com/PaulioRandall/svelte-css-preprocessor).
 
 **3. Import like any other package**
 
 ```json
 {
 	"devDependencies": {
-		"p90": "v0.10.0"
+		"p90": "v0.11.0"
 	}
 }
 ```
@@ -30,9 +30,9 @@ Loot the [`./src/lib`](https://github.com/PaulioRandall/svelte-css-preprocessor/
 
 ### svelte.config.js
 
-Import and add **p90** to the `preprocess` array in your `svelte.config.js`.
+Add **p90** to the `preprocess` array in your `svelte.config.js`.
 
-`./src/p90-styles.js` exports the config object we'll create in a moment. Move and rename as you see fit.
+`./src/p90-styles.js` exports the config object we'll create next. Move and rename as you see fit.
 
 ```js
 // svelte.config.js
@@ -98,21 +98,23 @@ const themes = {
 // read and change; but I one or two fair use cases.
 export default [
 	// Here's the neat part... these key-value pairs are up to you.
-	// - Functions are called without any parameters.
+	// - Undefined values throw an error.
 	// - Promises are resolved to values.
-	// - Undefined and null values throw an error.
+	// - Null values resolve to an empty string.
+	// - Objects are converted into CSS properties if called directly.
+	//   But must only contain properties that are straight forward to
+	//   stringify, i.e. string, number, bigint, and boolean.
+	// - Objects and nulls remove a single trailing colon or semi-colon if
+	//   present; everything else preserves colons and semi-colons.
 	// - Use kebab-case or camelCase if you don't like snake_case.
 	//
 	// But above all... do what works, is easy to read, and easy to change!
 	{
+		props: null,
+
 		rgb: rgbs,
 		color: colors,
 
-		// Objects are converted into CSS properties if called directly.
-		// But must only contain properties that are straight forward to
-		// stringify, i.e. string, number, bigint, and boolean
-		// E.g:
-		//   '$highlight.hover;' => 'border: 2px solid $theme.strong;
 		highlight: {
 			default: {
 				'border-radius': '0.4rem',
@@ -129,6 +131,7 @@ export default [
 		theme: generateThemeVariables(themes),
 
 		// Organise as you please.
+		//
 		// Both nesting and dead flat structures have their virtues.
 		// I advise keeping nesting to a minimum, it's easier to read and navigate.
 		font: {
@@ -223,12 +226,18 @@ export default [
 		}
 	}
 
-	/* Just for fun */
+	/*
+		'$props:' resolves to null in this example. This means the variable will
+		be removed from the CSS including the colon. This prevents most CSS
+		checkers from failing when properties are inserted via an object value.
+		
+		It also doubles up as documentation.
+	*/
 	p {
-		$highlight.default;
+		$props: $highlight.default;
 	}
 	p:hover {
-		$highlight.hover;
+		$props: $highlight.hover;
 	}
 </style>
 ```

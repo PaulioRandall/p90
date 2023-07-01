@@ -30,7 +30,7 @@ const scanFunc = (css, prefixRune = '$') => {
 
 	const scanSuffix = () => {
 		sr.skipSpaces()
-		const suffix = sr.accept(/;/)
+		const suffix = sr.accept(/[;:]/)
 		return suffix ? suffix : ''
 	}
 

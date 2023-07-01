@@ -9,7 +9,7 @@
 	}
 
 	/* prettier-ignore */
-	$render_color_schemes
+	$render_color_schemes()
 
 	:global(*),
 	:global(::before),

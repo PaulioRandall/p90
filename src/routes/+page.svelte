@@ -24,7 +24,7 @@
 	.container {
 		display: flex;
 		justify-content: center;
-		column-gap: $add(0.5, 0.8, 0.7)rem;
+		column-gap: $add(0.5, 0.8, 0.7) rem;
 	}
 
 	@media (prefers-color-scheme: light) {
@@ -42,11 +42,11 @@
 	.box {
 		width: 100px;
 		height: 100px;
-	
-		$highlight.normal;
+
+		$props: $highlight.normal;
 	}
 
 	.box:hover {
-		$highlight.hover;
+		$props: $highlight.hover;
 	}
 </style>
