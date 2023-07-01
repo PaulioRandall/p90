@@ -1,7 +1,7 @@
 import { newScanner } from './scanner.js'
 
-const scanAll = (css) => {
-	const f = scanFunc(css)
+const scanAll = (css, prefixRune) => {
+	const f = scanFunc(css, prefixRune)
 	const result = []
 	let tk = null
 
@@ -12,11 +12,17 @@ const scanAll = (css) => {
 	return result
 }
 
-const scanFunc = (css) => {
+const scanFunc = (css, prefixRune = '$') => {
 	// PLESAE NOTE: CBA to handle two code points for the first implementation.
 	// TODO
 
+	const escapeForRegex = (s) => {
+		return s.replace(/[/\-\.\(\)\[\]\$\^\&\\]/g, '\\$&')
+	}
+
 	const sr = newScanner(css)
+	const prefix = escapeForRegex(prefixRune)
+	const prefixRegex = new RegExp(prefix)
 
 	const scanName = () => {
 		const name = sr.readWhile(/[a-zA-Z0-9_\-\.]/)
@@ -72,7 +78,7 @@ const scanFunc = (css) => {
 	}
 
 	return () => {
-		if (!sr.seek(/\$/)) {
+		if (!sr.seek(prefixRegex)) {
 			return null
 		}
 

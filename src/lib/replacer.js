@@ -1,6 +1,8 @@
 import tokenScanner from './token-scanner.js'
 
-export const replacer = (styleSets) => {
+export const replacer = (styleSets, options = {}) => {
+	const { prefixRune } = options
+
 	return {
 		style: async ({ content, markup, attributes, filename }) => {
 			let css = content
@@ -10,7 +12,7 @@ export const replacer = (styleSets) => {
 			}
 
 			for (const styles of styleSets) {
-				css = await replaceAllTokens(css, styles)
+				css = await replaceAllTokens(css, styles, prefixRune)
 			}
 
 			return Promise.resolve({ code: css })
@@ -18,8 +20,8 @@ export const replacer = (styleSets) => {
 	}
 }
 
-const replaceAllTokens = async (css, styles) => {
-	const tokens = tokenScanner.scanAll(css)
+const replaceAllTokens = async (css, styles, prefixRune) => {
+	const tokens = tokenScanner.scanAll(css, prefixRune)
 
 	// Work from back to front of the CSS string otherwise replacements at
 	// the start will cause later tokens to hold the wrong start & end.

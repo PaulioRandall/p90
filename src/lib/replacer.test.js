@@ -9,11 +9,26 @@ const newFile = (content, markup, attributes, filename) => {
 	}
 }
 
-const applyStylesToCss = async (styles, css) => {
+const applyStylesToCss = async (styles, css, options) => {
 	const file = newFile(css)
-	const result = await replacer(styles).style(file)
+	const result = await replacer(styles, options).style(file)
 	return result.code
 }
+
+describe('replacer(styles, { prefixRune="#" })', () => {
+	test('#1', () => {
+		const styles = {
+			green: 'forestgreen',
+		}
+
+		const options = {
+			prefixRune: '#',
+		}
+
+		const act = applyStylesToCss(styles, `#green`, options)
+		expect(act).resolves.toEqual('forestgreen')
+	})
+})
 
 describe('WHEN replacer called', () => {
 	test('GIVEN placeholder is the only CSS', () => {
