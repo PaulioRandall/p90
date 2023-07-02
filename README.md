@@ -442,7 +442,9 @@ token_after_scanning = {
 }
 ```
 
-2. Look up the property `prop` in the users style map via [lookupProp](#lookupProp) from [lookup.js](./src/lib/lookup.js). The property is not the token field that should be used for substitution. Properties will be resolved into values in the next step. For most types there is no change but functions need to be invoked and objects transformed.
+2. Look up the property `prop` in the users style map via [lookupProp](#lookupProp) from [lookup.js](./src/lib/lookup.js).
+
+The property is not the token field that should be used for substitution. Properties will be resolved into values in the next step. For most types there is no change but functions need to be invoked and objects transformed.
 
 ```js
 token_after_lookup = {
@@ -453,7 +455,7 @@ token_after_lookup = {
 	suffix: ';', // One of ['', ';', ':']
 	path: ['numbers', 'add'],
 	args: ['1', '2', '3'],
-	type: 'function', // From typeof with the addition of 'array'
+	type: 'function', // From 'typeof' with extra custom type 'array'
 	prop: (...numbers) => {
 		let result = 0
 		for (const n of numbers) {
@@ -464,7 +466,30 @@ token_after_lookup = {
 }
 ```
 
-3. TODO
+3. Resolve the property `prop` to a value via [resolveValue](#resolveValue) from [resolve.js](./src/lib/resolve.js). The resultant `value` should be usable for the CSS string substitution without need for further modification.
+
+The `type` field is used to determine how this is done. The suffix will be appended, except where the type is _"null"_. If the type is _"object"_ and `suffix` is empty then `;\n` is appended.
+
+```js
+token_after_resolve = {
+	start: 9,
+	end: 31,
+	prefix: '$',
+	raw: '$numbers.add(1, 2, 3);',
+	suffix: ';', // One of ['', ';', ':']
+	path: ['numbers', 'add'],
+	args: ['1', '2', '3'],
+	type: 'function', // As returned by 'typeof' with extra custom type 'array'
+	prop: (...numbers) => {
+		let result = 0
+		for (const n of numbers) {
+			result += parseFloat(n)
+		}
+		return result
+	},
+	value: '6;', // Notice the suffix has been appended
+}
+```
 
 ### scanAll
 
@@ -537,6 +562,39 @@ tk = {
 	path: ['abc', 'xyz'],
 	type: 'number',
 	prop: 123,
+	...
+}
+*/
+```
+
+### resolveValue
+
+Resolves the `prop` using the `type` field for a token. The token is deep cloned before the `value` is resolved and appended. If a `type` can't be resolved then an error is thrown. If a function returns `undefined` then the `value` is set as such; it's then up to the calling code to decide the token's fate.
+
+**Parameters**:
+
+- **tk**: Scanned lexical token.
+
+```js
+import { resolveValue } from './resolve.js'
+
+const tk = {
+	...,
+	suffix: ';',
+	type: 'number',
+	prop: 123,
+	...
+}
+
+tk = resovleValue(tk)
+
+/*
+tk = {
+	...,
+	suffix: ';',
+	type: 'number',
+	prop: 123,
+	value: '123;'
 	...
 }
 */

@@ -44,15 +44,8 @@ describe('resolve(...)', () => {
 			prop: undefined,
 		}
 
-		const exp = {
-			suffix: ';',
-			type: 'undefined',
-			prop: undefined,
-			value: undefined,
-		}
-
 		const promise = resolveValue(given)
-		expect(promise).resolves.toEqual(exp)
+		expect(promise).rejects.toBeInstanceOf(Error)
 	})
 
 	test('#4', async () => {

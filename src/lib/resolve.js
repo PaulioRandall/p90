@@ -2,10 +2,6 @@ export const resolveValue = async (tk) => {
 	tk = deepClone(tk)
 
 	switch (tk.type) {
-		case 'undefined':
-			tk.value = undefined
-			break
-
 		case 'null':
 			tk.value = ''
 			break
@@ -19,6 +15,9 @@ export const resolveValue = async (tk) => {
 			break
 
 		case 'function':
+			// TODO: Recursive call neeeded if result is undefined, null, or object.
+			// If function is returned then throw error, there's no need to resolve.
+			// The user can call the function themselves, using async/await if need.
 			tk.value = await Promise.resolve(tk.prop(...tk.args))
 			break
 
@@ -27,7 +26,7 @@ export const resolveValue = async (tk) => {
 			break
 
 		default:
-			throw new Error(`Can't resolve unknown type '${tk.type}'`)
+			throw new Error(`Can't resolve unsupported type '${tk.type}'`)
 	}
 
 	return appendSuffix(tk)
