@@ -8,7 +8,6 @@ The rest of the introduction is hidden within the examples because you really do
 
 ## TODO
 
-- **Fix** whitespace is removed after value if no parameters or suffixis present.
 - **Test (& maybe add)** full unicode compatiblity.
 
 ## Choose your questline

@@ -56,7 +56,7 @@ const replaceAllTokens = async (css, lookupMap, filename, options) => {
 		try {
 			css = await replaceToken(css, lookupMap, tk)
 		} catch (e) {
-			handleError(e, filename, options)
+			handleError(e, filename, options, tk)
 		}
 	}
 
@@ -78,12 +78,12 @@ const replaceToken = async (css, lookupMap, tk) => {
 	return `${prefix}${tk.value}${postfix}`
 }
 
-const handleError = (e, filename, options) => {
+const handleError = (e, filename, options, tk) => {
 	if (options.printErrors) {
 		const tkStr = JSON.stringify(tk, null, 2)
 
 		process.stderr.write(`${TTY_RED}\nP90 error: ${filename}${TTY_RESET}`)
-		process.stderr.write(e.message)
+		process.stderr.write(`${TTY_RED}\n${e.message}${TTY_RESET}`)
 		process.stderr.write(`${TTY_YELLOW}\nP90 token: ${tkStr}${TTY_RESET}\n`)
 	}
 

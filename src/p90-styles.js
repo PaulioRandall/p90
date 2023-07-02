@@ -37,10 +37,10 @@ const themes = {
 
 export default [
 	{
-		props: null,
-
 		// This style map is processed first.
 		// Tokens injected by this map will be processed by the second.
+		props: null,
+
 		rgb,
 		color,
 
@@ -58,12 +58,12 @@ export default [
 		},
 
 		// Example func call
-		add: (...numbers) => {
+		addRem: (...rems) => {
 			let result = 0
-			for (const n of numbers) {
+			for (const n of rems) {
 				result += parseFloat(n)
 			}
-			return result
+			return `${result}rem`
 		},
 	},
 	{

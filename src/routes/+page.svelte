@@ -24,9 +24,7 @@
 	.container {
 		display: flex;
 		justify-content: center;
-		column-gap: $add(0.5, 0.8, 0.7) rem;
-
-		/* TODO: (BUG) whitespace needs to be preserved */
+		column-gap: $addRem(0.5, 0.8, 0.7);
 		border: $space.md() dashed cyan;
 	}
 

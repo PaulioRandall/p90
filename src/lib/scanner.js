@@ -36,6 +36,11 @@ export const newScanner = (s) => {
 		return runes.slice(start, end).join('')
 	}
 
+	// goto jumps to the absolute index i.
+	const goto = (i) => {
+		idx = i
+	}
+
 	// seek advances the iterator until a rune matches the regex.
 	const seek = (regex) => {
 		while (idx < len) {
@@ -95,6 +100,7 @@ export const newScanner = (s) => {
 		haveEnough,
 		match,
 		slice,
+		goto,
 		seek,
 		read,
 		accept,

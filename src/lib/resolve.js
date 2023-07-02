@@ -23,7 +23,7 @@ export const resolveValue = async (tk) => {
 			break
 
 		case 'object':
-			tk.value = mapToCssProps(tk.prop, tk)
+			tk.value = mapToCssProps(tk)
 			break
 
 		default:
@@ -81,28 +81,32 @@ const invokeFunction = async (tk) => {
 	return await resolveValue(tk)
 }
 
-const mapToCssProps = (map, tk) => {
+const mapToCssProps = (tk) => {
 	const result = []
 
-	for (const cssProp in map) {
-		const value = map[cssProp]
+	for (const cssProp in tk.prop) {
+		const value = tk.prop[cssProp]
 		checkCssPropValue(cssProp, value, tk)
 		result.push(`${cssProp}: ${value.toString()}`)
 	}
 
-	let suffix = ';\n'
-	if (tk.suffix) {
-		suffix = tk.suffix
-	}
-
+	const suffix = tk.suffix ? tk.suffix : ';\n'
 	return result.join(';\n') + suffix
 }
 
 const checkCssPropValue = (cssProp, value, tk) => {
-	if (!implicitTypes.includes(typeof value)) {
-		throw new Error(
-			`For '${tk.raw}', the CSS property '${cssProp}' does not have a valid type`
-		)
+	const type = identifyType(value)
+
+	if (!implicitTypes.includes(type)) {
+		const errObj = {
+			'CSS property': cssProp,
+			"User's type": type,
+			description: 'Type not allowed as a CSS property value',
+			validTypes: implicitTypes,
+		}
+
+		const errMsg = JSON.stringify(errObj, null, 2)
+		throw new Error(errMsg)
 	}
 }
 

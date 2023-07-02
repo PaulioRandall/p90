@@ -29,9 +29,17 @@ const scanFunc = (css, prefixRune = '$') => {
 	}
 
 	const scanSuffix = () => {
+		const bookmark = sr.index()
+
 		sr.skipSpaces()
 		const suffix = sr.accept(/[;:]/)
-		return suffix ? suffix : ''
+
+		if (!suffix) {
+			sr.goto(bookmark)
+			return ''
+		}
+
+		return suffix
 	}
 
 	const scanParams = (name) => {
