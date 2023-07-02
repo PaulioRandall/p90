@@ -48,7 +48,7 @@ describe('resolve(...)', () => {
 		expect(promise).rejects.toBeInstanceOf(Error)
 	})
 
-	test('#4', async () => {
+	test('#4', () => {
 		// NOT ASYNC
 
 		const func = (...propNameParts) => propNameParts.join('-')
@@ -72,7 +72,7 @@ describe('resolve(...)', () => {
 		expect(promise).resolves.toEqual(exp)
 	})
 
-	test('#5', async () => {
+	test('#5', () => {
 		// ASYNC
 
 		const func = async (...propNameParts) => propNameParts.join('-')
@@ -96,7 +96,7 @@ describe('resolve(...)', () => {
 		expect(promise).resolves.toEqual(exp)
 	})
 
-	test('#5', async () => {
+	test('#5', () => {
 		// WITH SUFFIX
 
 		const given = {
@@ -122,7 +122,7 @@ describe('resolve(...)', () => {
 		expect(promise).resolves.toEqual(exp)
 	})
 
-	test('#6', async () => {
+	test('#6', () => {
 		// NO SUFFIX
 
 		const given = {
@@ -146,5 +146,93 @@ describe('resolve(...)', () => {
 
 		const promise = resolveValue(given)
 		expect(promise).resolves.toEqual(exp)
+	})
+
+	test('#7', () => {
+		const func = () => {
+			return {
+				color: 'red',
+				'font-size': '2rem',
+			}
+		}
+
+		const given = {
+			suffix: ';',
+			args: [],
+			type: 'function',
+			prop: func,
+		}
+
+		const exp = {
+			suffix: ';',
+			args: [],
+			type: 'object',
+			prop: {
+				color: 'red',
+				'font-size': '2rem',
+			},
+			value: 'color: red;\nfont-size: 2rem;',
+			recursed: true,
+		}
+
+		const promise = resolveValue(given)
+		expect(promise).resolves.toEqual(exp)
+	})
+
+	test('#8', () => {
+		const func = () => {
+			return null
+		}
+
+		const given = {
+			suffix: ';',
+			args: [],
+			type: 'function',
+			prop: func,
+		}
+
+		const exp = {
+			suffix: ';',
+			args: [],
+			type: 'null',
+			prop: null,
+			value: '',
+			recursed: true,
+		}
+
+		const promise = resolveValue(given)
+		expect(promise).resolves.toEqual(exp)
+	})
+
+	test('#9', () => {
+		const func = () => {
+			return undefined
+		}
+
+		const given = {
+			suffix: ';',
+			args: [],
+			type: 'function',
+			prop: func,
+		}
+
+		const promise = resolveValue(given)
+		expect(promise).rejects.toBeInstanceOf(Error)
+	})
+
+	test('#10', () => {
+		const func = () => {
+			return () => 'Not allowed to return functions'
+		}
+
+		const given = {
+			suffix: ';',
+			args: [],
+			type: 'function',
+			prop: func,
+		}
+
+		const promise = resolveValue(given)
+		expect(promise).rejects.toBeInstanceOf(Error)
 	})
 })

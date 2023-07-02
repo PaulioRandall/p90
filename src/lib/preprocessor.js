@@ -72,13 +72,9 @@ const replaceToken = async (css, lookupMap, tk) => {
 
 	tk = await resolveValue(tk)
 
-	// TODO: This is temp until resolve is updated.
-	if (tk.value === undefined) {
-		throw new Error(`Value of '${tk.raw}' is undefined; tis not allowed!`)
-	}
-
 	const prefix = css.slice(0, tk.start)
 	const postfix = css.slice(tk.end, css.length)
+
 	return `${prefix}${tk.value}${postfix}`
 }
 

@@ -1,3 +1,7 @@
+import { identifyType } from './lookup.js'
+
+const implicitTypes = ['string', 'number', 'bigint', 'boolean', 'array']
+
 export const resolveValue = async (tk) => {
 	tk = deepClone(tk)
 
@@ -15,10 +19,7 @@ export const resolveValue = async (tk) => {
 			break
 
 		case 'function':
-			// TODO: Recursive call neeeded if result is undefined, null, or object.
-			// If function is returned then throw error, there's no need to resolve.
-			// The user can call the function themselves, using async/await if need.
-			tk.value = await Promise.resolve(tk.prop(...tk.args))
+			tk = await invokeFunction(tk)
 			break
 
 		case 'object':
@@ -58,13 +59,35 @@ const structuredCloneExtra = (tk, ...refFieldNames) => {
 	}
 }
 
+const invokeFunction = async (tk) => {
+	tk.value = await Promise.resolve(tk.prop(...tk.args))
+
+	const valueType = identifyType(tk.value)
+	if (implicitTypes.includes(valueType)) {
+		return tk
+	}
+
+	tk.recursed = true
+	tk.type = valueType
+	tk.prop = tk.value
+	delete tk.value
+
+	if (tk.type === 'function') {
+		throw new Error(
+			"To avoid inifinite recursion, you can't return a function from a function."
+		)
+	}
+
+	return await resolveValue(tk)
+}
+
 const mapToCssProps = (map, tk) => {
 	const result = []
 
 	for (const cssProp in map) {
 		const value = map[cssProp]
 		checkCssPropValue(cssProp, value, tk)
-		result.push(`${cssProp}: ${value}`)
+		result.push(`${cssProp}: ${value.toString()}`)
 	}
 
 	let suffix = ';\n'
@@ -76,9 +99,7 @@ const mapToCssProps = (map, tk) => {
 }
 
 const checkCssPropValue = (cssProp, value, tk) => {
-	const validCssPropTypes = ['string', 'number', 'bigint', 'boolean']
-
-	if (!validCssPropTypes.includes(typeof value)) {
+	if (!implicitTypes.includes(typeof value)) {
 		throw new Error(
 			`For '${tk.raw}', the CSS property '${cssProp}' does not have a valid type`
 		)

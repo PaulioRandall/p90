@@ -4,7 +4,7 @@ A minimalist CSS pre-processor for Svelte. No need to learn fancy syntax.
 
 The rest of the introduction is hidden within the examples because you really don't give a damn.
 
-**Note**: Full unicode is not yet supported. 2 byte Unicode only so far.
+**Note**: Probably not full unicode compatible yet.
 
 ## Choose your questline
 
@@ -23,7 +23,7 @@ Fork the repository and use as a starting point for your own CSS pre-processor. 
 ```json
 {
 	"devDependencies": {
-		"p90": "v0.13.0"
+		"p90": "v0.14.0"
 	}
 }
 ```
@@ -51,9 +51,17 @@ export default {
 ```js
 // Options with defaults.
 P90(styles, {
-	failOnError = false, // Svelte will usually tell you where the error is.
-	printErrors = true,  // Prints file name and token info.
-	mimeTypes: [ // import { defaultMimeTypes } from 'p90'
+	// If true errors will throw up to Svelte which usually fails when validating
+	// the CSS. Default is off beccause Svelte is better at telling you where
+	// the error is.
+	failOnError = false,
+
+	// Prints file name and token info.
+	printErrors = true,
+
+	// List accepted mime types.
+	// import { defaultMimeTypes } from 'p90'
+	mimeTypes: [
 		'', // None or empty lang attribute
 		'text/css',
 		'text/p90',
@@ -114,13 +122,26 @@ export default [
 	// - Null values resolve to an empty string.
 	// - Objects are converted into CSS properties if called directly.
 	//   But must only contain properties that are straight forward to
-	//   stringify, i.e. string, number, bigint, and boolean.
-	// - Objects and nulls remove a single trailing colon or semi-colon if
-	//   present; everything else preserves colons and semi-colons.
-	// - Use kebab-case or camelCase if you don't like snake_case.
+	//   stringify, i.e. string, number, bigint, boolean, and array.
+	// - Functions may return a `null` or `object` type which will be resolved
+	//   recursively. But returning a function from a function is needless so
+	//   will result in an error.
+	// - Trailing colons and semi-colons are preserved, except for:
+	//   - Nulls: which remove a single instance if present.
+	//   - Objects: which will appended `\n` if no is present.
 	//
-	// But above all... do what works, is easy to read, and easy to change!
+	// There aren't really any conventions because the limitations of the design
+	// are good enough. Use kebab-case or camelCase if you don't like snake_case.
+	// But above all...
+	// - do what works;
+	// - as simple as possible;
+	// - as easy to read as possible;
+	// - and as easy to change as possible.
 	{
+		// Organise as you please.
+		//
+		// Both nesting and dead flat structures have their virtues.
+		// However, I advise keeping nesting to a minimum.
 		props: null,
 
 		rgb: rgbs,
@@ -136,15 +157,10 @@ export default [
 				border: '10px solid $theme.strong',
 			},
 		},
-	},
-	{
+
 		color_schemes: renderColorSchemes(themes),
 		theme: generateThemeVariables(themes),
 
-		// Organise as you please.
-		//
-		// Both nesting and dead flat structures have their virtues.
-		// I advise keeping nesting to a minimum, it's easier to read and navigate.
 		font: {
 			family: {
 				// Silly. I know. But just an example of a function call.
@@ -154,18 +170,11 @@ export default [
 			},
 			size: {
 				// Constructed using utopia.fyi... Could these be constructed in code?
-				sm: 'clamp(0.89rem, calc(0.85rem + 0.18vw), 1.03rem)',
 				md: 'clamp(1.06rem, calc(0.98rem + 0.39vw), 1.38rem)',
 				lg: 'clamp(1.25rem, calc(1.19rem + 0.31vw), 1.5rem)',
 				xl: 'clamp(1.5rem, calc(1.41rem + 0.47vw), 1.88rem)',
 			}
 		}
-
-		space: {
-			md: '1rem',
-			lg: '2rem',
-			xl: '4rem',
-		},
 
 		screen: {
 			larger_devices: `(min-width: ${tablet_landscape_min_width})`,
@@ -200,25 +209,25 @@ export default [
 
 	<p>
 		It took me about an hour to learn and write my first Svelte CSS
-		pre-processor after deciding existing tooling was overweight for my needs.
+		pre-processor after deciding existing tooling was too obese for my needs.
 		Refactoring reduced my solution to about 20 lines of code. It simply
 		substituted named values like `$green` with whatever I configured `rgb(10,
-		240, 10)`. I've added a handful of utility functions for common use cases
-		and here we are.
+		240, 10)`. I've enhanced it a little and added a handful of utility
+		functions for common use cases; that's it.
 	</p>
 
 	<p>
-		It was so simple that I wondered why we've invented a plethora of CSS like
-		languages with needless diabolical syntax. Because no one had yet created
-		Svelte! Why do complex transpiling when simply value substitution can do the
-		job. Let JavaScript handle logic because that's what it's designed to do.
-		You know, making use of languages we already know and hate.
+		It was so simple that I wondered why we drag around a plethora of CSS like
+		languages with needless diabolical syntax. Because it's easier to use an
+		overweight tool you know than invest effort in adapting to the new
+		environment.
 	</p>
 
 	<p>
-		Please, have a ago at using, forking or plundering even if you intend to use
-		a main stream tool. You'll start to realise just how bloated most software
-		libraries are.
+		And why do slow complex transpiling when fast and simple value substitution
+		can do the job. Let JavaScript handle logic, not a CSS mutant, because
+		that's what JavaScript is designed to do. You know, making use of languages
+		we already know and hate.
 	</p>
 </page>
 
@@ -262,8 +271,6 @@ import p90Util from 'p90/util'
 
 | Name                                                          | Does what?                                                                                                                                                            |
 | :------------------------------------------------------------ | :-------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| [scanAll](#scanAll)                                           | Given a CSS string returns all P90 tokens within.                                                                                                                     |
-| [newScanFunc](#newscanfunc)                                   | Given a CSS string creates a function which can be called repeatedly to find all P90 tokens within.                                                                   |
 | [rgbsToColors](#rgbstocolors)                                 | Converts a map of RGB and RGBA arrays to CSS RGB and RGBA values.                                                                                                     |
 | [renderColorSchemes](#rendercolorschemes)                     | Generates CSS color scheme media queries from a set of themes with CSS variables as values; goes hand-in-hand with [generateThemeVariables](#generatethemevariables). |
 | [generateThemeVariables](#generatethemevariables)             | Generates a **set** of CSS variables from a set of themes; goes hand-in-hand with [renderColorSchemes](#rendercolorschemes).                                          |
@@ -314,7 +321,7 @@ Generates CSS color scheme media queries from a set of themes; goes hand-in-hand
 import { renderColorSchemes } from 'p90/util'
 
 const themes = {
-	// P90 doesn't care what the theme names are but CSS/browsers do!
+	// P90 doesn't care what the theme names are but browsers do!
 	light: {
 		base: [250, 250, 250],
 		text: [5, 10, 60],
@@ -356,7 +363,7 @@ Generates a **set** of CSS variables from a set of themes; goes hand-in-hand wit
 import { generateThemeVariables } from 'p90/util'
 
 const themes = {
-	// P90 doesn't care what the theme names are but CSS/browsers do!
+	// P90 doesn't care what the theme names are but browsers do!
 	light: {
 		base: [250, 250, 250],
 		text: [5, 10, 60],
@@ -391,7 +398,7 @@ Generates CSS colour scheme media queries.
 import { buildColorSchemeMediaQueries } from 'p90/util'
 
 const schemes = {
-	// P90 doesn't care what the scheme names are but CSS/browsers do!
+	// P90 doesn't care what the scheme names are but browsers do!
 	light: {
 		color: [250, 250, 250],
 		'background-color': [5, 10, 60],
@@ -428,7 +435,7 @@ console.log(mediaQueries)
 
 The [preproccessor.js](./src/lib/preprocessor.js) file is where everthing comes together and is the best place to start exploring the solution. We use a token data structure to keep all information about each substitution in one place. See [lexical analysis (Wikipedia)](https://en.wikipedia.org/wiki/Lexical_analysis) for a nice overview. Each major step in the process clones the tokens; adding new information.
 
-1. Scan all tokens via [scanAll](#scanAll) from [token-scanner.js](./src/lib/token-scanner.js).
+**1. Scan all tokens via [scanAll](#scanAll) from [token-scanner.js](./src/lib/token-scanner.js).**
 
 ```js
 token_after_scanning = {
@@ -442,7 +449,7 @@ token_after_scanning = {
 }
 ```
 
-2. Look up the property `prop` in the users style map via [lookupProp](#lookupProp) from [lookup.js](./src/lib/lookup.js).
+**2. Look up the property in the users style map via [lookupProp](#lookupProp) from [lookup.js](./src/lib/lookup.js).**
 
 The property is not the token field that should be used for substitution. Properties will be resolved into values in the next step. For most types there is no change but functions need to be invoked and objects transformed.
 
@@ -466,9 +473,13 @@ token_after_lookup = {
 }
 ```
 
-3. Resolve the property `prop` to a value via [resolveValue](#resolveValue) from [resolve.js](./src/lib/resolve.js). The resultant `value` should be usable for the CSS string substitution without need for further modification.
+**3. Resolve the property to a value via [resolveValue](#resolveValue) from [resolve.js](./src/lib/resolve.js).**
 
-The `type` field is used to determine how this is done. The suffix will be appended, except where the type is _"null"_. If the type is _"object"_ and `suffix` is empty then `;\n` is appended.
+The resultant `value` should be usable for the CSS string substitution without need for further modification.
+
+The `type` field is used to determine how this is done. The suffix will be appended, except where the type is _"null"_. If the type is _"object"_ and `suffix` is empty then `\n` is appended.
+
+Functions may return a `null` or `object` type which will be resolved recursively. But returning a function from a function will result in an error. It's needless and will just give users greater freedom to get confused by the complexities of their own making.
 
 ```js
 token_after_resolve = {

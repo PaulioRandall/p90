@@ -19,7 +19,7 @@ const findProp = (map, path) => {
 	return prop
 }
 
-const identifyType = (prop) => {
+export const identifyType = (prop) => {
 	if (prop === undefined) {
 		return 'undefined'
 	}
