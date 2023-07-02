@@ -27,7 +27,7 @@ Fork the repository and use as a starting point for your own CSS pre-processor. 
 ```json
 {
 	"devDependencies": {
-		"p90": "v0.14.0"
+		"p90": "v0.15.0"
 	}
 }
 ```
