@@ -25,6 +25,9 @@
 		display: flex;
 		justify-content: center;
 		column-gap: $add(0.5, 0.8, 0.7) rem;
+
+		/* TODO: (BUG) whitespace needs to be preserved */
+		border: $space.md() dashed cyan;
 	}
 
 	@media (prefers-color-scheme: light) {

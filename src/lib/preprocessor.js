@@ -1,9 +1,10 @@
 import tokenScanner from './token-scanner.js'
 import { lookupProp } from './lookup.js'
+import { resolveValue } from './resolve.js'
 
-const ttyRed = '\x1b[31m'
-const ttyYellow = '\x1b[33m'
-const ttyReset = '\x1b[0m'
+const TTY_RED = '\x1b[31m'
+const TTY_YELLOW = '\x1b[33m'
+const TTY_RESET = '\x1b[0m'
 
 export const defaultMimeTypes = ['', 'text/css', 'text/p90']
 
@@ -22,7 +23,6 @@ export const p90 = (styleSets, options = {}) => {
 			}
 
 			content = await processCss(content, styleSets, filename, options)
-
 			return Promise.resolve({ code: content })
 		},
 	}
@@ -38,14 +38,14 @@ const processCss = async (css, styleSets, filename, options) => {
 		styleSets = [styleSets]
 	}
 
-	for (const styles of styleSets) {
-		css = await replaceAllTokens(css, styles, filename, options)
+	for (const lookupMap of styleSets) {
+		css = await replaceAllTokens(css, lookupMap, filename, options)
 	}
 
 	return css
 }
 
-const replaceAllTokens = async (css, styles, filename, options) => {
+const replaceAllTokens = async (css, lookupMap, filename, options) => {
 	const tokens = tokenScanner.scanAll(css, '$')
 
 	// Work from back to front of the CSS string otherwise replacements at
@@ -54,94 +54,43 @@ const replaceAllTokens = async (css, styles, filename, options) => {
 
 	for (const tk of tokens) {
 		try {
-			css = await replaceToken(css, styles, tk)
+			css = await replaceToken(css, lookupMap, tk)
 		} catch (e) {
-			if (options.printErrors) {
-				process.stderr.write(`${ttyRed}\nP90 error: ${filename}${ttyReset}`)
-				process.stderr.write(
-					`${ttyYellow}\nP90 token: ${JSON.stringify(tk, null, 2)}${ttyReset}\n`
-				)
-			}
-
-			if (options.failOnError) {
-				throw e
-			}
+			handleError(e, filename, options)
 		}
 	}
 
 	return css
 }
 
-const replaceToken = async (css, styles, tk) => {
-	tk = lookupProp(styles, tk)
+const replaceToken = async (css, lookupMap, tk) => {
+	tk = lookupProp(lookupMap, tk)
+
 	if (tk.prop === undefined) {
-		return css
+		return css // Ignore prop, it could be in a following lookupMap
 	}
 
-	tk.value = resolveValue(tk, tk.prop)
-	tk.value = await Promise.resolve(tk.value)
-	checkReplacementValue(tk, tk.value)
+	tk = await resolveValue(tk)
 
-	if (tk.value === null) {
-		return replaceTokenWithValue(css, tk, '')
+	if (tk.value === undefined) {
+		throw new Error(`Value of '${tk.raw}' is undefined; tis not allowed!`)
 	}
 
-	tk.value += tk.suffix
-	return replaceTokenWithValue(css, tk, tk.value)
-}
-
-const checkReplacementValue = (tk, value) => {
-	if (value === undefined) {
-		throw new Error(`Value returned by function '${tk.raw}' returned undefined`)
-	}
-}
-
-const resolveValue = (tk, value) => {
-	if (value === null) {
-		return null
-	}
-
-	if (isFunction(value)) {
-		return value(...tk.args)
-	}
-
-	if (isObject(value)) {
-		return objectToCss(tk, value)
-	}
-
-	return value.toString()
-}
-
-const objectToCss = (tk, obj) => {
-	const result = []
-
-	for (const prop in obj) {
-		const value = obj[prop]
-		checkCssPropValue(tk, prop, value)
-		result.push(`${prop}: ${value}`)
-	}
-
-	return result.join(';\n') + ';\n'
-}
-
-const checkCssPropValue = (tk, prop, value) => {
-	if (!isValidCssPropValue(value)) {
-		throw new Error(
-			`For '${tk.raw}', the CSS value for property '${prop}' does not have a valid type`
-		)
-	}
-}
-
-const isValidCssPropValue = (v) => {
-	const validTypes = ['string', 'number', 'bigint', 'boolean']
-	return validTypes.includes(typeof v)
-}
-
-const replaceTokenWithValue = (css, tk, value) => {
 	const prefix = css.slice(0, tk.start)
 	const postfix = css.slice(tk.end, css.length)
-	return `${prefix}${value}${postfix}`
+	return `${prefix}${tk.value}${postfix}`
 }
 
-const isFunction = (v) => typeof v === 'function'
-const isObject = (v) => typeof v === 'object' && !Array.isArray(v)
+const handleError = (e, filename, options) => {
+	if (options.printErrors) {
+		const tkStr = JSON.stringify(tk, null, 2)
+
+		process.stderr.write(`${TTY_RED}\nP90 error: ${filename}${TTY_RESET}`)
+		process.stderr.write(e.message)
+		process.stderr.write(`${TTY_YELLOW}\nP90 token: ${tkStr}${TTY_RESET}\n`)
+	}
+
+	if (options.failOnError) {
+		throw e
+	}
+}

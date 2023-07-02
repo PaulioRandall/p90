@@ -10,7 +10,7 @@ const findProp = (map, path) => {
 
 	for (const segment of path) {
 		if (prop === undefined || prop === null) {
-			return undefined
+			return undefined // This is correct, only return null if last segment
 		}
 
 		prop = prop[segment]
@@ -21,11 +21,11 @@ const findProp = (map, path) => {
 
 const identifyType = (prop) => {
 	if (prop === undefined) {
-		return undefined
+		return 'undefined'
 	}
 
 	if (prop === null) {
-		return null
+		return 'null'
 	}
 
 	if (Array.isArray(prop)) {
