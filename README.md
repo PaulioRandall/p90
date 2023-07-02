@@ -23,7 +23,7 @@ Fork the repository and use as a starting point for your own CSS pre-processor. 
 ```json
 {
 	"devDependencies": {
-		"p90": "v0.12.0"
+		"p90": "v0.13.0"
 	}
 }
 ```
@@ -269,63 +269,6 @@ import p90Util from 'p90/util'
 | [generateThemeVariables](#generatethemevariables)             | Generates a **set** of CSS variables from a set of themes; goes hand-in-hand with [renderColorSchemes](#rendercolorschemes).                                          |
 | [buildColorSchemeMediaQueries](#buildcolorschememediaqueries) | Generates CSS color scheme media queries.                                                                                                                             |
 
-### scanAll
-
-You can pretty much ignore this function unless you want to scan **P90** tokens within CSS tags.
-
-Given a CSS string returns all P90 tokens in the order they appear. It is wise to perform string substitution in reverse order otherwise the `start` and `end` fields of later tokens become useless due to the CSS string length changing.
-
-**Parameters**:
-
-- **css**: CSS string.
-
-Use it like this:
-
-```js
-import { scanAll } from 'p90/util'
-
-const tokens = scanAll(css)
-tokens.reverse() // Because we have to substitute from back to front
-```
-
-### newScanFunc
-
-You can pretty much ignore this function unless you want to scan CSS files into tokens.
-
-Given a CSS string creates a function which is called repeatedly to find all **P90** tokens in the order they appear. It is wise to perform string substitution in reverse order otherwise the `start` and `end` fields of later tokens become useless due to the CSS string length changing.
-
-**Parameters**:
-
-- **css**: CSS string.
-
-Use it like this:
-
-```js
-import { newScanFunc } from 'p90/util'
-
-const f = newScanFunc(css)
-const tokens = []
-let tk = null
-
-while ((tk = f()) !== null) {
-	tokens.push(tk)
-}
-
-tokens.reverse() // Because we have to substitute from back to front
-```
-
-```js
-example_token = {
-	start: 9,
-	end: 34,
-	prefix: '$',
-	raw: '$color.mix(blue, yellow);',
-	suffix: ';', // One of ['', ';', ':']
-	path: ['color', 'mix'],
-	args: ['blue', 'yellow'],
-}
-```
-
 ### rgbsToColors
 
 Converts a map of RGB and RGBA arrays to CSS RGB and RGBA values.
@@ -476,5 +419,125 @@ console.log(mediaQueries)
 		background-color: rgb(231, 245, 255);
 	}
 }`
+*/
+```
+
+## Algorithm
+
+**This section is for those few who care about how P90 works underneath or wish to plunder its code to build their own parser.**
+
+The [preproccessor.js](./src/lib/preprocessor.js) file is where everthing comes together and is the best place to start exploring the solution. We use a token data structure to keep all information about each substitution in one place. See [lexical analysis (Wikipedia)](https://en.wikipedia.org/wiki/Lexical_analysis) for a nice overview. Each major step in the process clones the tokens; adding new information.
+
+1. Scan all tokens via [scanAll](#scanAll) from [token-scanner.js](./src/lib/token-scanner.js).
+
+```js
+token_after_scanning = {
+	start: 9,
+	end: 31,
+	prefix: '$',
+	raw: '$numbers.add(1, 2, 3);',
+	suffix: ';', // One of ['', ';', ':']
+	path: ['numbers', 'add'],
+	args: ['1', '2', '3'],
+}
+```
+
+2. Look up the property `prop` in the users style map via [lookupProp](#lookupProp) from [lookup.js](./src/lib/lookup.js). The property is not the token field that should be used for substitution. Properties will be resolved into values in the next step. For most types there is no change but functions need to be invoked and objects transformed.
+
+```js
+token_after_lookup = {
+	start: 9,
+	end: 31,
+	prefix: '$',
+	raw: '$numbers.add(1, 2, 3);',
+	suffix: ';', // One of ['', ';', ':']
+	path: ['numbers', 'add'],
+	args: ['1', '2', '3'],
+	type: 'function', // From typeof with the addition of 'array'
+	prop: (...numbers) => {
+		let result = 0
+		for (const n of numbers) {
+			result += parseFloat(n)
+		}
+		return result
+	},
+}
+```
+
+3. TODO
+
+### scanAll
+
+Given a CSS string returns all P90 tokens in the order they appear. Builds upon [newScanFunc](#newscanfunc) for convenience. It is wise to perform string substitution in reverse order otherwise the `start` and `end` fields of later tokens become useless due to the CSS string length changing.
+
+**Parameters**:
+
+- **css**: CSS string.
+
+```js
+import { scanAll } from './token-scanner.js'
+
+const tokens = scanAll(css)
+tokens.reverse() // Because we have to substitute from back to front
+```
+
+### newScanFunc
+
+Given a CSS string creates a function which is called repeatedly to find all **P90** tokens in the order they appear. It is wise to perform string substitution in reverse order otherwise the `start` and `end` fields of later tokens become useless due to the CSS string length changing.
+
+**Parameters**:
+
+- **css**: CSS string.
+
+```js
+import { newScanFunc } from './token-scanner.js'
+
+const f = newScanFunc(css)
+const tokens = []
+let tk = null
+
+while ((tk = f()) !== null) {
+	tokens.push(tk)
+}
+
+tokens.reverse() // Because we have to substitute from back to front
+```
+
+### lookupProp
+
+Looks up the users property in the users style map. The token is deep cloned and then `type` and `prop` information is added. If the look up function can't find the relevent property then `undefined` is returned.
+
+**Parameters**:
+
+- **map**: Users style map.
+- **tk**: Scanned lexical token.
+
+```js
+import { lookupProp } from './lookup.js'
+
+const map = {
+	...,
+	abc: {
+		xyz: 123,
+	},
+	...,
+}
+
+const tk = {
+	...,
+	path: ['abc', 'xyz'],
+	...
+}
+
+tk = lookupProp(map, tk)
+
+/*
+tk = {
+	...,
+	path: ['abc', 'xyz'],
+	type: 'number',
+	prop: 123,
+	...
+}
 */
 ```

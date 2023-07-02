@@ -1,4 +1,5 @@
 import tokenScanner from './token-scanner.js'
+import { lookupProp } from './lookup.js'
 
 const ttyRed = '\x1b[31m'
 const ttyYellow = '\x1b[33m'
@@ -72,35 +73,21 @@ const replaceAllTokens = async (css, styles, filename, options) => {
 }
 
 const replaceToken = async (css, styles, tk) => {
-	let value = lookupStylesValue(styles, tk)
-	if (value === undefined) {
+	tk = lookupProp(styles, tk)
+	if (tk.prop === undefined) {
 		return css
 	}
 
-	value = resolveValue(tk, value)
-	value = await Promise.resolve(value)
-	checkReplacementValue(tk, value)
+	tk.value = resolveValue(tk, tk.prop)
+	tk.value = await Promise.resolve(tk.value)
+	checkReplacementValue(tk, tk.value)
 
-	if (value === null) {
+	if (tk.value === null) {
 		return replaceTokenWithValue(css, tk, '')
 	}
 
-	value += tk.suffix
-	return replaceTokenWithValue(css, tk, value)
-}
-
-const lookupStylesValue = (styles, tk) => {
-	let value = styles
-
-	for (const part of tk.path) {
-		if (value === undefined || value === null) {
-			return undefined
-		}
-
-		value = value[part]
-	}
-
-	return value
+	tk.value += tk.suffix
+	return replaceTokenWithValue(css, tk, tk.value)
 }
 
 const checkReplacementValue = (tk, value) => {
