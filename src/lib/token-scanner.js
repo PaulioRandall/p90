@@ -13,9 +13,6 @@ const scanAll = (css, prefixRune) => {
 }
 
 const scanFunc = (css, prefixRune = '$') => {
-	// PLESAE NOTE: CBA to handle two code points for the first implementation.
-	// TODO
-
 	const escapeForRegex = (s) => {
 		return s.replace(/[/\-\.\(\)\[\]\$\^\&\\]/g, '\\$&')
 	}
@@ -29,13 +26,13 @@ const scanFunc = (css, prefixRune = '$') => {
 	}
 
 	const scanSuffix = () => {
-		const bookmark = sr.index()
+		const bookmark = sr.makeBookmark()
 
 		sr.skipSpaces()
 		const suffix = sr.accept(/[;:]/)
 
 		if (!suffix) {
-			sr.goto(bookmark)
+			sr.gotoBookmark(bookmark)
 			return ''
 		}
 
@@ -91,16 +88,18 @@ const scanFunc = (css, prefixRune = '$') => {
 			return null
 		}
 
-		const start = sr.index()
+		const [start, startCp] = sr.makeBookmark()
+
 		const startRune = sr.read()
 		const name = scanName()
 		const args = scanParams(name)
 		const suffix = scanSuffix()
-		const end = sr.index()
+
+		const [end, endCp] = sr.makeBookmark()
 
 		return {
-			start: start,
-			end: end,
+			start: startCp,
+			end: endCp,
 			prefix: prefixRune,
 			raw: sr.slice(start, end),
 			suffix: suffix,

@@ -22,6 +22,7 @@ export const p90 = (styleSets, options = {}) => {
 				return content
 			}
 
+			content = content.normalize('NFC')
 			content = await processCss(content, styleSets, filename, options)
 			return Promise.resolve({ code: content })
 		},

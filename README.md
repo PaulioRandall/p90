@@ -4,11 +4,9 @@ A minimalist CSS pre-processor for Svelte. No need to learn fancy syntax.
 
 The rest of the introduction is hidden within the examples because you really don't give a damn.
 
-**Note**: Probably not fully unicode compatible.
-
 ## TODO
 
-- **Test (& maybe add)** full unicode compatiblity.
+- **Allow** function arguments to be placed within quote marks. Ensure characters can be escaped.
 
 ## Choose your questline
 
@@ -27,18 +25,18 @@ Fork the repository and use as a starting point for your own CSS pre-processor. 
 ```json
 {
 	"devDependencies": {
-		"p90": "v0.15.0"
+		"p90": "v0.16.0"
 	}
 }
 ```
 
-## Usage
+## Import like any other package
 
 ### svelte.config.js
 
-Add **p90** to the `preprocess` array in your `svelte.config.js`.
+Add **p90** to the _preprocess_ array in your _svelte.config.js_.
 
-`./src/p90-styles.js` exports the config object we'll create next.
+_./src/p90-styles.js_ exports the config object we'll create next.
 
 ```js
 // svelte.config.js
@@ -443,8 +441,8 @@ The [preproccessor.js](./src/lib/preprocessor.js) file is where everthing comes 
 
 ```js
 token_after_scanning = {
-	start: 9,
-	end: 31,
+	start: 9, // Code point index
+	end: 31, // Code point index
 	prefix: '$',
 	raw: '$numbers.add(1, 2, 3);',
 	suffix: ';', // One of ['', ';', ':']
@@ -481,9 +479,9 @@ token_after_lookup = {
 
 The resultant `value` should be usable for the CSS string substitution without need for further modification.
 
-The `type` field is used to determine how this is done. The suffix will be appended, except where the type is _"null"_. If the type is _"object"_ and `suffix` is empty then `;\n` is appended.
+The `type` field is used to determine how this is done. The suffix will be appended, except where the type is _"null"_. If the type is _"object"_ and `suffix` is empty then _;\n_ is appended.
 
-Functions may return a `null` or `object` type which will be resolved recursively. But returning a function from a function will result in an error. It's needless and will just give users greater freedom to get confused by the complexities of their own making.
+Functions may return a _null_ or _object_ type which will be resolved recursively. But returning a function from a function will result in an error. It's needless and will just give users greater freedom to get confused by the complexities of their own making.
 
 ```js
 token_after_resolve = {

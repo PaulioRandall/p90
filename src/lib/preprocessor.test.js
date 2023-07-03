@@ -306,6 +306,21 @@ describe('p90({...})', () => {
 		const promise = applyStylesToCss(styles, `$$`)
 		expect(promise).resolves.toEqual('$')
 	})
+
+	test('#21', () => {
+		const styles = {
+			color: 'forestgreen',
+		}
+
+		const promise = applyStylesToCss(
+			styles,
+			joinLines('color: $color;', "content: '🫀';", 'color: $color;')
+		)
+
+		expect(promise).resolves.toEqual(
+			joinLines('color: forestgreen;', "content: '🫀';", 'color: forestgreen;')
+		)
+	})
 })
 
 describe('skipSpaces([...])', () => {
