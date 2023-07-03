@@ -1,4 +1,4 @@
-import { resolveValue } from './resolve.js'
+import { resolveValue } from './resolver.js'
 
 describe('resolve(...)', () => {
 	test('#1', () => {

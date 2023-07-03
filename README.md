@@ -16,16 +16,18 @@ With this project you have three options:
 
 Loot the [`./src/lib`](https://github.com/PaulioRandall/svelte-css-preprocessor/tree/trunk/src/lib) folder for code to embed in your own projects and packages.
 
-**2. Fork and customise**
+**2. Fork**
 
 Fork the repository and use as a starting point for your own CSS pre-processor. See code in [Github](https://github.com/PaulioRandall/svelte-css-preprocessor).
 
-**3. Import like any other package**
+**3. Import**
+
+Import like any other package.
 
 ```json
 {
 	"devDependencies": {
-		"p90": "v0.16.0"
+		"p90": "v0.17.0"
 	}
 }
 ```

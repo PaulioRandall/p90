@@ -1,7 +1,9 @@
 import { newScanner } from './scanner.js'
 
-const scanAll = (css, prefixRune) => {
-	const f = scanFunc(css, prefixRune)
+const prefixRune = '$'
+
+const scanAll = (css) => {
+	const f = scanFunc(css)
 	const result = []
 	let tk = null
 
@@ -12,7 +14,7 @@ const scanAll = (css, prefixRune) => {
 	return result
 }
 
-const scanFunc = (css, prefixRune = '$') => {
+const scanFunc = (css) => {
 	const escapeForRegex = (s) => {
 		return s.replace(/[/\-\.\(\)\[\]\$\^\&\\]/g, '\\$&')
 	}

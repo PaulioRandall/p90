@@ -1,29 +1,21 @@
-import { p90 } from './preprocessor.js'
+import { processCss } from './processor.js'
 
-const newFile = (content, markup, attributes, filename) => {
-	return {
-		content: content,
-		markup: markup ? markup : '',
-		attributes: attributes ? attributes : [],
-		filename: filename ? filename : 'CssTest.svelte',
-	}
-}
-
-const applyStylesToCss = async (styles, css, options, attributes) => {
-	const file = newFile(css, undefined, attributes)
-	const result = await p90(styles, options).style(file)
-	return result.code
+const doProcessCss = async (styles, css, config = {}) => {
+	return await processCss(css, styles, {
+		filename: 'Test.svelte',
+		...config,
+	})
 }
 
 const joinLines = (...lines) => lines.join('\n')
 
-describe('p90({...})', () => {
+describe('processCss({...})', () => {
 	test('#1', () => {
 		const styles = {
 			green: 'forestgreen',
 		}
 
-		const promise = applyStylesToCss(styles, `$green`)
+		const promise = doProcessCss(styles, `$green`)
 		expect(promise).resolves.toEqual('forestgreen')
 	})
 
@@ -32,7 +24,7 @@ describe('p90({...})', () => {
 			green: 'forestgreen',
 		}
 
-		const promise = applyStylesToCss(styles, `color: $green; font-size: 200%;`)
+		const promise = doProcessCss(styles, `color: $green; font-size: 200%;`)
 		expect(promise).resolves.toEqual(`color: forestgreen; font-size: 200%;`)
 	})
 
@@ -41,7 +33,7 @@ describe('p90({...})', () => {
 			green: 'forestgreen',
 		}
 
-		const promise = applyStylesToCss(
+		const promise = doProcessCss(
 			styles,
 			joinLines(
 				'color: $green;',
@@ -67,7 +59,7 @@ describe('p90({...})', () => {
 			red: 'indianred',
 		}
 
-		const promise = applyStylesToCss(
+		const promise = doProcessCss(
 			styles,
 			joinLines('color: $green;', 'color: $red;')
 		)
@@ -82,7 +74,7 @@ describe('p90({...})', () => {
 			blood_red: [115, 16, 16],
 		}
 
-		const promise = applyStylesToCss(styles, 'color: rgb($blood_red);')
+		const promise = doProcessCss(styles, 'color: rgb($blood_red);')
 		expect(promise).resolves.toEqual('color: rgb(115,16,16);')
 	})
 
@@ -93,7 +85,7 @@ describe('p90({...})', () => {
 			},
 		}
 
-		const act = applyStylesToCss(styles, `color: $color.blood_red;`)
+		const act = doProcessCss(styles, `color: $color.blood_red;`)
 		expect(act).resolves.toEqual(`color: rgb(115, 16, 16);`)
 	})
 
@@ -108,10 +100,7 @@ describe('p90({...})', () => {
 			},
 		}
 
-		const act = applyStylesToCss(
-			styles,
-			`color: $useless.nesting.color.blood_red;`
-		)
+		const act = doProcessCss(styles, `color: $useless.nesting.color.blood_red;`)
 
 		expect(act).resolves.toEqual(`color: rgb(115, 16, 16);`)
 	})
@@ -122,7 +111,7 @@ describe('p90({...})', () => {
 			red: 0,
 		}
 
-		const promise = applyStylesToCss(
+		const promise = doProcessCss(
 			styles,
 			joinLines('color: $green;', 'color: $red;')
 		)
@@ -135,7 +124,7 @@ describe('p90({...})', () => {
 			green: undefined,
 		}
 
-		const promise = applyStylesToCss(styles, `$green`)
+		const promise = doProcessCss(styles, `$green`)
 		expect(promise).resolves.toEqual('$green')
 	})
 
@@ -146,7 +135,7 @@ describe('p90({...})', () => {
 			},
 		}
 
-		const promise = applyStylesToCss(styles, `$color`)
+		const promise = doProcessCss(styles, `$color`)
 		expect(promise).resolves.toEqual('scarlet')
 	})
 
@@ -157,12 +146,12 @@ describe('p90({...})', () => {
 			},
 		}
 
-		const options = {
+		const config = {
 			failOnError: true,
 			printErrors: false,
 		}
 
-		const promise = applyStylesToCss(styles, `$color`, options)
+		const promise = doProcessCss(styles, `$color`, config)
 		expect(promise).rejects.toBeInstanceOf(Error)
 	})
 
@@ -176,7 +165,7 @@ describe('p90({...})', () => {
 			},
 		}
 
-		const promise = applyStylesToCss(styles, `$func(alpha, beta, charlie)`)
+		const promise = doProcessCss(styles, `$func(alpha, beta, charlie)`)
 		expect(promise).resolves.toEqual('alpha-beta-charlie')
 		expect(unspecifiedArg).toBeUndefined()
 	})
@@ -188,7 +177,7 @@ describe('p90({...})', () => {
 			},
 		}
 
-		const promise = applyStylesToCss(styles, `$color`)
+		const promise = doProcessCss(styles, `$color`)
 		expect(promise).resolves.toEqual('scarlet')
 	})
 
@@ -226,7 +215,7 @@ describe('p90({...})', () => {
 			'}'
 		)
 
-		const promise = applyStylesToCss(styles, css)
+		const promise = doProcessCss(styles, css)
 		expect(promise).resolves.toEqual(exp)
 	})
 
@@ -253,12 +242,12 @@ describe('p90({...})', () => {
 			'}'
 		)
 
-		const options = {
+		const config = {
 			failOnError: true,
 			printErrors: false,
 		}
 
-		const promise = applyStylesToCss(styles, css, options)
+		const promise = doProcessCss(styles, css, config)
 		expect(promise).rejects.toBeInstanceOf(Error)
 	})
 
@@ -267,7 +256,7 @@ describe('p90({...})', () => {
 			empty: null,
 		}
 
-		const promise = applyStylesToCss(styles, `$empty`)
+		const promise = doProcessCss(styles, `$empty`)
 		expect(promise).resolves.toEqual('')
 	})
 
@@ -276,7 +265,7 @@ describe('p90({...})', () => {
 			$: '$',
 		}
 
-		const promise = applyStylesToCss(styles, `$$`)
+		const promise = doProcessCss(styles, `$$`)
 		expect(promise).resolves.toEqual('$')
 	})
 
@@ -285,7 +274,7 @@ describe('p90({...})', () => {
 			$$$: '$',
 		}
 
-		const promise = applyStylesToCss(styles, `$$$$`)
+		const promise = doProcessCss(styles, `$$$$`)
 		expect(promise).resolves.toEqual('$')
 	})
 
@@ -294,7 +283,7 @@ describe('p90({...})', () => {
 			$: (n = 1) => '$'.repeat(n),
 		}
 
-		const promise = applyStylesToCss(styles, `$$(4)`)
+		const promise = doProcessCss(styles, `$$(4)`)
 		expect(promise).resolves.toEqual('$$$$')
 	})
 
@@ -303,7 +292,7 @@ describe('p90({...})', () => {
 			$: (n = 1) => '$'.repeat(n),
 		}
 
-		const promise = applyStylesToCss(styles, `$$`)
+		const promise = doProcessCss(styles, `$$`)
 		expect(promise).resolves.toEqual('$')
 	})
 
@@ -312,14 +301,15 @@ describe('p90({...})', () => {
 			color: 'forestgreen',
 		}
 
-		const promise = applyStylesToCss(
-			styles,
-			joinLines('color: $color;', "content: '🫀';", 'color: $color;')
-		)
+		const css = joinLines('color: $color;', "content: '🫀';", 'color: $color;')
+		const promise = doProcessCss(styles, css)
 
-		expect(promise).resolves.toEqual(
-			joinLines('color: forestgreen;', "content: '🫀';", 'color: forestgreen;')
+		const exp = joinLines(
+			'color: forestgreen;',
+			"content: '🫀';",
+			'color: forestgreen;'
 		)
+		expect(promise).resolves.toEqual(exp)
 	})
 })
 
@@ -331,39 +321,7 @@ describe('skipSpaces([...])', () => {
 			{ third: '\\o/' },
 		]
 
-		const promise = applyStylesToCss(styles, `$first`)
+		const promise = doProcessCss(styles, `$first`)
 		expect(promise).resolves.toEqual('\\o/')
-	})
-})
-
-describe('skipSpaces({...}, )', () => {
-	test('#1', () => {
-		const styles = {
-			color: 'green',
-		}
-
-		const attrs = {
-			lang: 'text/p90',
-		}
-
-		const promise = applyStylesToCss(styles, `$color`, {}, attrs)
-		expect(promise).resolves.toEqual('green')
-	})
-
-	test('#2', () => {
-		const styles = {
-			color: 'green',
-		}
-
-		const options = {
-			mimeTypes: ['homer/simpson'],
-		}
-
-		const attrs = {
-			lang: 'homer/simpson',
-		}
-
-		const promise = applyStylesToCss(styles, `$color`, options, attrs)
-		expect(promise).resolves.toEqual('green')
 	})
 })
