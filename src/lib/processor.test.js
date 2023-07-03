@@ -1,13 +1,13 @@
 import { processCss } from './processor.js'
 
+const joinLines = (...lines) => lines.join('\n')
+
 const doProcessCss = async (styles, css, config = {}) => {
 	return await processCss(css, styles, {
 		filename: 'Test.svelte',
 		...config,
 	})
 }
-
-const joinLines = (...lines) => lines.join('\n')
 
 describe('processCss({...})', () => {
 	test('#1', () => {

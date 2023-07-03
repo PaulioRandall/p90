@@ -1,4 +1,4 @@
-import { newScanner } from './scanner.js'
+import { newStringReader } from './string-reader.js'
 
 const prefixRune = '$'
 
@@ -19,7 +19,7 @@ const scanFunc = (css) => {
 		return s.replace(/[/\-\.\(\)\[\]\$\^\&\\]/g, '\\$&')
 	}
 
-	const sr = newScanner(css)
+	const sr = newStringReader(css)
 	const prefix = escapeForRegex(prefixRune)
 	const prefixRegex = new RegExp(prefix)
 

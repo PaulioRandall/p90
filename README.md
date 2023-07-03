@@ -439,7 +439,9 @@ console.log(mediaQueries)
 
 The [preproccessor.js](./src/lib/preprocessor.js) file is where everthing comes together and is the best place to start exploring the solution. We use a token data structure to keep all information about each substitution in one place. See [lexical analysis (Wikipedia)](https://en.wikipedia.org/wiki/Lexical_analysis) for a nice overview. Each major step in the process clones the tokens; adding new information.
 
-**1. Scan all tokens via [scanAll](#scanAll) from [token-scanner.js](./src/lib/token-scanner.js).**
+**1. Scan all tokens via [token-scanner.js](./src/lib/token-scanner.js).**
+
+[token-scanner.js](./src/lib/token-scanner.js) makes use of [string-reader.js](./src/lib/string-reader.js) which handles the reading and matching of symbols as well as mapping between symbol and codepoint indexes. It \[almost completely\] isloates the handling of surrogate pair UTF-16 codepoints.
 
 ```js
 token_after_scanning = {
@@ -453,7 +455,7 @@ token_after_scanning = {
 }
 ```
 
-**2. Look up the property in the users style map via [lookupProp](#lookupProp) from [lookup.js](./src/lib/lookup.js).**
+**2. Look up the property in the users style map via [lookup.js](./src/lib/lookup.js).**
 
 The property is not the token field that should be used for substitution. Properties will be resolved into values in the next step. For most types there is no change but functions need to be invoked and objects transformed.
 
@@ -477,7 +479,21 @@ token_after_lookup = {
 }
 ```
 
-**3. Resolve the property to a value via [resolveValue](#resolveValue) from [resolve.js](./src/lib/resolve.js).**
+```js
+import { identifyType } from './lookup.js'
+
+identifyType(undefined) // 'undefined'
+identifyType(null) // 'null'
+identifyType(0) // 'number'
+identifyType(12345678987654321) // 'bigint'
+identifyType('') // 'string'
+identifyType(true) // 'boolean'
+identifyType([]) // 'array'
+identifyType({}) // 'object'
+identifyType(() => '') // 'function'
+```
+
+**3. Resolve the property to a value via [resolve.js](./src/lib/resolver.js).**
 
 The resultant `value` should be usable for the CSS string substitution without need for further modification.
 
@@ -505,146 +521,7 @@ token_after_resolve = {
 	value: '6;', // Notice the suffix has been appended
 
 	// True if a function returned a result (null or object) which required a
-	// recursive function call (resolveValue).
+	// recursive function call.
 	recursed?: false
 }
-```
-
-### scanAll
-
-Given a CSS string, returns all P90 tokens in the order they appear. Builds upon [newScanFunc](#newscanfunc) for convenience.
-
-It is wise to perform string substitution in reverse order otherwise the `start` and `end` fields of later tokens become useless due to the CSS string length changing.
-
-**Parameters**:
-
-- **css**: CSS string.
-
-```js
-import { scanAll } from './token-scanner.js'
-
-const tokens = scanAll(css)
-tokens.reverse() // Because we have to substitute from back to front
-```
-
-### newScanFunc
-
-Given a CSS string creates a function which is called repeatedly to find all **P90** tokens in the order they appear.
-
-It is wise to perform string substitution in reverse order otherwise the `start` and `end` fields of later tokens become useless due to the CSS string length changing.
-
-**Parameters**:
-
-- **css**: CSS string.
-
-```js
-import { newScanFunc } from './token-scanner.js'
-
-const f = newScanFunc(css)
-const tokens = []
-let tk = null
-
-while ((tk = f()) !== null) {
-	tokens.push(tk)
-}
-
-tokens.reverse() // Because we have to substitute from back to front
-```
-
-### lookupProp
-
-Looks up the users property in the users style map. The token is deep cloned and then `type` and `prop` information is added. If the look up function can't find the relevent property then `undefined` is returned.
-
-**Parameters**:
-
-- **map**: Users style map.
-- **tk**: Scanned lexical token.
-
-```js
-import { lookupProp } from './lookup.js'
-
-const map = {
-	...,
-	abc: {
-		xyz: 123,
-	},
-	...,
-}
-
-const tk = {
-	...,
-	path: ['abc', 'xyz'],
-	...
-}
-
-tk = lookupProp(map, tk)
-
-/*
-tk = {
-	...,
-	path: ['abc', 'xyz'],
-	type: 'number',
-	prop: 123,
-	...
-}
-*/
-```
-
-### identifyType
-
-Used by [lookupProp](#lookupProp) and [resolveValue](#resolveValue), identifies the type of a value. The type will be the result of calling `typeof` except:
-
-- _undefined_ => _'undefined'_
-- _null_ => _'null'_
-- _array_ => _'array'_
-
-**Parameters**:
-
-- **value**: The value to get the type of.
-
-```js
-import { identifyType } from './lookup.js'
-
-identifyType(undefined) // 'undefined'
-identifyType(null) // 'null'
-identifyType(0) // 'number'
-identifyType(12345678987654321) // 'bigint'
-identifyType('') // 'string'
-identifyType(true) // 'boolean'
-identifyType([]) // 'array'
-identifyType({}) // 'object'
-identifyType(() => '') // 'function'
-```
-
-### resolveValue
-
-Resolves the `prop` using the `type` field for a token. The token is deep cloned before the `value` is resolved and appended. If _undefined_ or an unknown type is passed then an error is thrown.
-
-**Parameters**:
-
-- **tk**: Scanned lexical token.
-
-```js
-import { resolveValue } from './resolve.js'
-
-const tk = {
-	...,
-	suffix: ';',
-	type: 'number',
-	prop: 123,
-	...
-}
-
-tk = resovleValue(tk)
-
-/*
-tk = {
-	...,
-	suffix: ';',
-	type: 'number',
-	prop: 123,
-	value: '123;'
-	...
-}
-*/
 ```

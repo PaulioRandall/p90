@@ -1,16 +1,17 @@
-// newScanner creates an object with functions for scanning a string,
+// newStringReader creates an object with functions for reading a string,
 // rune by rune, using regular expressions.
 //
-// A rune, terminology borrowed from the Go programming language, is a alias
-// for a unicode symbol. JavaScript engines all use UTF-16 (AFAIK) meaning
-// symbols may be composed of either one or two code points. Functions in
-// this file assume the input string is well formed UTF-16.
+// A rune (AKA symbol), terminology borrowed from the Go programming language,
+// is a alias for a unicode symbol. JavaScript engines all use UTF-16 (AFAIK)
+// meaning symbols may be composed of either one or two code points. Functions
+// in this file assume the input string is well formed UTF-16.
 //
-// This implementation works on symbols but keeps a track of code points
-// because that's what users will need for manipulating JavaScript strings.
+// This implementation works on runes but keeps a track of code points
+// because that's what the reader's users will need for manipulating
+// JavaScript strings.
 //
-// The scanner acts as an iterator with various query and read operations.
-export const newScanner = (s) => {
+// The reader acts as an iterator with various query and read operations.
+export const newStringReader = (s) => {
 	const runes = Array.from(s)
 	const len = runes.length
 
@@ -18,48 +19,49 @@ export const newScanner = (s) => {
 	// increment function; never increment manually!
 
 	// Tracks index in the rune array (AKA symbol index).
-	let idx = 0
+	//
+	// Use this index when with StringReader functions.
+	let runeIdx = 0
 
 	// Tracks code point index in the CSS string.
 	//
-	// When performing string replacements use this index otherwise you might
-	// screw up indexes for other tokens.
+	// Use this index when with standard JavaScript string functions.
 	let cpIdx = 0
 
-	// index returns the symbol index.
-	const index = () => idx
+	// runeIndex returns the rune (symbol) index.
+	const runeIndex = () => runeIdx
 
 	// codePointIndex returns the code point index.
 	const codePointIndex = () => cpIdx
 
 	// reset doesn't need explanation.
 	const reset = () => {
-		idx = 0
+		runeIdx = 0
 		cpIdx = 0
 	}
 
 	// isEmpty doesn't need explanation.
-	const isEmpty = () => idx >= len
+	const isEmpty = () => runeIdx >= len
 
 	// increment the indexes ensuring cpIdx is incremented twice for surrogate
 	// pairs.
 	const increment = () => {
-		const isSurrogatePair = (cp) => cp >= 0x10000
-		const cp = runes[idx].codePointAt(0)
+		const cp = runes[runeIdx].codePointAt(0)
 
-		idx++
+		runeIdx++
 		cpIdx++
 
-		if (isSurrogatePair(cp)) {
+		const hasTwoCodePoints = cp >= 0x10000
+		if (hasTwoCodePoints) {
 			cpIdx++
 		}
 	}
 
 	// haveEnough returns true if there is at least n unread runes.
-	const haveEnough = (n) => idx + n <= len
+	const haveEnough = (n) => runeIdx + n <= len
 
 	// match returns true if there is a regex match on the next rune.
-	const match = (regex) => !isEmpty() && runes[idx].match(regex)
+	const match = (regex) => !isEmpty() && runes[runeIdx].match(regex)
 
 	// slice returns a sub string using absolute indexes. It's interface is
 	// identical to Array.slice.
@@ -77,7 +79,7 @@ export const newScanner = (s) => {
 	//
 	// Do not manually modify the bookmark!!
 	const makeBookmark = () => {
-		return [idx, cpIdx]
+		return [runeIdx, cpIdx]
 	}
 
 	// gotoBookmark jumps to a bookmarked location. Only use bookmarks created
@@ -85,14 +87,14 @@ export const newScanner = (s) => {
 	//
 	// Never use a manually modified bookmarks!!
 	const gotoBookmark = (bookmark) => {
-		idx = bookmark[0]
+		runeIdx = bookmark[0]
 		cpIdx = bookmark[1]
 	}
 
 	// seek advances the iterator until a rune matches the regex.
 	const seek = (regex) => {
-		while (idx < len) {
-			if (runes[idx].match(regex)) {
+		while (runeIdx < len) {
+			if (runes[runeIdx].match(regex)) {
 				return true
 			}
 			increment()
@@ -106,7 +108,7 @@ export const newScanner = (s) => {
 			throw new Error(`Can't read because EOF`)
 		}
 
-		const ru = runes[idx]
+		const ru = runes[runeIdx]
 		increment()
 		return ru
 	}
@@ -122,7 +124,7 @@ export const newScanner = (s) => {
 	const expect = (regex) => {
 		const ru = accept(regex)
 		if (ru === null) {
-			const got = isEmpty() ? 'EOF' : runes[idx]
+			const got = isEmpty() ? 'EOF' : runes[runeIdx]
 			throw new Error(`Expected ${regex} but got ${got}`)
 		}
 		return ru
@@ -133,7 +135,7 @@ export const newScanner = (s) => {
 	const readWhile = (regex) => {
 		const result = []
 		while (match(regex)) {
-			result.push(runes[idx])
+			result.push(runes[runeIdx])
 			increment()
 		}
 		return result.join('')
@@ -143,7 +145,7 @@ export const newScanner = (s) => {
 	const skipSpaces = () => readWhile(/\s/)
 
 	return {
-		index,
+		runeIndex,
 		codePointIndex,
 		reset,
 		isEmpty,
