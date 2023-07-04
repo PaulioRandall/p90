@@ -114,4 +114,60 @@ describe('scanFunc(...)', () => {
 		const exp = newToken(0, 15, '$func(1, 2, 3);', ['func'], ['1', '2', '3'])
 		expect(f()).toEqual(exp)
 	})
+
+	test('#12', () => {
+		const f = tokenScanner.scanFunc('$func("");')
+		const exp = newToken(0, 10, '$func("");', ['func'], [''])
+		expect(f()).toEqual(exp)
+	})
+
+	test('#13', () => {
+		const f = tokenScanner.scanFunc('$func("abc");')
+		const exp = newToken(0, 13, '$func("abc");', ['func'], ['abc'])
+		expect(f()).toEqual(exp)
+	})
+
+	test('#14', () => {
+		const f = tokenScanner.scanFunc('$func("abc   xyz");')
+		const exp = newToken(0, 19, '$func("abc   xyz");', ['func'], ['abc   xyz'])
+		expect(f()).toEqual(exp)
+	})
+
+	test('#15', () => {
+		const f = tokenScanner.scanFunc('$func("a\\"b");')
+		const exp = newToken(0, 14, '$func("a\\"b");', ['func'], ['a"b'])
+		expect(f()).toEqual(exp)
+	})
+
+	test('#16', () => {
+		const f = tokenScanner.scanFunc('$func("a\\\\b");')
+		const exp = newToken(0, 14, '$func("a\\\\b");', ['func'], ['a\\b'])
+		expect(f()).toEqual(exp)
+	})
+
+	test('#17', () => {
+		const f = tokenScanner.scanFunc('$func("\\\\\\\\");')
+		const exp = newToken(0, 14, '$func("\\\\\\\\");', ['func'], ['\\\\'])
+		expect(f()).toEqual(exp)
+	})
+
+	test('#18', () => {
+		const f = tokenScanner.scanFunc('$func(");')
+		expect(f).toThrow(Error)
+	})
+
+	test('#19', () => {
+		const f = tokenScanner.scanFunc('$func("\\");')
+		expect(f).toThrow(Error)
+	})
+
+	test('#20', () => {
+		const f = tokenScanner.scanFunc('$func("\\\\\\");')
+		expect(f).toThrow(Error)
+	})
+
+	test('#21', () => {
+		const f = tokenScanner.scanFunc('$func(""");')
+		expect(f).toThrow(Error)
+	})
 })

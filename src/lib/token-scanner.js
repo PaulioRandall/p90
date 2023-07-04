@@ -77,12 +77,61 @@ const scanFunc = (css) => {
 	const scanArg = (name) => {
 		sr.skipSpaces()
 
-		const arg = sr.readWhile(/[^,)]/)
-		if (arg === '') {
+		const delim = sr.accept(/["']/)
+		let arg = ''
+
+		if (delim) {
+			console.log(delim)
+			arg = scanQuotedArg(delim, name)
+		} else {
+			arg = sr.readWhile(/[^,)]/)
+			arg = arg === '' ? null : arg
+		}
+
+		if (arg === null) {
 			throw new Error(`Missing argument for '${name}'`)
 		}
 
 		return arg
+	}
+
+	const scanQuotedArg = (delim, name) => {
+		const readingArg = new RegExp(`[^\\\\${delim}]`)
+		const terminatingDelim = new RegExp(delim)
+
+		let result = ''
+		let escaped = false
+
+		while (!sr.isEmpty()) {
+			result += sr.readWhile(readingArg)
+
+			const termintor = sr.accept(terminatingDelim)
+
+			if (termintor && !escaped) {
+				return result
+			}
+
+			if (termintor && escaped) {
+				result += termintor
+				escaped = false
+				continue
+			}
+
+			const backSlash = sr.accept(/\\/)
+
+			if (backSlash && !escaped) {
+				escaped = true
+				continue
+			}
+
+			if (backSlash && escaped) {
+				result += backSlash
+				escaped = false
+				continue
+			}
+		}
+
+		throw new Error(`Unterminated string for argument of '${name}'`)
 	}
 
 	return () => {
