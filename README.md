@@ -1,12 +1,13 @@
 # P90
 
-A minimalist CSS pre-processor for Svelte. No need to learn fancy syntax.
+A minimalist CSS pre-processor for Svelte. Let JavaScript handle the logic, not a CSS mutant.
 
 The rest of the introduction is hidden within the examples because you really don't give a damn.
 
 ## TODO
 
-- **Allow** function arguments to be placed within quote marks. Ensure characters can be escaped.
+- **Tidy** README.
+- **Figure out** how to effectively document this library.
 
 ## Choose your questline
 
@@ -76,6 +77,8 @@ P90(styles, {
 ### p90-styles.js
 
 Rename, move, and reorganise as you see fit.
+
+> I've made so many changes to this example that it probably contains a few errors. I have a TODO to polish it up.
 
 ```js
 // ./src/p90-styles.js
@@ -151,6 +154,39 @@ export default [
 		rgb: rgbs,
 		color: colors,
 
+		// Function arguments are always strings.
+		// It is up to you to parse them into numbers etc.
+		colorWithAlpha: (color, alpha) => {
+			const rgb = rgbs[color]
+			const a = parseFloat(alpha)
+
+			const setAplha = (rgb, alpha) => {
+				const result = [...rgb]
+
+				if (rgb.length === 3) {
+					result.push(alpha)
+				} else {
+					result[3] = alpha
+				}
+
+				return result
+			}
+
+			if (!rgb) {
+				throw new Error(`Unknown color '${color}'`)
+			}
+
+			if (rgb.length !== 3 && rgb.length !== 4) {
+				throw new Error(`Invalid RGB/RGBA color ${rgb}`)
+			}
+
+			if (a === NaN || a < 0 || a > 1) {
+				throw new Error(`Alpha must be a number between 0 and 1, you gave me '${alpha}'`)
+			}
+
+			return setAplha(rgb, a)
+		},
+
 		highlight: {
 			default: {
 				'border-radius': '0.4rem',
@@ -167,10 +203,7 @@ export default [
 
 		font: {
 			family: {
-				// Silly. I know. But just an example of a function call.
-				sans_serif: async () => {
-					return ['sans-serif', 'Helvetica', 'Arial', 'Verdana']
-				},
+				sans_serif: ['sans-serif', 'Helvetica', 'Arial', 'Verdana'],
 			},
 			size: {
 				// Constructed using utopia.fyi... Could these be constructed in code?
@@ -239,6 +272,10 @@ export default [
 	h1 {
 		color: $theme.strong;
 		font-size: $font.size.lg;
+
+		/* You don't have to put single or double quotes around string arguments */
+		/* But it helps */
+		background-color: $colorWithAlpha('burly_wood', 0.2);
 	}
 
 	@media $screen.larger_devices {
@@ -504,12 +541,12 @@ Functions may return a _null_ or _object_ type which will be resolved recursivel
 ```js
 token_after_resolve = {
 	start: 9,
-	end: 31,
+	end: 35,
 	prefix: '$',
-	raw: '$numbers.add(1, 2, 3);',
+	raw: `$numbers.add(1, '2', "3");`,
 	suffix: ';', // One of ['', ';', ':']
 	path: ['numbers', 'add'],
-	args: ['1', '2', '3'],
+	args: ['1', `'2'`, `"3"`],
 	type: 'function', // As returned by 'typeof' with extra custom type 'array'
 	prop: (...numbers) => {
 		let result = 0

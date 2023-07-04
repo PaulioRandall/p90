@@ -24,7 +24,7 @@
 	.container {
 		display: flex;
 		justify-content: center;
-		column-gap: $addRem(0.5, 0.8, 0.7);
+		column-gap: $addRem(0.5, '0.8', '1.2');
 		border: $space.md() dashed cyan;
 	}
 
