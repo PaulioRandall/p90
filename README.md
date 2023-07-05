@@ -1,6 +1,6 @@
 # P90
 
-A minimalist CSS pre-processor with out of the box support for Svelte. Let simple JavaScript handle the logic, not a CSS mutant or obese frameworks.
+A minimalist CSS processor with out of the box support for Svelte. Let simple JavaScript handle the logic, not a CSS mutant or obese frameworks.
 
 If you can't incrementally add or remove a tool then be prepared to rewrite your program if you ever want to remove it. If you find something better than **P90** then it should be easy to incrementally replace **P90** in CI/CD fashion.
 
@@ -8,7 +8,7 @@ The rest of the introduction is hidden within the examples because you really do
 
 ## TODO
 
-- **Figure out** how to better document this library.
+- **Figure out** how to better document this package.
 
 ## Choose your questline
 
@@ -16,11 +16,11 @@ With this project you have three options:
 
 **1. Plunder**
 
-Loot the [`./src/lib`](https://github.com/PaulioRandall/svelte-css-preprocessor/tree/trunk/src/lib) folder for code to embed in your own projects and packages.
+Loot [`./src`](https://github.com/PaulioRandall/svelte-css-preprocessor/tree/trunk/src) for code to embed in your own projects and packages.
 
 **2. Fork**
 
-Fork the repository and use as a starting point for your own CSS pre-processor. See code in [Github](https://github.com/PaulioRandall/svelte-css-preprocessor).
+Fork the repository and use as a starting point for your own CSS processor. See [Github](https://github.com/PaulioRandall/p90).
 
 **3. Import**
 
@@ -317,7 +317,7 @@ import p90 from 'p90/processor'
 **Parameters**:
 
 - **css**: CSS string.
-- **styles**: Mapping of P90 variable names to values ([example](#p90-styles.js)).
+- **styles**: Mapping of P90 variable names to values ([example](#p90-stylesjs)).
 - **config**: Configuration and options ([docs](#config)).
 
 ```js
@@ -353,7 +353,7 @@ const config = {
 	stderr: console.error,
 
 	// Name of file being processed so it can be printed upon error.
-	filename: ''
+	filename: '',
 
 	// If true, errors will be thrown immediately ending the processing.
 	// Default is off beccause Svelte and various CSS checkers will usually tell
@@ -537,11 +537,11 @@ console.log(mediaQueries)
 
 **This section is for those few who care about how P90 works underneath or wish to plunder its code to build their own parser.**
 
-The [preproccessor.js](./src/lib/preprocessor.js) file is where everthing comes together and is the best place to start exploring the solution. We use a token data structure to keep all information about each substitution in one place. See [lexical analysis (Wikipedia)](https://en.wikipedia.org/wiki/Lexical_analysis) for a nice overview. Each major step in the process clones the tokens; adding new information.
+The [proccessor](./src/processor/processor.js) file is where everthing comes together and is the best place to start exploring the solution. We use a token data structure to keep all information about each substitution in one place. See [lexical analysis (Wikipedia)](https://en.wikipedia.org/wiki/Lexical_analysis) for a nice overview. Each major step in the process clones the tokens; adding new information.
 
-**1. Scan all tokens via [token-scanner.js](./src/lib/token-scanner.js).**
+**1. Scan all tokens via [token-scanner.js](./src/processor/token-scanner.js).**
 
-[token-scanner.js](./src/lib/token-scanner.js) makes use of [string-reader.js](./src/lib/string-reader.js) which handles the reading and matching of symbols as well as mapping between symbol and codepoint indexes. It \[almost completely\] isloates the handling of surrogate pair UTF-16 codepoints.
+[token-scanner.js](./src/processor/token-scanner.js) makes use of [string-reader.js](./src/processor/string-reader.js) which handles the reading and matching of symbols as well as mapping between symbol and codepoint indexes. It isloates the handling of surrogate pair UTF-16 codepoints.
 
 ```js
 token_after_scanning = {
@@ -555,7 +555,7 @@ token_after_scanning = {
 }
 ```
 
-**2. Look up the property in the users style map via [lookup.js](./src/lib/lookup.js).**
+**2. Look up the property in the users style map via [lookup.js](./src/processor/lookup.js).**
 
 The property is not the token field that should be used for substitution. Properties will be resolved into values in the next step. For most types there is no change but functions need to be invoked and objects transformed.
 
@@ -580,7 +580,7 @@ token_after_lookup = {
 ```
 
 ```js
-import { identifyType } from './lookup.js'
+import { identifyType } from './src/processor/lookup.js'
 
 identifyType(undefined) // 'undefined'
 identifyType(null) // 'null'
@@ -593,7 +593,7 @@ identifyType({}) // 'object'
 identifyType(() => '') // 'function'
 ```
 
-**3. Resolve the property to a value via [resolve.js](./src/lib/resolver.js).**
+**3. Resolve the property to a value via [resolve.js](./src/processor/resolver.js).**
 
 The resultant `value` should be usable for the CSS string substitution without need for further modification.
 
