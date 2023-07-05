@@ -1,13 +1,14 @@
 # P90
 
-A minimalist CSS pre-processor for Svelte. Let JavaScript handle the logic, not a CSS mutant.
+A minimalist CSS pre-processor with out of the box support for Svelte. Let simple JavaScript handle the logic, not a CSS mutant or obese frameworks.
+
+If you can't incrementally add or remove a tool then be prepared to rewrite your program if you ever want to remove it. If you find something better than **P90** then it should be easy to incrementally replace **P90** in CI/CD fashion.
 
 The rest of the introduction is hidden within the examples because you really don't give a damn.
 
 ## TODO
 
-- **Tidy** README.
-- **Figure out** how to effectively document this library.
+- **Figure out** how to better document this library.
 
 ## Choose your questline
 
@@ -23,12 +24,12 @@ Fork the repository and use as a starting point for your own CSS pre-processor. 
 
 **3. Import**
 
-Import like any other package.
+Like any other package.
 
 ```json
 {
 	"devDependencies": {
-		"p90": "v0.17.0"
+		"p90": "v0.18.0"
 	}
 }
 ```
@@ -43,7 +44,7 @@ _./src/p90-styles.js_ exports the config object we'll create next.
 
 ```js
 // svelte.config.js
-import p90 from 'p90'
+import p90 from 'p90/svelte'
 import styles from './src/p90-styles.js'
 
 export default {
@@ -54,31 +55,34 @@ export default {
 ```
 
 ```js
-// Options with defaults.
-P90(styles, {
-	// If true errors will throw up to Svelte which usually fails when validating
-	// the CSS. Default is off beccause Svelte is better at telling you where
-	// the error is.
-	failOnError = false,
+// Config and options with their defaults.
+const config = {
+	stdout: console.log,
+	stderr: console.error,
 
-	// Prints file name and token info.
-	printErrors = true,
+	// If true, errors will be thrown immediately ending the processing.
+	// Default is off beccause Svelte and various CSS checkers will usually tell
+	// you where the errors are. They're better at it too.
+	throwOnError: false,
 
-	// List accepted mime types.
+	// Prints file name and token info when an error is encountered.
+	printErrors: true,
+
+	// List of accepted lang attibute values.
 	// import { defaultMimeTypes } from 'p90'
 	mimeTypes: [
-		'', // None or empty lang attribute
+		'', // Undefined, null, or empty lang attribute.
 		'text/css',
 		'text/p90',
 	],
-})
+}
 ```
 
 ### p90-styles.js
 
 Rename, move, and reorganise as you see fit.
 
-> I've made so many changes to this example that it probably contains a few errors. I have a TODO to polish it up.
+> I've made so many changes to this example that it probably contains a few errors. I have a TODO to rewrite it.
 
 ```js
 // ./src/p90-styles.js
@@ -300,11 +304,70 @@ export default [
 </style>
 ```
 
+## Process function
+
+If you're not working in Svelte you can use the underlying processor. This project doesn't depend on anything other than _Jest_; even that's a _devDependency_.
+
+Currently there is no support for reading CSS from files or repositories. But I'll consider adding it if a use case pops up or, in the unlikely event, through popular demand.
+
+```js
+import p90 from 'p90/processor'
+```
+
+**Parameters**:
+
+- **css**: CSS string.
+- **styles**: Mapping of P90 variable names to values ([example](#p90-styles.js)).
+- **config**: Configuration and options ([docs](#config)).
+
+```js
+import p90 from 'p90/processor'
+
+function processCss() {
+	const cssBefore = '{ color: $color.blue; }'
+
+	const styles = {
+		color: {
+			blue: '#2222FF',
+		}
+	}
+
+	const config = {
+		filename: 'main.css',
+		throwOnError: true,
+	}
+
+	const cssAfter = await p90(cssBefore, styles, config)
+
+	console.log(cssAfter)
+	// '{ color: #2222FF; }'
+}
+```
+
+### Config
+
+```js
+// Config and options with their defaults.
+const config = {
+	stdout: console.log,
+	stderr: console.error,
+
+	// Name of file being processed so it can be printed upon error.
+	filename: ''
+
+	// If true, errors will be thrown immediately ending the processing.
+	// Default is off beccause Svelte and various CSS checkers will usually tell
+	// you where the errors are. They're better at it too.
+	throwOnError: false,
+
+	// Prints file name and token info when an error is encountered.
+	printErrors: true,
+}
+```
+
 ## Util functions
 
-There exists some utility functions for common activities. You don't have to use them to use **P90**. If you don't like the way I've approached CSS code generation then right your own functions. It's just plain JavaScript after all.
-
-Some are really convenient while others are so trivial it'll be quicker to write your own than look them up.
+There exists some utility functions for common activities. You don't have to use them to use **P90**. If you don't my approach to CSS code generation then write your own functions. It's plain JavaScript after all.
 
 ```js
 import p90Util from 'p90/util'

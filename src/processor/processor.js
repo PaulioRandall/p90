@@ -6,7 +6,8 @@ export const processCss = async (css, styles, config) => {
 	config = {
 		stdout: console.log,
 		stderr: console.error,
-		failOnError: false,
+		filename: '',
+		throwOnError: false,
 		printErrors: true,
 		...config,
 	}
@@ -69,7 +70,7 @@ const handleError = (e, tk, config) => {
 		config.stdout(`P90 token: ${tkStr}`)
 	}
 
-	if (config.failOnError) {
+	if (config.throwOnError) {
 		throw e
 	}
 }

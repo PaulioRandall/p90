@@ -147,7 +147,7 @@ describe('processCss({...})', () => {
 		}
 
 		const config = {
-			failOnError: true,
+			throwOnError: true,
 			printErrors: false,
 		}
 
@@ -243,7 +243,7 @@ describe('processCss({...})', () => {
 		)
 
 		const config = {
-			failOnError: true,
+			throwOnError: true,
 			printErrors: false,
 		}
 

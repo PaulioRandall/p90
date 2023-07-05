@@ -1,4 +1,4 @@
-import { processCss } from './processor.js'
+import { processCss } from '../processor/processor.js'
 
 const TTY_RED = '\x1b[31m'
 const TTY_YELLOW = '\x1b[33m'
