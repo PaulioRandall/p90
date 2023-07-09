@@ -1,6 +1,12 @@
 export const lookupProp = (map, tk) => {
 	tk = structuredClone(tk)
-	tk.prop = findProp(map, tk.path)
+
+	if (tk.escape) {
+		tk.prop = '$'
+	} else {
+		tk.prop = findProp(map, tk.path)
+	}
+
 	tk.type = identifyType(tk.prop)
 	return tk
 }

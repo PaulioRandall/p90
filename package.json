@@ -1,15 +1,15 @@
 {
 	"author": "Paul Williams",
 	"name": "p90",
-	"description": "A minimalist CSS pre-processor with out of the box support for Svelte.",
+	"description": "A minimalist CSS processor with out of the box support for Svelte.",
 	"keywords": [
-		"svelte",
-		"sveltekit",
 		"css",
+		"minimalist",
+		"processor",
 		"preprocessor",
-		"minimalist"
+		"svelte"
 	],
-	"version": "0.18.0",
+	"version": "0.19.0",
 	"exports": {
 		"./processor": "./src/processor.js",
 		"./svelte": "./src/svelte.js",

@@ -2,6 +2,7 @@ import tokenScanner from './token-scanner.js'
 
 const newToken = (start, end, raw, path, args = []) => {
 	return {
+		escape: false,
 		start,
 		end,
 		prefix: '$',
@@ -169,5 +170,24 @@ describe('scanFunc(...)', () => {
 	test('#21', () => {
 		const f = tokenScanner.scanFunc('$func(""");')
 		expect(f).toThrow(Error)
+	})
+
+	test('#22', () => {
+		const f = tokenScanner.scanFunc('$$')
+
+		const exp = newToken(0, 2, '$$', ['$'], [])
+		exp.escape = true
+		exp.suffix = ''
+
+		expect(f()).toEqual(exp)
+	})
+
+	test('#23', () => {
+		const f = tokenScanner.scanFunc('$$;$$')
+
+		const exp = newToken(0, 3, '$$;', ['$'], [])
+		exp.escape = true
+
+		expect(f()).toEqual(exp)
 	})
 })

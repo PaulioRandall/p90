@@ -29,7 +29,7 @@ Like any other package.
 ```json
 {
 	"devDependencies": {
-		"p90": "v0.18.0"
+		"p90": "v0.19.0"
 	}
 }
 ```
@@ -128,6 +128,7 @@ const themes = {
 // read and change; but I one or two fair use cases.
 export default [
 	// Here's the neat part... these key-value pairs are up to you.
+	// - Double $$ escapes so `$$$$` resolves to `$$`
 	// - Undefined values throw an error.
 	// - Promises are resolved to values.
 	// - Null values resolve to an empty string.

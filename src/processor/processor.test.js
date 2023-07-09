@@ -261,39 +261,18 @@ describe('processCss({...})', () => {
 	})
 
 	test('#17', () => {
-		const styles = {
-			$: '$',
-		}
-
-		const promise = doProcessCss(styles, `$$`)
+		const promise = doProcessCss({}, `$$`)
 		expect(promise).resolves.toEqual('$')
 	})
 
 	test('#18', () => {
-		const styles = {
-			$$$: '$',
-		}
-
-		const promise = doProcessCss(styles, `$$$$`)
-		expect(promise).resolves.toEqual('$')
+		const promise = doProcessCss({}, `$$;$$;`)
+		expect(promise).resolves.toEqual('$;$;')
 	})
 
 	test('#19', () => {
-		const styles = {
-			$: (n = 1) => '$'.repeat(n),
-		}
-
-		const promise = doProcessCss(styles, `$$(4)`)
+		const promise = doProcessCss({}, `$$$$$$$$`)
 		expect(promise).resolves.toEqual('$$$$')
-	})
-
-	test('#20', () => {
-		const styles = {
-			$: (n = 1) => '$'.repeat(n),
-		}
-
-		const promise = doProcessCss(styles, `$$`)
-		expect(promise).resolves.toEqual('$')
 	})
 
 	test('#21', () => {

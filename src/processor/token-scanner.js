@@ -14,14 +14,56 @@ const scanAll = (css) => {
 	return result
 }
 
-const scanFunc = (css) => {
-	const escapeForRegex = (s) => {
-		return s.replace(/[/\-\.\(\)\[\]\$\^\&\\]/g, '\\$&')
-	}
+const escapeForRegex = (s) => {
+	return s.replace(/[/\-\.\(\)\[\]\$\^\&\\]/g, '\\$&')
+}
 
+const scanFunc = (css) => {
 	const sr = newStringReader(css)
 	const prefix = escapeForRegex(prefixRune)
 	const prefixRegex = new RegExp(prefix)
+
+	const scanTokenFunc = () => {
+		if (!sr.seek(prefixRegex)) {
+			return null
+		}
+
+		const [start, startCp] = sr.makeBookmark()
+
+		const startRune = sr.read()
+		if (sr.accept(prefixRegex)) {
+			const suffix = scanSuffix()
+			const [end, endCp] = sr.makeBookmark()
+
+			return {
+				escape: true,
+				start: startCp,
+				end: endCp,
+				prefix: prefixRune,
+				raw: sr.slice(start, end),
+				suffix: suffix,
+				path: [prefixRune],
+				args: [],
+			}
+		}
+
+		const name = scanName()
+		const args = scanParams(name)
+		const suffix = scanSuffix()
+
+		const [end, endCp] = sr.makeBookmark()
+
+		return {
+			escape: false,
+			start: startCp,
+			end: endCp,
+			prefix: prefixRune,
+			raw: sr.slice(start, end),
+			suffix: suffix,
+			path: name.split('.'),
+			args: args,
+		}
+	}
 
 	const scanName = () => {
 		return sr.readWhile(/[a-zA-Z0-9_\-\.\$]/)
@@ -134,30 +176,7 @@ const scanFunc = (css) => {
 		throw new Error(`Unterminated string for argument of '${name}'`)
 	}
 
-	return () => {
-		if (!sr.seek(prefixRegex)) {
-			return null
-		}
-
-		const [start, startCp] = sr.makeBookmark()
-
-		const startRune = sr.read()
-		const name = scanName()
-		const args = scanParams(name)
-		const suffix = scanSuffix()
-
-		const [end, endCp] = sr.makeBookmark()
-
-		return {
-			start: startCp,
-			end: endCp,
-			prefix: prefixRune,
-			raw: sr.slice(start, end),
-			suffix: suffix,
-			path: name.split('.'),
-			args: args,
-		}
-	}
+	return scanTokenFunc
 }
 
 export default {
