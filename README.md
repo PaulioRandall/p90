@@ -1,26 +1,22 @@
 # P90
 
-A minimalist CSS processor with out of the box support for Svelte. Let simple JavaScript handle the logic, not a CSS mutant or obese frameworks.
+A minimalist CSS processor with out of the box support for Svelte. Let plain JavaScript handle the logic, not a CSS mutant.
 
-If you can't incrementally add or remove a tool then be prepared to rewrite your program if you ever want to remove it. If you find something better than **P90** then it should be easy to incrementally replace **P90** in CI/CD fashion.
+**P90** scans CSS for **P90** variables just like an ordinary compiler. But it does not parse, tokens are simply substituted with user defined values. No parsing or syntax trees needed.
 
-The rest of the introduction is hidden within the examples because you really don't give a damn.
-
-## TODO
-
-- **Figure out** how to better document this package.
+The rest of the introduction is hidden within the examples because you don't really give a damn.
 
 ## Choose your questline
 
-With this project you have three options:
+You have three options:
 
 **1. Plunder**
 
-Loot [`./src`](https://github.com/PaulioRandall/svelte-css-preprocessor/tree/trunk/src) for code to embed in your own projects and packages.
+Loot [`/src`](https://github.com/PaulioRandall/svelte-css-preprocessor/tree/trunk/src) for code to embed in your own projects.
 
 **2. Fork**
 
-Fork the repository and use as a starting point for your own CSS processor. See [Github](https://github.com/PaulioRandall/p90).
+And use as a starting point for your own CSS processor. See [Github](https://github.com/PaulioRandall/p90).
 
 **3. Import**
 
@@ -82,6 +78,21 @@ const config = {
 
 Rename, move, and reorganise as you see fit.
 
+There aren't really any conventions because the limitations of the design are good enough. Use kebab-case or camelCase if you don't like snake_case.
+
+Organise as you please. Both nesting and dead flat structures have their virtues. **P90** variable names and user values can be whatever you like providing the meet the following criteria:
+
+- Variable names must start with `$`.
+- Double `$$` escapes, e.g. `$$$$` resolves to `$$`
+- Undefined user values throw an error.
+- Promise values are resolved to values (not recursive).
+- Null values resolve to an empty string.
+- Objects are converted into CSS properties if called directly. But must only contain properties that are straight forward to stringify, i.e. string, number, bigint, boolean, and array.
+- Functions may return a `null` or `object` type which will be resolved recursively, but returning a function from a function will result in an error.
+- Trailing colons and semi-colons are preserved, except for:
+  - _Nulls_: which remove a single instance if suffix is present.
+  - _Objects_: which will appended `;\n` if no suffix is present.
+
 > I've made so many changes to this example that it probably contains a few errors. I have a TODO to rewrite it.
 
 ```js
@@ -118,78 +129,37 @@ const themes = {
 	},
 }
 
-// Export either an object (style set) containing the key-value
-// mappings or an array style sets each containing there own
+// Export either an object (value map) containing the key-value
+// mappings or an array of objects each containing there own
 // mappings.
 //
-// If p90 receives and array then they are applied sequentially
-// so that the output of the first can be processed by the second.
-// You'll generally want to avoid this since makes code hard to
-// read and change; but I one or two fair use cases.
+// If p90 receives and array then the value maps are applied
+// sequentially so that the output of the first can be processed
+// by the second. You'll generally want to avoid this since makes
+// code hard to read and change. But there maybe fair use cases.
 export default [
-	// Here's the neat part... these key-value pairs are up to you.
-	// - Double $$ escapes so `$$$$` resolves to `$$`
-	// - Undefined values throw an error.
-	// - Promises are resolved to values.
-	// - Null values resolve to an empty string.
-	// - Objects are converted into CSS properties if called directly.
-	//   But must only contain properties that are straight forward to
-	//   stringify, i.e. string, number, bigint, boolean, and array.
-	// - Functions may return a `null` or `object` type which will be resolved
-	//   recursively. But returning a function from a function is needless so
-	//   will result in an error.
-	// - Trailing colons and semi-colons are preserved, except for:
-	//   - Nulls: which remove a single instance if present.
-	//   - Objects: which will appended `\n` if no is present.
-	//
-	// There aren't really any conventions because the limitations of the design
-	// are good enough. Use kebab-case or camelCase if you don't like snake_case.
-	// But above all...
-	// - do what works;
-	// - as simple as possible;
-	// - as easy to read as possible;
-	// - and as easy to change as possible.
 	{
-		// Organise as you please.
-		//
-		// Both nesting and dead flat structures have their virtues.
-		// However, I advise keeping nesting to a minimum.
 		props: null,
 
 		rgb: rgbs,
 		color: colors,
 
-		// Function arguments are always strings.
-		// It is up to you to parse them into numbers etc.
 		colorWithAlpha: (color, alpha) => {
 			const rgb = rgbs[color]
+
+			// Function arguments are always strings.
+			// It is up to you to parse them into numbers etc.
 			const a = parseFloat(alpha)
 
-			const setAplha = (rgb, alpha) => {
-				const result = [...rgb]
+			const result = [...rgb]
 
-				if (rgb.length === 3) {
-					result.push(alpha)
-				} else {
-					result[3] = alpha
-				}
-
-				return result
+			if (rgb.length === 3) {
+				result.push(a)
+			} else {
+				result[3] = a
 			}
 
-			if (!rgb) {
-				throw new Error(`Unknown color '${color}'`)
-			}
-
-			if (rgb.length !== 3 && rgb.length !== 4) {
-				throw new Error(`Invalid RGB/RGBA color ${rgb}`)
-			}
-
-			if (a === NaN || a < 0 || a > 1) {
-				throw new Error(`Alpha must be a number between 0 and 1, you gave me '${alpha}'`)
-			}
-
-			return setAplha(rgb, a)
+			return result
 		},
 
 		highlight: {
@@ -374,12 +344,11 @@ There exists some utility functions for common activities. You don't have to use
 import p90Util from 'p90/util'
 ```
 
-| Name                                                          | Does what?                                                                                                                                                            |
-| :------------------------------------------------------------ | :-------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| [rgbsToColors](#rgbstocolors)                                 | Converts a map of RGB and RGBA arrays to CSS RGB and RGBA values.                                                                                                     |
-| [renderColorSchemes](#rendercolorschemes)                     | Generates CSS color scheme media queries from a set of themes with CSS variables as values; goes hand-in-hand with [generateThemeVariables](#generatethemevariables). |
-| [generateThemeVariables](#generatethemevariables)             | Generates a **set** of CSS variables from a set of themes; goes hand-in-hand with [renderColorSchemes](#rendercolorschemes).                                          |
-| [buildColorSchemeMediaQueries](#buildcolorschememediaqueries) | Generates CSS color scheme media queries.                                                                                                                             |
+| Name                                              | Does what?                                                                                                                                                            |
+| :------------------------------------------------ | :-------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --- |
+| [rgbsToColors](#rgbstocolors)                     | Converts a map of RGB and RGBA arrays to CSS RGB and RGBA values.                                                                                                     |
+| [renderColorSchemes](#rendercolorschemes)         | Generates CSS color scheme media queries from a set of themes with CSS variables as values; goes hand-in-hand with [generateThemeVariables](#generatethemevariables). |
+| [generateThemeVariables](#generatethemevariables) | Generates a **set** of CSS variables from a set of themes; goes hand-in-hand with [renderColorSchemes](#rendercolorschemes).                                          |     |
 
 ### rgbsToColors
 
@@ -489,63 +458,21 @@ console.log(themeVariables)
 */
 ```
 
-### buildColorSchemeMediaQueries
-
-Generates CSS colour scheme media queries.
-
-**Parameters**:
-
-- **schemes**: map of CSS colour schemes.
-- **global**: generate global CSS `:global(...)` (default: `true`).
-- **toValue**: (prop, value) => "" (default: `` (p, v) => `${p}: ${v}`  ``).
-
-```js
-import { buildColorSchemeMediaQueries } from 'p90/util'
-
-const schemes = {
-	// P90 doesn't care what the scheme names are but browsers do!
-	light: {
-		color: [250, 250, 250],
-		'background-color': [5, 10, 60],
-	},
-	dark: {
-		color: [5, 10, 35],
-		'background-color': [231, 245, 255],
-	},
-}
-
-const toValue = (prop, rgb) => `${prop}: rgb(${rgb[0]}, ${rgb[1]}, ${rgb[2]})`
-const mediaQueries = buildColorSchemeMediaQueries(schemes, false, toValue)
-console.log(mediaQueries)
-/*
-`@media (prefers-color-scheme: light) {
-	:root {
-		color: rgb(250, 250, 250);
-		background-color: rgb(5, 10, 60);
-	}
-}
-
-@media (prefers-color-scheme: dark) {
-	:root {
-		color: rgb(5, 10, 35);
-		background-color: rgb(231, 245, 255);
-	}
-}`
-*/
-```
-
 ## Algorithm
 
 **This section is for those few who care about how P90 works underneath or wish to plunder its code to build their own parser.**
 
-The [proccessor](./src/processor/processor.js) file is where everthing comes together and is the best place to start exploring the solution. We use a token data structure to keep all information about each substitution in one place. See [lexical analysis (Wikipedia)](https://en.wikipedia.org/wiki/Lexical_analysis) for a nice overview. Each major step in the process clones the tokens; adding new information.
+The [proccessor](./src/processor/processor.js) file is where everthing comes together and is the best place to start exploring.
 
-**1. Scan all tokens via [token-scanner.js](./src/processor/token-scanner.js).**
+We use a token data structure to keep all information about each substitution in one place. See [lexical analysis (Wikipedia)](https://en.wikipedia.org/wiki/Lexical_analysis) for a general overview to scanning. Each major step in the process clones the tokens and then adds new information.
+
+### 1. Scan all tokens via [token-scanner.js](./src/processor/token-scanner.js)
 
 [token-scanner.js](./src/processor/token-scanner.js) makes use of [string-reader.js](./src/processor/string-reader.js) which handles the reading and matching of symbols as well as mapping between symbol and codepoint indexes. It isloates the handling of surrogate pair UTF-16 codepoints.
 
 ```js
 token_after_scanning = {
+	escape: false, // True only when escaping
 	start: 9, // Code point index
 	end: 31, // Code point index
 	prefix: '$',
@@ -556,20 +483,36 @@ token_after_scanning = {
 }
 ```
 
-**2. Look up the property in the users style map via [lookup.js](./src/processor/lookup.js).**
+Escape tokens are flagged as they need no value map lookup:
 
-The property is not the token field that should be used for substitution. Properties will be resolved into values in the next step. For most types there is no change but functions need to be invoked and objects transformed.
+```js
+escape_token = {
+	escape: true,
+	start: 10,
+	end: 12,
+	prefix: '$',
+	raw: '$$',
+	suffix: '',
+	path: ['$'],
+	args: [],
+}
+```
+
+### 2. Look up the initial value (referred to as `prop`) in the users value map via [lookup.js](./src/processor/lookup.js)
+
+`prop` does not hold the final value used for substitution. They will be resolved in the next step. For most types there is no change but functions need to be invoked, objects transformed, etc.
 
 ```js
 token_after_lookup = {
+	escape: false,
 	start: 9,
 	end: 31,
 	prefix: '$',
 	raw: '$numbers.add(1, 2, 3);',
-	suffix: ';', // One of ['', ';', ':']
+	suffix: ';',
 	path: ['numbers', 'add'],
 	args: ['1', '2', '3'],
-	type: 'function', // From 'typeof' with extra custom type 'array'
+	type: 'function', // From 'typeof' with additional custom type 'array'
 	prop: (...numbers) => {
 		let result = 0
 		for (const n of numbers) {
@@ -594,24 +537,25 @@ identifyType({}) // 'object'
 identifyType(() => '') // 'function'
 ```
 
-**3. Resolve the property to a value via [resolve.js](./src/processor/resolver.js).**
+### 3. Resolve the property to a value via [resolve.js](./src/processor/resolver.js)
 
 The resultant `value` should be usable for the CSS string substitution without need for further modification.
 
 The `type` field is used to determine how this is done. The suffix will be appended, except where the type is _"null"_. If the type is _"object"_ and `suffix` is empty then _;\n_ is appended.
 
-Functions may return a _null_ or _object_ type which will be resolved recursively. But returning a function from a function will result in an error. It's needless and will just give users greater freedom to get confused by the complexities of their own making.
+Functions may return a _null_ or _object_ type which will be resolved recursively. But returning a function from a function will result in an error. There's no need, just call it before returning.
 
 ```js
 token_after_resolve = {
+	escape: false,
 	start: 9,
 	end: 35,
 	prefix: '$',
 	raw: `$numbers.add(1, '2', "3");`,
-	suffix: ';', // One of ['', ';', ':']
+	suffix: ';',
 	path: ['numbers', 'add'],
-	args: ['1', `'2'`, `"3"`],
-	type: 'function', // As returned by 'typeof' with extra custom type 'array'
+	args: ['1', `2`, `3`],
+	type: 'function',
 	prop: (...numbers) => {
 		let result = 0
 		for (const n of numbers) {
@@ -621,8 +565,8 @@ token_after_resolve = {
 	},
 	value: '6;', // Notice the suffix has been appended
 
-	// True if a function returned a result (null or object) which required a
-	// recursive function call.
+	// True if a function returned a null or object which required a
+	// recursive resolution.
 	recursed?: false
 }
 ```

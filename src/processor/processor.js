@@ -18,14 +18,14 @@ export const processCss = async (css, styles, config) => {
 		styles = [styles]
 	}
 
-	for (const styleMap of styles) {
-		css = await replaceAllTokens(css, styleMap, config)
+	for (const valueMap of styles) {
+		css = await replaceAllTokens(css, valueMap, config)
 	}
 
 	return css
 }
 
-const replaceAllTokens = async (css, styleMap, config) => {
+const replaceAllTokens = async (css, valueMap, config) => {
 	const tokens = tokenScanner.scanAll(css)
 
 	// Work from back to front of the CSS string otherwise replacements at
@@ -34,7 +34,7 @@ const replaceAllTokens = async (css, styleMap, config) => {
 
 	for (const tk of tokens) {
 		try {
-			css = await attemptReplacement(css, styleMap, tk)
+			css = await attemptReplacement(css, valueMap, tk)
 		} catch (e) {
 			handleError(e, tk, config)
 		}
@@ -43,11 +43,11 @@ const replaceAllTokens = async (css, styleMap, config) => {
 	return css
 }
 
-const attemptReplacement = async (css, styleMap, tk) => {
-	tk = lookupProp(styleMap, tk)
+const attemptReplacement = async (css, valueMap, tk) => {
+	tk = lookupProp(valueMap, tk)
 
 	if (tk.prop === undefined) {
-		return css // Ignore prop, it could be in a following styleMap
+		return css // Ignore prop, it could be in the next valueMap
 	}
 
 	tk = await resolveValue(tk)

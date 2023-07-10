@@ -6,7 +6,7 @@ const TTY_RESET = '\x1b[0m'
 
 export const defaultMimeTypes = ['', 'text/css', 'text/p90']
 
-export const p90 = (styles, options = {}) => {
+export const p90 = (valueMap, options = {}) => {
 	options = {
 		stdout: (msg) => process.stdout.write(`\n${TTY_YELLOW}${msg}${TTY_RESET}`),
 		stderr: (msg) => process.stderr.write(`\n${TTY_RED}${msg}${TTY_RESET}`),
@@ -26,7 +26,7 @@ export const p90 = (styles, options = {}) => {
 			}
 
 			return {
-				code: await processCss(content, styles, config),
+				code: await processCss(content, valueMap, config),
 			}
 		},
 	}

@@ -2,11 +2,11 @@ import { p90 } from './svelte.js'
 
 describe('svelte/p90', () => {
 	test('Integration', () => {
-		const styles = {
+		const valueMap = {
 			color: 'blue',
 		}
 
-		const sveltePreProcessor = p90(styles)
+		const sveltePreProcessor = p90(valueMap)
 
 		const given = {
 			content: '$color',

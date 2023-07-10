@@ -1,18 +1,18 @@
-export const lookupProp = (map, tk) => {
+export const lookupProp = (valueMap, tk) => {
 	tk = structuredClone(tk)
 
 	if (tk.escape) {
 		tk.prop = '$'
 	} else {
-		tk.prop = findProp(map, tk.path)
+		tk.prop = findProp(valueMap, tk.path)
 	}
 
 	tk.type = identifyType(tk.prop)
 	return tk
 }
 
-const findProp = (map, path) => {
-	let prop = map
+const findProp = (valueMap, path) => {
+	let prop = valueMap
 
 	for (const segment of path) {
 		if (prop === undefined || prop === null) {
