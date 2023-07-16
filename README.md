@@ -2,13 +2,9 @@
 
 A minimalist CSS processor with out of the box support for Svelte. Let plain JavaScript handle logic, not a CSS mutant.
 
-I just needed a bit of sugar upon my CSS. The design trade-offs lean towards simplicity, readability, and user capability more than writability. Complexity of configuration is almost entirely in your court.
+I just needed a bit of sugar upon my CSS. It's straight up optimised for my tastes. The design trade-offs lean towards simplicity, readability, and flexibility more than writability. Complexity of configuration is almost entirely in the user's court.
 
-> "The readability of programs is immeasurably more important than their writability" - C. A. R. Hoare
-
-It's straight up optimised for my tastes. If you hate other devs then use a CSS mutant like SCSS or SASS. Throw in some mixins and a CSS methodology to really piss people off. If you prefer clutter and being spoon feed on a leash then use Tailwind; a tool that puts writability ahead of readability.
-
-**P90** scans CSS for **P90** variables just like any ordinary compiler. But tokens are simply substituted with user defined values. It's really just an enhanced `string.replace` &mdash;seems pretty fast considering I've yet to make any effort at optimisation&mdash;.
+**P90** scans CSS for **P90** variables just like any ordinary compiler. But tokens are simply substituted with user defined values. It's really just an enhanced `string.replace`.
 
 ## 1. Plunder
 
@@ -36,15 +32,15 @@ Rename, move, and reorganise as you see fit.
 
 There aren't really any conventions because the limitations of the design are good enough. Use kebab-case or camelCase if you don't like snake_case.
 
-Organise as you please. Both nesting and dead flat structures have their virtues. **P90** variable names and user values can be whatever you like providing they meet the following criteria:
+Organise as you please. Both nested and flat structures have their vices aand virtues. **P90** variable names and user values can be whatever you like providing they meet the following criteria:
 
-- Variable names must start with `$`.
+- Variable in CSS are prefixed with `$`.
 - Double `$$` escapes, e.g. `$$$$` resolves to `$$`
 - Objects and undefined values throw an error.
-- Promises are awaited and resolved to values, but not recursively!
 - Null values resolve to an empty string, trailing colons and semi-colons are removed.
 - Function arguments are always strings. It's your responsibility to parse them.
 - Returning a function from a function will result in an error.
+- Promises are awaited and resolved to values, but not recursively!
 - Trailing colons and semi-colons are preserved, except for _nulls_.
 
 > I've made so many changes to this example that it probably contains a few errors. The rewrite is in my TODO list so will probably never get done.
@@ -91,13 +87,16 @@ export default [
 		rgb: rgbs,
 		color: colors,
 
+		color_schemes: renderColorSchemes(themes),
+		theme: generateThemeVariables(themes),
+
 		// The function is called for each instance.
 		// There is no caching unless you implement it.
 		colorWithAlpha: (color, alpha) => {
 			const rgb = rgbs[color]
 
 			// Function arguments are always strings.
-			// It is up to you to parse them as you see fit.
+			// Parse them as you see fit.
 			const a = parseFloat(alpha)
 
 			const result = [...rgb]
@@ -110,20 +109,6 @@ export default [
 
 			return result
 		},
-
-		highlight: {
-			default: {
-				'border-radius': '0.4rem',
-				border: '10px solid transparent',
-				transition: 'border 300ms ease-out',
-			},
-			hover: {
-				border: '10px solid $theme.strong',
-			},
-		},
-
-		color_schemes: renderColorSchemes(themes),
-		theme: generateThemeVariables(themes),
 
 		font: {
 			family: {
@@ -329,11 +314,11 @@ There exists some utility functions for common activities. You don't have to use
 import p90Util from 'p90/util'
 ```
 
-| Name                                              | Does what?                                                                                                                                                            |
-| :------------------------------------------------ | :-------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --- |
-| [rgbsToColors](#rgbstocolors)                     | Converts a map of RGB and RGBA arrays to CSS RGB and RGBA values.                                                                                                     |
-| [renderColorSchemes](#rendercolorschemes)         | Generates CSS color scheme media queries from a set of themes with CSS variables as values; goes hand-in-hand with [generateThemeVariables](#generatethemevariables). |
-| [generateThemeVariables](#generatethemevariables) | Generates a **set** of CSS variables from a set of themes; goes hand-in-hand with [renderColorSchemes](#rendercolorschemes).                                          |     |
+| Name | Does what? |
+| :--- | :--- |
+| [rgbsToColors](#rgbstocolors) | Converts a map of RGB and RGBA arrays to CSS RGB and RGBA values.  |
+| [renderColorSchemes](#rendercolorschemes)  | Generates CSS color scheme media queries from a set of themes with CSS variables as values; goes hand-in-hand with [generateThemeVariables](#generatethemevariables). |
+| [generateThemeVariables](#generatethemevariables) | Generates a **set** of CSS variables from a set of themes; goes hand-in-hand with [renderColorSchemes](#rendercolorschemes). |
 
 ### rgbsToColors
 
