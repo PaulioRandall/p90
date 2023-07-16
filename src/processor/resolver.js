@@ -22,12 +22,8 @@ export const resolveValue = async (tk) => {
 			tk = await invokeFunction(tk)
 			break
 
-		case 'object':
-			tk.value = mapToCssProps(tk)
-			break
-
 		default:
-			throw new Error(`Can't resolve unsupported type '${tk.type}'`)
+			throw new Error(`'${tk.type}' type unsupported.`)
 	}
 
 	return appendSuffix(tk)
@@ -81,38 +77,9 @@ const invokeFunction = async (tk) => {
 	return await resolveValue(tk)
 }
 
-const mapToCssProps = (tk) => {
-	const result = []
-
-	for (const cssProp in tk.prop) {
-		const value = tk.prop[cssProp]
-		checkCssPropValue(cssProp, value, tk)
-		result.push(`${cssProp}: ${value.toString()}`)
-	}
-
-	const suffix = tk.suffix ? tk.suffix : ';\n'
-	return result.join(';\n') + suffix
-}
-
-const checkCssPropValue = (cssProp, value, tk) => {
-	const type = identifyType(value)
-
-	if (!implicitTypes.includes(type)) {
-		const errObj = {
-			'CSS property': cssProp,
-			"User's type": type,
-			description: 'Type not allowed as a CSS property value',
-			validTypes: implicitTypes,
-		}
-
-		const errMsg = JSON.stringify(errObj, null, 2)
-		throw new Error(errMsg)
-	}
-}
-
 const appendSuffix = (tk) => {
 	const deadValue = tk.value === undefined || tk.value === null
-	const dontSuffix = ['undefined', 'null', 'object']
+	const dontSuffix = ['undefined', 'null']
 
 	if (deadValue || dontSuffix.includes(tk.type)) {
 		return tk

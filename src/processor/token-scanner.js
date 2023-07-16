@@ -123,7 +123,6 @@ const scanFunc = (css) => {
 		let arg = ''
 
 		if (delim) {
-			console.log(delim)
 			arg = scanQuotedArg(delim, name)
 		} else {
 			arg = sr.readWhile(/[^,)]/)
