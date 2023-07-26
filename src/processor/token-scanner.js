@@ -65,27 +65,18 @@ const scanFunc = (css) => {
 		}
 	}
 
+	// NAME := { *alpha-numeric* | "_" | "-" | "." | "$" }
 	const scanName = () => {
 		return sr.readWhile(/[a-zA-Z0-9_\-\.\$]/)
 	}
 
-	const scanSuffix = () => {
+	// PARAMS := [ "(" ARGS ")" ]
+	const scanParams = (name) => {
 		const bookmark = sr.makeBookmark()
 
 		sr.skipSpaces()
-		const suffix = sr.accept(/[;:]/)
-
-		if (!suffix) {
-			sr.gotoBookmark(bookmark)
-			return ''
-		}
-
-		return suffix
-	}
-
-	const scanParams = (name) => {
-		sr.skipSpaces()
 		if (!sr.accept(/\(/)) {
+			sr.gotoBookmark(bookmark)
 			return []
 		}
 
@@ -100,6 +91,7 @@ const scanFunc = (css) => {
 		return args
 	}
 
+	// ARGS := [ ARG { "," ARG } ]
 	const scanArgs = (name) => {
 		const args = []
 
@@ -116,6 +108,9 @@ const scanFunc = (css) => {
 		return args
 	}
 
+	// ARG := '"' { *any rune except '"' OR '\'* | '\"' | '\\' } '"'
+	// ARG := "'" { *any rune except "'" OR "\"* | "\'" | "\\" } "'"
+	// ARG := { *any rune except "\"* | "\\" }
 	const scanArg = (name) => {
 		sr.skipSpaces()
 
@@ -173,6 +168,26 @@ const scanFunc = (css) => {
 		}
 
 		throw new Error(`Unterminated string for argument of '${name}'`)
+	}
+
+		// SUFFIX := ";" | ";" | *white-space*
+	const scanSuffix = () => {
+		const bookmark = sr.makeBookmark()
+
+		sr.skipSpaces()
+		let suffix = sr.accept(/[;:]/)
+
+		if (!suffix) {
+			sr.gotoBookmark(bookmark)
+			suffix = sr.accept(/\s/)
+		}
+
+		if (!suffix) {
+			sr.gotoBookmark(bookmark)
+			return ''
+		}
+
+		return suffix
 	}
 
 	return scanTokenFunc

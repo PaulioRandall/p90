@@ -1,6 +1,6 @@
 # P90
 
-A minimalist CSS processor with out of the box support for Svelte. Let plain JavaScript handle logic, not a CSS mutant.
+A minimalist CSS processor with out of the box support for Svelte. Let plain JavaScript handle preprocessing logic, not a CSS mutant.
 
 I just needed a bit of sugar upon my CSS. It's straight up optimised for my tastes. The design trade-offs lean towards simplicity, readability, and flexibility more than writability. Complexity of configuration is almost entirely in the user's court.
 
@@ -41,7 +41,7 @@ Organise as you please. Both nested and flat structures have their vices aand vi
 - Function arguments are always strings. It's your responsibility to parse them.
 - Returning a function from a function will result in an error.
 - Promises are awaited and resolved to values, but not recursively!
-- Trailing colons and semi-colons are preserved, except for _nulls_.
+- A single trailing colon, semi-colon, or whitespace character is preserved, except where the replacement value is _null_.
 
 > I've made so many changes to this example that it probably contains a few errors. The rewrite is in my TODO list so will probably never get done.
 

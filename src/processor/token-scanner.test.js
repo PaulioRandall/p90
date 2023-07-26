@@ -1,13 +1,13 @@
 import tokenScanner from './token-scanner.js'
 
-const newToken = (start, end, raw, path, args = []) => {
+const newToken = (start, end, raw, path = [], args = [], suffix = ";") => {
 	return {
 		escape: false,
 		start,
 		end,
 		prefix: '$',
 		raw,
-		suffix: ';',
+		suffix,
 		path,
 		args,
 	}
@@ -175,7 +175,7 @@ describe('scanFunc(...)', () => {
 	test('#22', () => {
 		const f = tokenScanner.scanFunc('$$')
 
-		const exp = newToken(0, 2, '$$', ['$'], [])
+		const exp = newToken(0, 2, '$$', ['$'])
 		exp.escape = true
 		exp.suffix = ''
 
@@ -185,9 +185,27 @@ describe('scanFunc(...)', () => {
 	test('#23', () => {
 		const f = tokenScanner.scanFunc('$$;$$')
 
-		const exp = newToken(0, 3, '$$;', ['$'], [])
+		const exp = newToken(0, 3, '$$;', ['$'])
 		exp.escape = true
 
+		expect(f()).toEqual(exp)
+	})
+
+	test('#24', () => {
+		const f = tokenScanner.scanFunc('$color ')
+		const exp = newToken(0, 7, '$color ', ['color'], [], " ")
+		expect(f()).toEqual(exp)
+	})
+
+	test('#25', () => {
+		const f = tokenScanner.scanFunc('$color   ')
+		const exp = newToken(0, 7, '$color ', ['color'], [], " ")
+		expect(f()).toEqual(exp)
+	})
+
+	test('#26', () => {
+		const f = tokenScanner.scanFunc('$color\t ')
+		const exp = newToken(0, 7, '$color\t', ['color'], [], "\t")
 		expect(f()).toEqual(exp)
 	})
 })
