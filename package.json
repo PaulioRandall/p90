@@ -9,7 +9,7 @@
 		"preprocessor",
 		"svelte"
 	],
-	"version": "0.20.0",
+	"version": "0.21.0",
 	"exports": {
 		".": "./src/processor.js",
 		"./processor": "./src/processor.js",

@@ -13,16 +13,7 @@ export const processCss = async (css, styles, config) => {
 	}
 
 	css = css.normalize('NFC')
-
-	if (!Array.isArray(styles)) {
-		styles = [styles]
-	}
-
-	for (const valueMap of styles) {
-		css = await replaceAllTokens(css, valueMap, config)
-	}
-
-	return css
+	return await replaceAllTokens(css, styles, config)
 }
 
 const replaceAllTokens = async (css, valueMap, config) => {

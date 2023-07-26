@@ -21,7 +21,7 @@ Like any other package.
 ```json
 {
 	"devDependencies": {
-		"p90": "v0.20.0"
+		"p90": "v0.21.0"
 	}
 }
 ```
@@ -74,59 +74,49 @@ const themes = {
 	},
 }
 
-// Export either an object (value map) containing the key-value
-// mappings or an array of objects each containing there own
-// mappings.
-//
-// If p90 receives and array then the value maps are applied
-// sequentially so that the output of the first can be processed
-// by the second. You'll generally want to avoid this since makes
-// code hard to read and change. But there maybe fair use cases.
-export default [
-	{
-		rgb: rgbs,
-		color: colors,
+export default {
+	rgb: rgbs,
+	color: colors,
 
-		color_schemes: renderColorSchemes(themes),
-		theme: generateThemeVariables(themes),
+	color_schemes: renderColorSchemes(themes),
+	theme: generateThemeVariables(themes),
 
-		// The function is called for each instance.
-		// There is no caching unless you implement it.
-		colorWithAlpha: (color, alpha) => {
-			const rgb = rgbs[color]
+	// The function is called for each instance.
+	// There is no caching unless you implement it.
+	colorWithAlpha: (color, alpha) => {
+		const rgb = rgbs[color]
 
-			// Function arguments are always strings.
-			// Parse them as you see fit.
-			const a = parseFloat(alpha)
+		// Function arguments are always strings.
+		// Parse them as you see fit.
+		const a = parseFloat(alpha)
 
-			const result = [...rgb]
+		const result = [...rgb]
 
-			if (rgb.length === 3) {
-				result.push(a)
-			} else {
-				result[3] = a
-			}
+		if (rgb.length === 3) {
+			result.push(a)
+		} else {
+			result[3] = a
+		}
 
-			return result
+		return result
+	},
+
+	font: {
+		family: {
+			sans_serif: ['sans-serif', 'Helvetica', 'Arial', 'Verdana'],
 		},
-
-		font: {
-			family: {
-				sans_serif: ['sans-serif', 'Helvetica', 'Arial', 'Verdana'],
-			},
-			size: {
-				// Constructed using utopia.fyi... Could these be constructed in code?
-				md: 'clamp(1.06rem, calc(0.98rem + 0.39vw), 1.38rem)',
-				lg: 'clamp(1.25rem, calc(1.19rem + 0.31vw), 1.5rem)',
-				xl: 'clamp(1.5rem, calc(1.41rem + 0.47vw), 1.88rem)',
-			},
-		},
-
-		screen: {
-			larger_devices: `(min-width: 900px)`,
+		size: {
+			// Constructed using utopia.fyi... Could these be constructed in code?
+			md: 'clamp(1.06rem, calc(0.98rem + 0.39vw), 1.38rem)',
+			lg: 'clamp(1.25rem, calc(1.19rem + 0.31vw), 1.5rem)',
+			xl: 'clamp(1.5rem, calc(1.41rem + 0.47vw), 1.88rem)',
 		},
 	},
-]
+
+	screen: {
+		larger_devices: `(min-width: 900px)`,
+	},
+}
 ```
 
 ### svelte.config.js
@@ -233,7 +223,7 @@ export default {
 		font-size: $font.size.lg;
 
 		/* You don't have to put single or double quotes around arguments. */
-		/* But it helps readability and required if using punctuation. */
+		/* But it helps */
 		background-color: $colorWithAlpha('burly_wood', 0.2);
 	}
 
@@ -314,11 +304,11 @@ There exists some utility functions for common activities. You don't have to use
 import p90Util from 'p90/util'
 ```
 
-| Name | Does what? |
-| :--- | :--- |
-| [rgbsToColors](#rgbstocolors) | Converts a map of RGB and RGBA arrays to CSS RGB and RGBA values.  |
-| [renderColorSchemes](#rendercolorschemes)  | Generates CSS color scheme media queries from a set of themes with CSS variables as values; goes hand-in-hand with [generateThemeVariables](#generatethemevariables). |
-| [generateThemeVariables](#generatethemevariables) | Generates a **set** of CSS variables from a set of themes; goes hand-in-hand with [renderColorSchemes](#rendercolorschemes). |
+| Name                                              | Does what?                                                                                                                                                            |
+| :------------------------------------------------ | :-------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [rgbsToColors](#rgbstocolors)                     | Converts a map of RGB and RGBA arrays to CSS RGB and RGBA values.                                                                                                     |
+| [renderColorSchemes](#rendercolorschemes)         | Generates CSS color scheme media queries from a set of themes with CSS variables as values; goes hand-in-hand with [generateThemeVariables](#generatethemevariables). |
+| [generateThemeVariables](#generatethemevariables) | Generates a **set** of CSS variables from a set of themes; goes hand-in-hand with [renderColorSchemes](#rendercolorschemes).                                          |
 
 ### rgbsToColors
 

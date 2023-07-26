@@ -224,16 +224,3 @@ describe('processCss({...})', () => {
 		expect(promise).resolves.toEqual(exp)
 	})
 })
-
-describe('skipSpaces([...])', () => {
-	test('#1', () => {
-		const valueMap = [
-			{ first: '$second' },
-			{ second: '$third' },
-			{ third: '\\o/' },
-		]
-
-		const promise = doProcessCss(valueMap, `$first`)
-		expect(promise).resolves.toEqual('\\o/')
-	})
-})
