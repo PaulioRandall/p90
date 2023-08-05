@@ -9,7 +9,7 @@
 		"preprocessor",
 		"svelte"
 	],
-	"version": "0.21.0",
+	"version": "0.22.0",
 	"exports": {
 		".": "./src/processor.js",
 		"./processor": "./src/processor.js",
@@ -32,6 +32,6 @@
 		"commit": "npm run fmt && npm run test && cat ./scripts/youre-ready-to-integrate.txt"
 	},
 	"devDependencies": {
-		"jest": "29.6.1"
+		"jest": "29.6.2"
 	}
 }

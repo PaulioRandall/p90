@@ -4,7 +4,7 @@ const TTY_RED = '\x1b[31m'
 const TTY_YELLOW = '\x1b[33m'
 const TTY_RESET = '\x1b[0m'
 
-export const defaultMimeTypes = ['', 'text/css', 'text/p90']
+export const defaultMimeTypes = ['p90', 'text/p90']
 
 export const p90 = (valueMap, options = {}) => {
 	options = {
@@ -16,7 +16,7 @@ export const p90 = (valueMap, options = {}) => {
 
 	return {
 		style: async ({ content, markup, attributes, filename }) => {
-			if (!isP90Stylesheet(options.mimeTypes, attributes.lang)) {
+			if (!isP90Lang(options.mimeTypes, attributes.lang)) {
 				return content
 			}
 
@@ -32,7 +32,7 @@ export const p90 = (valueMap, options = {}) => {
 	}
 }
 
-const isP90Stylesheet = (mimeTypes, lang) => {
+const isP90Lang = (mimeTypes, lang) => {
 	lang = lang ? lang : ''
 	return mimeTypes.includes(lang)
 }

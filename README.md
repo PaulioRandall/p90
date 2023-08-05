@@ -21,7 +21,7 @@ Like any other package.
 ```json
 {
 	"devDependencies": {
-		"p90": "v0.21.0"
+		"p90": "v0.22.0"
 	}
 }
 ```
