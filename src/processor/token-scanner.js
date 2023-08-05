@@ -170,7 +170,7 @@ const scanFunc = (css) => {
 		throw new Error(`Unterminated string for argument of '${name}'`)
 	}
 
-		// SUFFIX := ";" | ";" | *white-space*
+	// SUFFIX := ";" | ";" | *white-space*
 	const scanSuffix = () => {
 		const bookmark = sr.makeBookmark()
 

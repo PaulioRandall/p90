@@ -1,6 +1,6 @@
 import tokenScanner from './token-scanner.js'
 
-const newToken = (start, end, raw, path = [], args = [], suffix = ";") => {
+const newToken = (start, end, raw, path = [], args = [], suffix = ';') => {
 	return {
 		escape: false,
 		start,
@@ -193,19 +193,19 @@ describe('scanFunc(...)', () => {
 
 	test('#24', () => {
 		const f = tokenScanner.scanFunc('$color ')
-		const exp = newToken(0, 7, '$color ', ['color'], [], " ")
+		const exp = newToken(0, 7, '$color ', ['color'], [], ' ')
 		expect(f()).toEqual(exp)
 	})
 
 	test('#25', () => {
 		const f = tokenScanner.scanFunc('$color   ')
-		const exp = newToken(0, 7, '$color ', ['color'], [], " ")
+		const exp = newToken(0, 7, '$color ', ['color'], [], ' ')
 		expect(f()).toEqual(exp)
 	})
 
 	test('#26', () => {
 		const f = tokenScanner.scanFunc('$color\t ')
-		const exp = newToken(0, 7, '$color\t', ['color'], [], "\t")
+		const exp = newToken(0, 7, '$color\t', ['color'], [], '\t')
 		expect(f()).toEqual(exp)
 	})
 })
