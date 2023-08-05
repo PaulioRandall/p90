@@ -12,11 +12,15 @@ export const processCss = async (css, styles, config) => {
 		...config,
 	}
 
+	if (!Array.isArray(styles)) {
+		styles = [styles]
+	}
+
 	css = css.normalize('NFC')
 	return await replaceAllTokens(css, styles, config)
 }
 
-const replaceAllTokens = async (css, valueMap, config) => {
+const replaceAllTokens = async (css, valueMaps, config) => {
 	const tokens = tokenScanner.scanAll(css)
 
 	// Work from back to front of the CSS string otherwise replacements at
@@ -25,7 +29,7 @@ const replaceAllTokens = async (css, valueMap, config) => {
 
 	for (const tk of tokens) {
 		try {
-			css = await attemptReplacement(css, valueMap, tk)
+			css = await attemptReplacement(css, valueMaps, tk)
 		} catch (e) {
 			handleError(e, tk, config)
 		}
@@ -34,11 +38,11 @@ const replaceAllTokens = async (css, valueMap, config) => {
 	return css
 }
 
-const attemptReplacement = async (css, valueMap, tk) => {
-	tk = lookupProp(valueMap, tk)
+const attemptReplacement = async (css, valueMaps, tk) => {
+	tk = lookupProp(valueMaps, tk)
 
 	if (tk.prop === undefined) {
-		return css // Ignore prop, it could be in the next valueMap
+		return css
 	}
 
 	tk = await resolveValue(tk)

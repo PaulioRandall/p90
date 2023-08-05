@@ -1,14 +1,25 @@
-export const lookupProp = (valueMap, tk) => {
+export const lookupProp = (valueMaps, tk) => {
 	tk = structuredClone(tk)
 
 	if (tk.escape) {
 		tk.prop = '$'
 	} else {
-		tk.prop = findProp(valueMap, tk.path)
+		tk.prop = searchValueMaps(valueMaps, tk.path)
 	}
 
 	tk.type = identifyType(tk.prop)
 	return tk
+}
+
+const searchValueMaps = (valueMaps, path) => {
+	for (const valueMap of valueMaps) {
+		const prop = findProp(valueMap, path)
+		if (prop !== undefined) {
+			return prop
+		}
+	}
+
+	return undefined
 }
 
 const findProp = (valueMap, path) => {

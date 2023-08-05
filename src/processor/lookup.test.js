@@ -2,9 +2,11 @@ import { lookupProp } from './lookup.js'
 
 describe('lookupProp(...)', () => {
 	test('#1', () => {
-		const map = {
-			x: 'prop',
-		}
+		const maps = [
+			{
+				x: 'prop',
+			},
+		]
 
 		const given = {
 			path: ['x'],
@@ -16,18 +18,20 @@ describe('lookupProp(...)', () => {
 			prop: 'prop',
 		}
 
-		const act = lookupProp(map, given)
+		const act = lookupProp(maps, given)
 		expect(act).toEqual(exp)
 	})
 
 	test('#2', () => {
 		const func = () => 'meh'
 
-		const map = {
-			my: {
-				func,
+		const maps = [
+			{
+				my: {
+					func,
+				},
 			},
-		}
+		]
 
 		const given = {
 			path: ['my', 'func'],
@@ -39,14 +43,16 @@ describe('lookupProp(...)', () => {
 			prop: func,
 		}
 
-		const act = lookupProp(map, given)
+		const act = lookupProp(maps, given)
 		expect(act).toEqual(exp)
 	})
 
 	test('#3', () => {
-		const map = {
-			list: [1, 2, 3],
-		}
+		const maps = [
+			{
+				list: [1, 2, 3],
+			},
+		]
 
 		const given = {
 			path: ['list'],
@@ -58,7 +64,24 @@ describe('lookupProp(...)', () => {
 			prop: [1, 2, 3],
 		}
 
-		const act = lookupProp(map, given)
+		const act = lookupProp(maps, given)
+		expect(act).toEqual(exp)
+	})
+
+	test('#4', () => {
+		const maps = [{ a: 'alpha' }, { b: 'beta' }, { c: 'charlie' }]
+
+		const given = {
+			path: ['c'],
+		}
+
+		const exp = {
+			path: ['c'],
+			type: 'string',
+			prop: 'charlie',
+		}
+
+		const act = lookupProp(maps, given)
 		expect(act).toEqual(exp)
 	})
 })
