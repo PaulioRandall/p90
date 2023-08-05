@@ -1,4 +1,4 @@
-export const generateThemeVariables = (themes) => {
+export const themeVariables = (themes) => {
 	const result = {}
 
 	for (const name in themes) {
@@ -10,26 +10,26 @@ export const generateThemeVariables = (themes) => {
 	return result
 }
 
-export const renderColorSchemes = (themes) => {
+export const colorSchemes = (themes) => {
 	const toVar = (name, value) => `--theme-${name}: ${value}`
-	return buildColorSchemeMediaQueries(themes, toVar)
+	return colorSchemeMediaQueries(themes, toVar)
 }
 
-const buildColorSchemeMediaQueries = (
+const colorSchemeMediaQueries = (
 	themes,
 	toValue = (name, value) => `${name}: ${value}`
 ) => {
 	let result = ''
 
 	for (const name in themes) {
-		result += buildColorSchemeMediaQuery(name, themes[name], toValue)
+		result += colorSchemeMediaQuery(name, themes[name], toValue)
 		result += '\n\n'
 	}
 
 	return result
 }
 
-const buildColorSchemeMediaQuery = (name, theme, toValue) => {
+const colorSchemeMediaQuery = (name, theme, toValue) => {
 	let result = `@media (prefers-color-scheme: ${name}) {`
 	result += '\n\t:global(:root) {'
 

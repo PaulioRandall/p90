@@ -1,4 +1,4 @@
-import { generateThemeVariables, renderColorSchemes } from './color-schemes.js'
+import { themeVariables, colorSchemes } from './color-schemes.js'
 
 const themes = {
 	light: {
@@ -13,7 +13,7 @@ const themes = {
 	},
 }
 
-describe('generateThemeVariables', () => {
+describe('themeVariables', () => {
 	test('#1', () => {
 		const exp = {
 			base: 'var(--theme-base)',
@@ -21,12 +21,12 @@ describe('generateThemeVariables', () => {
 			strong: 'var(--theme-strong)',
 		}
 
-		const act = generateThemeVariables(themes)
+		const act = themeVariables(themes)
 		expect(act).toEqual(exp)
 	})
 })
 
-describe('renderColorSchemes', () => {
+describe('colorSchemes', () => {
 	test('#1', () => {
 		const exp = `@media (prefers-color-scheme: light) {
 	:global(:root) {
@@ -46,7 +46,7 @@ describe('renderColorSchemes', () => {
 
 ` // Two lines are always appended for a little space
 
-		const act = renderColorSchemes(themes)
+		const act = colorSchemes(themes)
 		expect(act).toEqual(exp)
 	})
 })
