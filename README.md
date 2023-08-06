@@ -34,7 +34,7 @@ Like any other package.
 
 There aren't really any conventions because the limitations of the design are good enough. Use kebab-case or camelCase if you don't like snake_case.
 
-Organise value map as you please. Both nested and flat structures have their vices aand virtues. **P90** variable names and user values can be whatever you like providing they meet the following criteria:
+Organise value map as you please. Both nested and flat structures have their vices and virtues. **P90** variable names and user values can be whatever you like providing they meet the following criteria:
 
 - Variable in CSS are prefixed with `$`.
 - Double `$$` escapes, e.g. `$$$$` resolves to `$$`
@@ -106,26 +106,6 @@ p {
 
 There's no support for reading CSS from files or repositories because that's not in the project scope. [NP90](https://github.com/PaulioRandall/np90) is what you want for that. It builds on **P90** for Node based file processing.
 
-## Options
-
-```js
-const options = {
-	stdout: console.log,
-	stderr: console.error,
-
-	// If true, errors will be thrown immediately ending the processing.
-	// Default is off beccause Svelte and various CSS checkers will usually tell
-	// you where the errors are. They're better at it too.
-	throwOnError: false,
-
-	// Prints file name and token info when an error is encountered.
-	printErrors: true,
-
-	// Will be printed if printErrors === true.
-	filename: '',
-}
-```
-
 ## API
 
 **Parameters**:
@@ -158,24 +138,23 @@ function processCss() {
 }
 ```
 
-### Config
+## Options
 
 ```js
-// Config and options with their defaults.
-const config = {
+const options = {
 	stdout: console.log,
 	stderr: console.error,
 
-	// Name of file being processed so it can be printed upon error.
-	filename: '',
-
 	// If true, errors will be thrown immediately ending the processing.
-	// Default is off because I use Svelte and it's compiler does a good enough
-	// job of telling tells me where my errors are after preprocessing.
+	// Default is off beccause Svelte and various CSS checkers will usually tell
+	// you where the errors are. They're better at it too.
 	throwOnError: false,
 
-	// Prints filename and token info when an error is encountered.
+	// Prints file name and token info when an error is encountered.
 	printErrors: true,
+
+	// Will be printed if printErrors === true.
+	filename: '',
 }
 ```
 
@@ -312,11 +291,21 @@ console.log(theme)
 
 **This section is for those few who care about how P90 works underneath or wish to plunder its code to build their own parser.**
 
-The [proccessor](./src/processor/processor.js) file is where everthing comes together and is the best place to start exploring.
+The [proccessor.js](./src/processor/processor.js) file is where everthing comes together and is the best place to start exploring.
 
 We use a token data structure to keep all information about each substitution in one place. See [lexical analysis (Wikipedia)](https://en.wikipedia.org/wiki/Lexical_analysis) for a general overview to scanning. Each major step in the process clones the tokens before adding new information.
 
-Given the following value map:
+Given the following CSS:
+
+```css
+body {
+	--result: $numbers.add(1, '2', "3");
+	--escaped: '$$'
+}
+```
+
+
+And the following value map:
 
 ```js
 {
@@ -339,10 +328,10 @@ Given the following value map:
 ```js
 token_after_scanning = {
 	escape: false, // True only when escaping
-	start: 9, // Code point index
-	end: 31, // Code point index
+	start: 18, // Code point index
+	end: 44, // Code point index
 	prefix: '$',
-	raw: '$numbers.add(1, 2, 3);',
+	raw: `$numbers.add(1, '2', "3");`,
 	suffix: ';', // One of ['', ';', ':']
 	path: ['numbers', 'add'],
 	args: ['1', '2', '3'],
@@ -354,8 +343,8 @@ Escape tokens are flagged as they need no value map lookup:
 ```js
 escape_token = {
 	escape: true,
-	start: 10,
-	end: 12,
+	start: 54,
+	end: 56,
 	prefix: '$',
 	raw: '$$',
 	suffix: '',
@@ -371,10 +360,10 @@ escape_token = {
 ```js
 token_after_lookup = {
 	escape: false,
-	start: 9,
-	end: 31,
+	start: 18,
+	end: 44,
 	prefix: '$',
-	raw: '$numbers.add(1, 2, 3);',
+	raw: `$numbers.add(1, '2', "3");`,
 	suffix: ';',
 	path: ['numbers', 'add'],
 	args: ['1', '2', '3'],
@@ -412,13 +401,13 @@ The resultant `value` should be usable for the CSS string substitution without n
 ```js
 token_after_resolve = {
 	escape: false,
-	start: 9,
-	end: 35,
+	start: 18,
+	end: 44,
 	prefix: '$',
 	raw: `$numbers.add(1, '2', "3");`,
 	suffix: ';',
 	path: ['numbers', 'add'],
-	args: ['1', `2`, `3`],
+	args: ['1', '2', '3'],
 	type: 'function',
 	prop: (...numbers) => {
 		let result = 0.0
