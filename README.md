@@ -6,7 +6,7 @@ I just needed a bit of sugar upon my CSS.
 
 A minimalist value replacement processor for CSS. Let plain JavaScript handle preprocessing logic, not a CSS mutant.
 
-Honestly, this tool is straight up optimised for my tastes. The design trade-offs lean towards simplicity, readability, and flexibility more than writability. Complexity of configuration is almost entirely in the user's court.
+Honestly, this tool is straight up optimised for my tastes. The design trade-offs lean towards simplicity, readability, and flexibility more than writability. Complexity of mapping values is almost entirely in the user's court.
 
 **P90** scans CSS for **P90** tokens which are substituted with user defined values. It's really just an enhanced `string.replace`.
 
@@ -25,7 +25,7 @@ Like any other package.
 ```json
 {
 	"devDependencies": {
-		"p90": "v0.23.0"
+		"p90": "v0.24.0"
 	}
 }
 ```
@@ -299,11 +299,10 @@ Given the following CSS:
 
 ```css
 body {
-	--result: $numbers.add(1, '2', "3");
-	--escaped: '$$'
+	--result: $numbers.add(1, '2', '3');
+	--escaped: '$$';
 }
 ```
-
 
 And the following value map:
 

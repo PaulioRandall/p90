@@ -29,7 +29,7 @@ describe('themeVariables', () => {
 describe('colorSchemes', () => {
 	test('#1', () => {
 		const exp = `@media (prefers-color-scheme: light) {
-	:global(:root) {
+	:root {
 		--theme-base: rgb(250, 250, 250);
 		--theme-text: rgb(5, 10, 60);
 		--theme-strong: rgb(30, 85, 175);
@@ -37,7 +37,7 @@ describe('colorSchemes', () => {
 }
 
 @media (prefers-color-scheme: dark) {
-	:global(:root) {
+	:root {
 		--theme-base: rgb(5, 10, 35);
 		--theme-text: rgb(231, 245, 255);
 		--theme-strong: rgb(222, 184, 135);

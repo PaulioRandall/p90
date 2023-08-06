@@ -31,7 +31,7 @@ const colorSchemeMediaQueries = (
 
 const colorSchemeMediaQuery = (name, theme, toValue) => {
 	let result = `@media (prefers-color-scheme: ${name}) {`
-	result += '\n\t:global(:root) {'
+	result += '\n\t:root {'
 
 	for (const key in theme) {
 		const value = toValue(key, theme[key])

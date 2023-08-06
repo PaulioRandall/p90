@@ -7,7 +7,7 @@
 		"minimalist",
 		"processor"
 	],
-	"version": "0.23.0",
+	"version": "0.24.0",
 	"exports": {
 		".": "./src/index.js",
 		"./util": "./src/util.js"
