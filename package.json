@@ -1,25 +1,21 @@
 {
 	"author": "Paul Williams",
 	"name": "p90",
-	"description": "A minimalist CSS processor with out of the box support for Svelte.",
+	"description": "A minimalist value replacement processor for CSS.",
 	"keywords": [
 		"css",
 		"minimalist",
-		"processor",
-		"preprocessor",
-		"svelte"
+		"processor"
 	],
-	"version": "0.22.0",
+	"version": "0.23.0",
 	"exports": {
-		".": "./src/processor.js",
-		"./processor": "./src/processor.js",
-		"./svelte": "./src/svelte.js",
+		".": "./src/index.js",
 		"./util": "./src/util.js"
 	},
 	"type": "module",
 	"license": "MIT",
 	"engines": {
-		"node": ">=18.0.0 <19"
+		"node": ">=18.0.0"
 	},
 	"repository": {
 		"type": "git",

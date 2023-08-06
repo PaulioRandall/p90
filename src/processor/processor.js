@@ -2,14 +2,14 @@ import tokenScanner from './token-scanner.js'
 import { lookupProp } from './lookup.js'
 import { resolveValue } from './resolver.js'
 
-export const processCss = async (css, styles, config) => {
-	config = {
+export const processCss = async (css, styles, options) => {
+	options = {
 		stdout: console.log,
 		stderr: console.error,
-		filename: '',
 		throwOnError: false,
 		printErrors: true,
-		...config,
+		filename: '',
+		...options,
 	}
 
 	if (!Array.isArray(styles)) {
@@ -17,10 +17,10 @@ export const processCss = async (css, styles, config) => {
 	}
 
 	css = css.normalize('NFC')
-	return await replaceAllTokens(css, styles, config)
+	return await replaceAllTokens(css, styles, options)
 }
 
-const replaceAllTokens = async (css, valueMaps, config) => {
+const replaceAllTokens = async (css, valueMaps, options) => {
 	const tokens = tokenScanner.scanAll(css)
 
 	// Work from back to front of the CSS string otherwise replacements at
@@ -31,7 +31,7 @@ const replaceAllTokens = async (css, valueMaps, config) => {
 		try {
 			css = await attemptReplacement(css, valueMaps, tk)
 		} catch (e) {
-			handleError(e, tk, config)
+			handleError(e, tk, options)
 		}
 	}
 
@@ -55,14 +55,14 @@ const replaceValue = (css, tk) => {
 	return `${prefix}${tk.value}${postfix}`
 }
 
-const handleError = (e, tk, config) => {
-	if (config.printErrors) {
+const handleError = (e, tk, options) => {
+	if (options.printErrors) {
 		const tkStr = JSON.stringify(tk, null, 2)
-		const file = config.filename
+		const file = options.filename
 
-		config.stderr(`P90 error: ${file}`)
-		config.stderr(`${e.message}`)
-		config.stdout(`P90 token: ${tkStr}`)
+		options.stderr(`P90 error: ${file}`)
+		options.stderr(`${e.message}`)
+		options.stdout(`P90 token: ${tkStr}`)
 	}
 
 	if (config.throwOnError) {
