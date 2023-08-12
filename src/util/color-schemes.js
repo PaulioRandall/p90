@@ -10,35 +10,28 @@ export const themeVariables = (themes) => {
 	return result
 }
 
-export const colorSchemes = (themes) => {
-	const toVar = (name, value) => `--theme-${name}: ${value}`
-	return colorSchemeMediaQueries(themes, toVar)
-}
+export const colorSchemes = (themes) => colorSchemeMediaQueries(themes)
 
-const colorSchemeMediaQueries = (
-	themes,
-	toValue = (name, value) => `${name}: ${value}`
-) => {
-	let result = ''
+const colorSchemeMediaQueries = (themes) => {
+	const result = []
 
 	for (const name in themes) {
-		result += colorSchemeMediaQuery(name, themes[name], toValue)
-		result += '\n\n'
+		const csmq = colorSchemeMediaQuery(name, themes[name])
+		result.push(csmq)
 	}
 
-	return result
+	return result.join('\n\n')
 }
 
-const colorSchemeMediaQuery = (name, theme, toValue) => {
-	let result = `@media (prefers-color-scheme: ${name}) {`
-	result += '\n\t:root {'
+const colorSchemeMediaQuery = (name, theme) => {
+	const result = [`@media (prefers-color-scheme: ${name}) {`, '\t:root {']
 
 	for (const key in theme) {
-		const value = toValue(key, theme[key])
-		result += `\n\t\t${value};`
+		const value = `--theme-${key}: ${theme[key]}`
+		result.push(`\t\t${value};`)
 	}
 
-	result += '\n\t}'
-	result += '\n}'
-	return result
+	result.push('\t}')
+	result.push('}')
+	return result.join('\n')
 }

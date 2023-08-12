@@ -42,9 +42,7 @@ describe('colorSchemes', () => {
 		--theme-text: rgb(231, 245, 255);
 		--theme-strong: rgb(222, 184, 135);
 	}
-}
-
-` // Two lines are always appended for a little space
+}`
 
 		const act = colorSchemes(themes)
 		expect(act).toEqual(exp)

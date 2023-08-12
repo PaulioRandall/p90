@@ -21,13 +21,17 @@ const pxToMm = (px) => round((px * 1) / PX_IN_MM, 1)
 const pxToPc = (px) => round((px * 1) / PX_IN_PC)
 
 export const spacings = (values, options = {}) => {
-	const { base = 16, custom = {} } = options
+	const { base = 16, defaultFmt = 'px', custom = {} } = options
 	const spaces = {}
 
 	for (const name in values) {
 		const px = values[name]
 
-		spaces[name] = (fmt = 'px') => {
+		spaces[name] = (fmt) => {
+			if (!fmt) {
+				fmt = defaultFmt
+			}
+
 			switch (fmt) {
 				case 'px':
 					return px + fmt
