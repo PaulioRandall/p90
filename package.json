@@ -6,10 +6,9 @@
 		"minimalist",
 		"processor"
 	],
-	"version": "0.25.0",
+	"version": "0.26.0",
 	"exports": {
-		".": "./src/processor/index.js",
-		"./css": "./src/css/index.js"
+		".": "./src/index.js"
 	},
 	"type": "module",
 	"license": "MIT",

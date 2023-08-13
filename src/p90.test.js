@@ -1,4 +1,4 @@
-import { replaceAll } from './processor.js'
+import { replaceAll } from './p90.js'
 
 const joinLines = (...lines) => lines.join('\n')
 
