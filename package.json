@@ -1,16 +1,15 @@
 {
 	"author": "Paul Williams",
 	"name": "p90",
-	"description": "A minimalist value replacement processor for CSS.",
+	"description": "A minimalist search and replace tool for preprocessing files.",
 	"keywords": [
-		"css",
 		"minimalist",
 		"processor"
 	],
-	"version": "0.24.0",
+	"version": "0.1.0",
 	"exports": {
-		".": "./src/index.js",
-		"./util": "./src/util.js"
+		".": "./src/processor/index.js",
+		"./css": "./src/css/index.js"
 	},
 	"type": "module",
 	"license": "MIT",
@@ -25,7 +24,7 @@
 		"fmt": "npx prettier --loglevel warn --write --plugin-search-dir=. .",
 		"test": "node --experimental-vm-modules node_modules/jest/bin/jest.js --silent",
 		"debug": "node --experimental-vm-modules node_modules/jest/bin/jest.js",
-		"commit": "npm run fmt && npm run test && cat ./scripts/youre-ready-to-integrate.txt"
+		"commit": "npm run fmt && npm run test && cat ./scripts/ready-to-integrate.txt"
 	},
 	"devDependencies": {
 		"jest": "29.6.2"

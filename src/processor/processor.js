@@ -1,71 +1,85 @@
-import tokenScanner from './token-scanner.js'
-import { lookupProp } from './lookup.js'
-import { resolveValue } from './resolver.js'
+import { scanAll } from './scanner/scanner.js'
+import { lookup } from './lookup/lookup.js'
+import { resolve, identifyType } from './resolve/resolve.js'
 
-export const processCss = async (css, styles, options) => {
-	options = {
+export const replaceAll = (valueMaps, content, userOptions = {}) => {
+	const options = getOptions(userOptions)
+
+	if (!Array.isArray(valueMaps)) {
+		valueMaps = [valueMaps]
+	}
+
+	// Double prefix escapes the prefix
+	valueMaps.push({ [options.prefix]: options.prefix })
+
+	content = content.normalize('NFC')
+	return replaceAllTokens(valueMaps, content, options)
+}
+
+const getOptions = (userOptions) => {
+	return {
+		prefix: '$',
 		stdout: console.log,
 		stderr: console.error,
 		throwOnError: false,
 		printErrors: true,
-		filename: '',
-		...options,
+		errorNote: '¯\\_(ツ)_/¯', // Filename usually
+		...userOptions,
 	}
-
-	if (!Array.isArray(styles)) {
-		styles = [styles]
-	}
-
-	css = css.normalize('NFC')
-	return await replaceAllTokens(css, styles, options)
 }
 
-const replaceAllTokens = async (css, valueMaps, options) => {
-	const tokens = tokenScanner.scanAll(css)
+const replaceAllTokens = (valueMaps, content, options) => {
+	const tokens = scanAll(content, options.prefix)
 
-	// Work from back to front of the CSS string otherwise replacements at
-	// the start will cause later tokens to hold the wrong start & end.
+	// Work from back to front of the content string otherwise replacements at
+	// the start will cause later tokens to hold the wrong start & end indexes.
 	tokens.reverse()
 
 	for (const tk of tokens) {
 		try {
-			css = await attemptReplacement(css, valueMaps, tk)
+			content = replaceToken(valueMaps, content, tk)
 		} catch (e) {
 			handleError(e, tk, options)
 		}
 	}
 
-	return css
+	return content
 }
 
-const attemptReplacement = async (css, valueMaps, tk) => {
-	tk = lookupProp(valueMaps, tk)
+const replaceToken = (valueMaps, content, tk) => {
+	let value = lookup(valueMaps, tk.path)
 
-	if (tk.prop === undefined) {
-		return css
+	if (value === undefined) {
+		return content
 	}
 
-	tk = await resolveValue(tk)
-	return replaceValue(css, tk)
+	value = resolve(value, tk.args)
+	value = appendSuffix(value, tk.suffix)
+
+	return replaceValue(content, value, tk.start, tk.end)
 }
 
-const replaceValue = (css, tk) => {
-	const prefix = css.slice(0, tk.start)
-	const postfix = css.slice(tk.end, css.length)
-	return `${prefix}${tk.value}${postfix}`
+const replaceValue = (content, value, start, end) => {
+	const prefix = content.slice(0, start)
+	const postfix = content.slice(end, content.length)
+	return `${prefix}${value}${postfix}`
+}
+
+const appendSuffix = (value, suffix) => {
+	const dontSuffix = value === undefined || value === null
+	return dontSuffix ? value : value + suffix
 }
 
 const handleError = (e, tk, options) => {
 	if (options.printErrors) {
 		const tkStr = JSON.stringify(tk, null, 2)
-		const file = options.filename
 
-		options.stderr(`P90 error: ${file}`)
-		options.stderr(`${e.message}`)
+		options.stderr(`P90 error: ${options.errorNote}`)
 		options.stdout(`P90 token: ${tkStr}`)
+		options.stderr(e)
 	}
 
-	if (config.throwOnError) {
+	if (options.throwOnError) {
 		throw e
 	}
 }

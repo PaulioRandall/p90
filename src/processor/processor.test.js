@@ -1,164 +1,52 @@
-import { processCss } from './processor.js'
+import { replaceAll } from './processor.js'
 
 const joinLines = (...lines) => lines.join('\n')
 
-const doProcessCss = async (valueMap, css, config = {}) => {
-	return await processCss(css, valueMap, {
+const doProcessString = (valueMaps, content, config = {}) => {
+	return replaceAll(valueMaps, content, {
 		filename: 'Test.svelte',
+		throwOnError: true,
 		...config,
 	})
 }
 
-describe('processCss({...})', () => {
-	test('#1', () => {
+describe('replaceAll', () => {
+	test('performs simple replacement', () => {
 		const valueMap = {
 			green: 'forestgreen',
 		}
 
-		const promise = doProcessCss(valueMap, `$green`)
-		expect(promise).resolves.toEqual('forestgreen')
+		const act = doProcessString(valueMap, `$green`)
+		expect(act).toEqual('forestgreen')
 	})
 
-	test('#2', () => {
-		const valueMap = {
-			green: 'forestgreen',
-		}
-
-		const promise = doProcessCss(valueMap, `color: $green; font-size: 200%;`)
-		expect(promise).resolves.toEqual(`color: forestgreen; font-size: 200%;`)
-	})
-
-	test('#3', () => {
-		const valueMap = {
-			green: 'forestgreen',
-		}
-
-		const promise = doProcessCss(
-			valueMap,
-			joinLines(
-				'color: $green;',
-				'color: $green;',
-				'color: $green;',
-				'color: forestgreen;'
-			)
-		)
-
-		expect(promise).resolves.toEqual(
-			joinLines(
-				'color: forestgreen;',
-				'color: forestgreen;',
-				'color: forestgreen;',
-				'color: forestgreen;'
-			)
-		)
-	})
-
-	test('#4', () => {
+	test('performs multiple simple replacements', () => {
 		const valueMap = {
 			green: 'forestgreen',
 			red: 'indianred',
 		}
 
-		const promise = doProcessCss(
+		const act = doProcessString(
 			valueMap,
-			joinLines('color: $green;', 'color: $red;')
+			joinLines(
+				'color: $green;',
+				'color: $red;',
+				'color: $green;',
+				'color: orange;'
+			)
 		)
 
-		expect(promise).resolves.toEqual(
-			joinLines('color: forestgreen;', 'color: indianred;')
+		expect(act).toEqual(
+			joinLines(
+				'color: forestgreen;',
+				'color: indianred;',
+				'color: forestgreen;',
+				'color: orange;'
+			)
 		)
 	})
 
-	test('#5', () => {
-		const valueMap = {
-			blood_red: [115, 16, 16],
-		}
-
-		const promise = doProcessCss(valueMap, 'color: rgb($blood_red);')
-		expect(promise).resolves.toEqual('color: rgb(115,16,16);')
-	})
-
-	test('#6', () => {
-		const valueMap = {
-			color: {
-				blood_red: 'rgb(115, 16, 16)',
-			},
-		}
-
-		const act = doProcessCss(valueMap, `color: $color.blood_red;`)
-		expect(act).resolves.toEqual(`color: rgb(115, 16, 16);`)
-	})
-
-	test('#7', () => {
-		const valueMap = {
-			useless: {
-				nesting: {
-					color: {
-						blood_red: 'rgb(115, 16, 16)',
-					},
-				},
-			},
-		}
-
-		const act = doProcessCss(
-			valueMap,
-			`color: $useless.nesting.color.blood_red;`
-		)
-
-		expect(act).resolves.toEqual(`color: rgb(115, 16, 16);`)
-	})
-
-	test('#8', () => {
-		const valueMap = {
-			green: '',
-			red: 0,
-		}
-
-		const promise = doProcessCss(
-			valueMap,
-			joinLines('color: $green;', 'color: $red;')
-		)
-
-		expect(promise).resolves.toEqual(joinLines('color: ;', 'color: 0;'))
-	})
-
-	test('#9', () => {
-		const valueMap = {
-			green: undefined,
-		}
-
-		const promise = doProcessCss(valueMap, `$green`)
-		expect(promise).resolves.toEqual('$green')
-	})
-
-	test('#10', () => {
-		const valueMap = {
-			color: () => {
-				return 'scarlet'
-			},
-		}
-
-		const promise = doProcessCss(valueMap, `$color`)
-		expect(promise).resolves.toEqual('scarlet')
-	})
-
-	test('#11', () => {
-		const valueMap = {
-			color: () => {
-				return undefined
-			},
-		}
-
-		const config = {
-			throwOnError: true,
-			printErrors: false,
-		}
-
-		const promise = doProcessCss(valueMap, `$color`, config)
-		expect(promise).rejects.toBeInstanceOf(Error)
-	})
-
-	test('#12', () => {
+	test('passes correct arguments to users value function', () => {
 		let unspecifiedArg = 'something'
 
 		const valueMap = {
@@ -168,59 +56,18 @@ describe('processCss({...})', () => {
 			},
 		}
 
-		const promise = doProcessCss(valueMap, `$func(alpha, beta, charlie)`)
-		expect(promise).resolves.toEqual('alpha-beta-charlie')
+		const act = doProcessString(valueMap, `$func(alpha, beta, charlie)`)
+		expect(act).toEqual('alpha-beta-charlie')
 		expect(unspecifiedArg).toBeUndefined()
 	})
 
-	test('#13', () => {
-		const valueMap = {
-			color: async () => {
-				return 'scarlet'
-			},
-		}
-
-		const promise = doProcessCss(valueMap, `$color`)
-		expect(promise).resolves.toEqual('scarlet')
+	test('escapes prefix', () => {
+		const act = doProcessString({}, `$$`)
+		expect(act).toEqual('$')
 	})
 
-	test('#16', () => {
-		const valueMap = {
-			empty: null,
-		}
-
-		const promise = doProcessCss(valueMap, `$empty`)
-		expect(promise).resolves.toEqual('')
-	})
-
-	test('#17', () => {
-		const promise = doProcessCss({}, `$$`)
-		expect(promise).resolves.toEqual('$')
-	})
-
-	test('#18', () => {
-		const promise = doProcessCss({}, `$$;$$;`)
-		expect(promise).resolves.toEqual('$;$;')
-	})
-
-	test('#19', () => {
-		const promise = doProcessCss({}, `$$$$$$$$`)
-		expect(promise).resolves.toEqual('$$$$')
-	})
-
-	test('#21', () => {
-		const valueMap = {
-			color: 'forestgreen',
-		}
-
-		const css = joinLines('color: $color;', "content: '🫀';", 'color: $color;')
-		const promise = doProcessCss(valueMap, css)
-
-		const exp = joinLines(
-			'color: forestgreen;',
-			"content: '🫀';",
-			'color: forestgreen;'
-		)
-		expect(promise).resolves.toEqual(exp)
+	test('escapes multiple sequential prefixes', () => {
+		const act = doProcessString({}, `$$$$$$$$`)
+		expect(act).toEqual('$$$$')
 	})
 })

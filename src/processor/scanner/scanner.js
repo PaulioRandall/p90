@@ -1,9 +1,11 @@
-import { newStringReader } from './string-reader.js'
+import { newStringReader } from '../string-reader/string-reader.js'
 
-const prefixRune = '$'
+const escapeForRegex = (s) => {
+	return s.replace(/[/\-\.\(\)\[\]\$\^\&\\]/g, '\\$&')
+}
 
-const scanAll = (css) => {
-	const f = scanFunc(css)
+export const scanAll = (content, prefix) => {
+	const f = scanFunc(content, prefix)
 	const result = []
 	let tk = null
 
@@ -14,14 +16,10 @@ const scanAll = (css) => {
 	return result
 }
 
-const escapeForRegex = (s) => {
-	return s.replace(/[/\-\.\(\)\[\]\$\^\&\\]/g, '\\$&')
-}
-
-const scanFunc = (css) => {
-	const sr = newStringReader(css)
-	const prefix = escapeForRegex(prefixRune)
-	const prefixRegex = new RegExp(prefix)
+export const scanFunc = (content, prefix) => {
+	const sr = newStringReader(content)
+	const escapedPrefix = escapeForRegex(prefix)
+	const prefixRegex = new RegExp(escapedPrefix)
 
 	const scanTokenFunc = () => {
 		if (!sr.seek(prefixRegex)) {
@@ -36,13 +34,11 @@ const scanFunc = (css) => {
 			const [end, endCp] = sr.makeBookmark()
 
 			return {
-				escape: true,
 				start: startCp,
 				end: endCp,
-				prefix: prefixRune,
 				raw: sr.slice(start, end),
 				suffix: suffix,
-				path: [prefixRune],
+				path: [prefix],
 				args: [],
 			}
 		}
@@ -54,10 +50,8 @@ const scanFunc = (css) => {
 		const [end, endCp] = sr.makeBookmark()
 
 		return {
-			escape: false,
 			start: startCp,
 			end: endCp,
-			prefix: prefixRune,
 			raw: sr.slice(start, end),
 			suffix: suffix,
 			path: name.split('.'),
@@ -170,30 +164,10 @@ const scanFunc = (css) => {
 		throw new Error(`Unterminated string for argument of '${name}'`)
 	}
 
-	// SUFFIX := ";" | ";" | *white-space*
+	// SUFFIX := *white-space*
 	const scanSuffix = () => {
-		const bookmark = sr.makeBookmark()
-
-		sr.skipSpaces()
-		let suffix = sr.accept(/[;:]/)
-
-		if (!suffix) {
-			sr.gotoBookmark(bookmark)
-			suffix = sr.accept(/\s/)
-		}
-
-		if (!suffix) {
-			sr.gotoBookmark(bookmark)
-			return ''
-		}
-
-		return suffix
+		return sr.accept(/\s/) || ''
 	}
 
 	return scanTokenFunc
-}
-
-export default {
-	scanAll: scanAll,
-	scanFunc: scanFunc,
 }
