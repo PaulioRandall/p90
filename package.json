@@ -6,7 +6,7 @@
 		"minimalist",
 		"processor"
 	],
-	"version": "0.1.0",
+	"version": "0.25.0",
 	"exports": {
 		".": "./src/processor/index.js",
 		"./css": "./src/css/index.js"

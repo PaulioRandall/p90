@@ -9,9 +9,6 @@ export const replaceAll = (valueMaps, content, userOptions = {}) => {
 		valueMaps = [valueMaps]
 	}
 
-	// Double prefix escapes the prefix
-	valueMaps.push({ [options.prefix]: options.prefix })
-
 	content = content.normalize('NFC')
 	return replaceAllTokens(valueMaps, content, options)
 }

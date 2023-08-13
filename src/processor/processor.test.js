@@ -61,13 +61,16 @@ describe('replaceAll', () => {
 		expect(unspecifiedArg).toBeUndefined()
 	})
 
-	test('escapes prefix', () => {
-		const act = doProcessString({}, `$$`)
-		expect(act).toEqual('$')
-	})
+	test('handles custom prefixes', () => {
+		const valueMap = {
+			green: 'forestgreen',
+		}
 
-	test('escapes multiple sequential prefixes', () => {
-		const act = doProcessString({}, `$$$$$$$$`)
-		expect(act).toEqual('$$$$')
+		const options = {
+			prefix: '£',
+		}
+
+		const act = doProcessString(valueMap, `£green`, options)
+		expect(act).toEqual('forestgreen')
 	})
 })
