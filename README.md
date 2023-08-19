@@ -2,13 +2,13 @@
 
 A minimalist search and replace tool for preprocessing files.
 
-It's straight up optimised for me and my tastes. The design trade-offs lean towards simplicity and flexibility more than writability.
-
 **P90** scans CSS for **P90** tokens which are substituted with user defined values. It's really just an enhanced GREP using `string.replace`.
 
-This tool is rather low level, language agnostic, and doesn't handle the IO. [**P69**](https://github.com/PaulioRandall/p69) is usually what you want to use. It provides Node based CSS preprocessing using **P90** with out of the box support for Svelte.
+This tool is straight up optimised for me and my tastes. The design trade-offs lean towards simplicity and flexibility more than writability.
 
-The example below is CSS this tool is language agnostic.
+This tool is also low level, language agnostic, and doesn't handle IO. [**P69**](https://github.com/PaulioRandall/p69) is usually what you want to use. It provides Node based CSS preprocessing using **P90** with out of the box support for Svelte.
+
+The example below is CSS but this tool is language agnostic.
 
 ```js
 import p90 from 'p90'
@@ -78,7 +78,8 @@ strong {
 }
 `
 
-const after = p90(valueMap, before)
+const options = {}
+const after = p90(valueMap, before, options)
 console.log(after)
 /*
 `
